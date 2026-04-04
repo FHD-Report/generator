@@ -726,6 +726,10 @@ input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-i
 #vti-intervention-details-wrap.visible textarea { min-height: 64px; }
 .inline-warn { font-size: 11.5px; color: #92400e; padding: 4px 2px 0; line-height: 1.35; display: none; }
 .inline-warn.show { display: block; }
+.inline-warn.ci-clinical-alert { color: #b91c1c; font-weight: 600; }
+html[data-theme="dark"] .inline-warn.ci-clinical-alert { color: #fca5a5; }
+.inline-warn.ci-amber-note { color: #b45309; font-size: 11px; font-weight: 500; }
+html[data-theme="dark"] .inline-warn.ci-amber-note { color: #fcd34d; }
 .vein-hint { font-size: 11.5px; padding: 4px 2px 0; line-height: 1.35; font-weight: 600; display: none; }
 .vein-hint.show { display: block; }
 .vein-hint.hint-normal { color: #14532d; }
@@ -789,6 +793,8 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
 #pasp-field-group-wrap.section-hidden { display: none; }
 #ea-field-group-wrap.section-hidden { display: none; }
 #lv-fs-field-wrap.section-hidden { display: none; }
+#ci-field-wrap.section-hidden { display: none; }
+#ci-wt-ht-fields.section-hidden { display: none; }
 
 /* ─── FOOTER ──────────────────────────────────────────── */
 #stickyFooter {
@@ -1210,6 +1216,21 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
 #toast.success { background: var(--green); }
 #toast.warn { background: #d97706; }
 
+/* ─── UPDATE TOAST ───────────────────────────────────── */
+#update-toast {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--primary-dark, #0d4a82); color: #fff;
+  padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 500;
+  display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25); z-index: 100000;
+  animation: toast-in 0.3s ease;
+}
+#update-toast button {
+  background: #fff; color: var(--primary-dark, #0d4a82);
+  border: none; border-radius: 5px; padding: 6px 14px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+}
+
 /* ─── VALIDATION NOTICE ───────────────────────────────── */
 
 /* ─── LUNG: pleural effusion sub-fields ───────────────── */
@@ -1229,20 +1250,21 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
 /* ─── LUNG GRID ─────────────────────────────────────── */
 .lung-grid { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .lung-grid-header th {
-  text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
-  text-transform: uppercase; color: var(--text-muted); padding: 0 2px 8px;
+  text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--text-muted); padding: 0 1px 8px;
 }
-.lung-grid-header th:first-child { text-align: left; width: 38%; }
-.lung-grid-header th:not(:first-child) { width: 20%; }
-.lung-grid-row td { padding: 4px 2px; vertical-align: middle; }
+.lung-grid-header th:first-child { text-align: left; }
+.lung-grid col.lung-col-label { width: 34%; }
+.lung-grid col.lung-col-btn { width: 22%; }
+.lung-grid-row td { padding: 4px 1px; vertical-align: middle; }
 .lung-grid-row td:first-child {
-  font-size: 13px; font-weight: 500; color: var(--text); padding-right: 6px;
+  font-size: 12.5px; font-weight: 500; color: var(--text); padding-right: 4px;
   word-break: break-word;
 }
 .lung-grid-row td:not(:first-child) { text-align: center; }
 .lung-side-btn {
-  display: inline-block; width: 100%; max-width: 80px; padding: 6px 4px;
-  font-size: 12px; font-weight: 600; text-align: center;
+  display: block; width: 100%; padding: 6px 2px;
+  font-size: 11.5px; font-weight: 600; text-align: center;
   border: 1.5px solid var(--border); border-radius: var(--radius-sm);
   background: var(--surface); color: var(--text-mid);
   cursor: pointer; user-select: none; box-sizing: border-box;
@@ -1252,9 +1274,17 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
   background: var(--primary); border-color: var(--primary); color: #fff;
 }
 @media (max-width: 380px) {
-  .lung-grid-header th:first-child { width: 34%; }
-  .lung-side-btn { font-size: 11px; padding: 5px 2px; }
-  .lung-grid-row td:first-child { font-size: 12px; }
+  .lung-grid col.lung-col-label { width: 30%; }
+  .lung-grid col.lung-col-btn { width: 23.3%; }
+  .lung-side-btn { font-size: 10.5px; padding: 5px 1px; }
+  .lung-grid-row td:first-child { font-size: 11.5px; }
+}
+.lung-grid-row.lung-row-normal td:first-child {
+  font-weight: 700; color: var(--primary-dark, #0d4a82);
+}
+.lung-grid-row.lung-row-normal {
+  border-bottom: 1.5px solid var(--border-light);
+  margin-bottom: 2px;
 }
 .lung-grid-summary {
   margin-top: 10px; font-size: 12px; color: var(--text-muted); min-height: 18px;
@@ -1698,6 +1728,10 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
             <div><div class="toggle-label">LV fractional shortening</div><div class="settings-toggle-hint">Show auto-calculated FS% in Left Ventricle Section</div></div>
             <label class="toggle-switch"><input type="checkbox" id="toggle-show-lv-fractional-shortening"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
           </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Cardiac Index</div><div class="settings-toggle-hint">CO adjusted for BSA to allow for standardised haemodynamic assessment. Will add weight and height fields to patient demographics</div></div>
+            <label class="toggle-switch"><input type="checkbox" id="toggle-show-cardiac-index"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+          </div>
         </div>
         <div class="settings-normal-study-block">
           <div class="rv-subheading">Normal study helper</div>
@@ -1862,6 +1896,19 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
           <label class="field-label" for="f-age" id="f-age-label">Age <span class="unit">(years)</span></label>
           <input type="number" id="f-age" placeholder="e.g. 64" min="0" max="130" step="1">
           <div id="age-warn" class="inline-warn">Unusual value.</div>
+        </div>
+      </div>
+
+      <div id="ci-wt-ht-fields" class="field-row two-col section-hidden">
+        <div class="field-group">
+          <label class="field-label" for="f-weight">Weight <span class="unit">(kg)</span></label>
+          <input type="number" id="f-weight" placeholder="e.g. 70" min="1" max="400" step="0.1" oninput="checkCIAnthropometrics(); recalcCardiacIndex();">
+          <div id="weight-plaus-hint" class="inline-warn"></div>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="f-height">Height <span class="unit">(cm)</span></label>
+          <input type="number" id="f-height" placeholder="e.g. 170" min="30" max="280" step="0.1" oninput="checkCIAnthropometrics(); recalcCardiacIndex();">
+          <div id="height-plaus-hint" class="inline-warn"></div>
         </div>
       </div>
 
@@ -2079,6 +2126,22 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
             </div>
           </div>
           <div class="calc-hint">⟵ Also requires Heart Rate (Section 1)</div>
+        </div>
+      </div>
+
+      <div id="ci-field-wrap" class="section-hidden">
+        <div class="field-group">
+          <label class="field-label" for="ci-display-input">Cardiac Index <span class="unit">(L/min/m²)</span><span class="field-label-source-tag" id="ci-display-source" hidden></span></label>
+          <div class="calc-display calc-display-editable" id="ci-display">
+            <div class="calc-editable-value-line">
+              <span class="calc-editable-prefix">CI:</span>
+              <input type="text" class="calc-editable-value auto-calc-input" id="ci-display-input" inputmode="decimal" autocomplete="off" aria-label="Cardiac index L per min per m squared">
+              <span class="calc-editable-suffix">L/min/m²</span>
+            </div>
+          </div>
+          <div class="calc-hint">⟵ Requires CO + Weight &amp; Height (Section 1)</div>
+          <div id="ci-range-hint" class="inline-warn"></div>
+          <div id="ci-high-output-hint" class="inline-warn ci-amber-note"></div>
         </div>
       </div>
 
@@ -2637,6 +2700,12 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
     </div>
     <div class="section-body">
       <table class="lung-grid" id="lungGrid">
+        <colgroup>
+          <col class="lung-col-label">
+          <col class="lung-col-btn">
+          <col class="lung-col-btn">
+          <col class="lung-col-btn">
+        </colgroup>
         <thead>
           <tr class="lung-grid-header">
             <th></th>
@@ -3034,6 +3103,16 @@ const REFERENCE_RANGES_DATA = [
       {
         parameter: 'Cardiac output (CO)',
         lines: [{ k: 'Formula', v: 'CO = HR × LVOT VTI × π × (LVOT diameter/2)²' }]
+      },
+      {
+        parameter: 'Cardiac index (CI)',
+        lines: [
+          { k: 'Formula', v: 'CI = CO / BSA' },
+          { k: 'BSA (Mosteller)', v: 'BSA = √( Height(cm) × Weight(kg) / 3600 )' },
+          { k: 'Normal', v: '2.5 – 4.0 L/min/m²' },
+          { k: 'Cardiogenic shock (with vasoactive support)', v: '< 2.2 L/min/m²' },
+          { k: 'Cardiogenic shock (without support)', v: '< 1.8 L/min/m²' }
+        ]
       },
       {
         parameter: 'Respiratory variation (%)',
@@ -3446,6 +3525,7 @@ const PHT_ADVANCED_REQUIRES_PWD = new Set([
 const PHT_ADVANCED_REQUIRES_CWD = 'Early diastolic PR velocity >2.2 m/s';
 
 const LUNG_PE_CHIP = 'Pleural Effusion';
+const LUNG_NORMAL_CHIP = 'Normal';
 const LUNG_FINDINGS = [
   'Normal',
   'Pneumothorax',
@@ -3471,6 +3551,7 @@ const SESSION_DRAFT_TOGGLE_IDS = [
   'toggle-show-pasp-field',
   'toggle-show-ea-field',
   'toggle-show-lv-fractional-shortening',
+  'toggle-show-cardiac-index',
   'toggle-omit-empty-export',
   'toggle-export-summary-near-top',
   'toggle-export-aggressive-2page'
@@ -3550,6 +3631,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('toggle-show-pasp-field')?.addEventListener('change', refreshPASPGatedVisibility);
   document.getElementById('toggle-show-ea-field')?.addEventListener('change', refreshEAFieldVisibility);
   document.getElementById('toggle-show-lv-fractional-shortening')?.addEventListener('change', refreshLVFractionalShorteningVisibility);
+  document.getElementById('toggle-show-cardiac-index')?.addEventListener('change', refreshCardiacIndexVisibility);
   document.getElementById('toggle-machine-cwd')?.addEventListener('change', refreshMachineCapabilityFields);
   document.getElementById('toggle-machine-pwd')?.addEventListener('change', refreshMachineCapabilityFields);
   document.getElementById('toggle-machine-tdi')?.addEventListener('change', refreshMachineCapabilityFields);
@@ -3584,6 +3666,7 @@ document.addEventListener('DOMContentLoaded', () => {
   bindAutoCalcInput('map-display-input', 'map-display-source', recalcMAP);
   bindAutoCalcInput('sv-display-input', 'sv-display-source', recalcHaemodynamics);
   bindAutoCalcInput('co-display-input', 'co-display-source', recalcHaemodynamics);
+  bindAutoCalcInput('ci-display-input', 'ci-display-source', recalcCardiacIndex);
   bindAutoCalcInput('fs-display-input', 'fs-display-source', recalcFractionalShortening);
   bindAutoCalcInput('ea-display-input', 'ea-display-source', recalcEA);
   bindAutoCalcInput('eprime-avg-input', 'eprime-avg-source', recalcEe);
@@ -3720,6 +3803,7 @@ function buildCVSDrugChips() {
       else { selectedCVSDrugs.add(d); chip.classList.add('selected'); }
       updateCVSDrugSummary();
       updateCVSDrugDetailsUI();
+      recalcCardiacIndex();
     });
     c.appendChild(chip);
   });
@@ -4002,6 +4086,17 @@ function updateRightLungSummary() {
   }
 }
 
+function lungEnforceNormalExclusivity(finding, affectedSides) {
+  const isNormal = finding === LUNG_NORMAL_CHIP;
+  affectedSides.forEach(set => {
+    if (isNormal && set.has(LUNG_NORMAL_CHIP)) {
+      LUNG_FINDINGS.forEach(f => { if (f !== LUNG_NORMAL_CHIP) set.delete(f); });
+    } else if (!isNormal && set.has(finding)) {
+      set.delete(LUNG_NORMAL_CHIP);
+    }
+  });
+}
+
 function buildLungGrid() {
   const tbody = document.getElementById('lungGridBody');
   if (!tbody) return;
@@ -4009,6 +4104,7 @@ function buildLungGrid() {
   LUNG_FINDINGS.forEach(f => {
     const tr = document.createElement('tr');
     tr.className = 'lung-grid-row';
+    if (f === LUNG_NORMAL_CHIP) tr.classList.add('lung-row-normal');
     const labelTd = document.createElement('td');
     labelTd.textContent = f;
     tr.appendChild(labelTd);
@@ -4027,16 +4123,19 @@ function buildLungGrid() {
       btn.addEventListener('click', () => {
         if (side === 'left') {
           selectedLeftLung.has(f) ? selectedLeftLung.delete(f) : selectedLeftLung.add(f);
+          lungEnforceNormalExclusivity(f, [selectedLeftLung]);
         } else if (side === 'right') {
           selectedRightLung.has(f) ? selectedRightLung.delete(f) : selectedRightLung.add(f);
+          lungEnforceNormalExclusivity(f, [selectedRightLung]);
         } else {
           if (selectedLeftLung.has(f) && selectedRightLung.has(f)) {
             selectedLeftLung.delete(f); selectedRightLung.delete(f);
           } else {
             selectedLeftLung.add(f); selectedRightLung.add(f);
           }
+          lungEnforceNormalExclusivity(f, [selectedLeftLung, selectedRightLung]);
         }
-        refreshLungGridRow(f);
+        refreshLungGridAllRows();
         updateLeftLungPESubVisibility();
         updateRightLungPESubVisibility();
       });
@@ -4057,6 +4156,10 @@ function refreshLungGridRow(finding) {
       : side === 'left' ? selectedLeftLung.has(finding) : selectedRightLung.has(finding);
     btn.classList.toggle('active', active);
   });
+}
+
+function refreshLungGridAllRows() {
+  LUNG_FINDINGS.forEach(f => refreshLungGridRow(f));
   updateLeftLungSummary();
   updateRightLungSummary();
 }
@@ -4623,6 +4726,38 @@ function refreshLVFractionalShorteningVisibility() {
   if (settingsOn) recalcFractionalShortening();
 }
 
+function clearCardiacIndexValidationUI() {
+  document.getElementById('ci-display-input')?.classList.remove('soft-red');
+  const rangeHint = document.getElementById('ci-range-hint');
+  if (rangeHint) {
+    rangeHint.textContent = '';
+    rangeHint.classList.remove('show', 'ci-clinical-alert');
+  }
+  const hiHint = document.getElementById('ci-high-output-hint');
+  if (hiHint) {
+    hiHint.textContent = '';
+    hiHint.classList.remove('show');
+  }
+  document.getElementById('f-height')?.classList.remove('soft-red');
+  document.getElementById('f-weight')?.classList.remove('soft-red');
+  document.getElementById('height-plaus-hint')?.classList.remove('show');
+  document.getElementById('weight-plaus-hint')?.classList.remove('show');
+}
+
+function refreshCardiacIndexVisibility() {
+  const ciWrap = document.getElementById('ci-field-wrap');
+  const wtHtWrap = document.getElementById('ci-wt-ht-fields');
+  const on = !!document.getElementById('toggle-show-cardiac-index')?.checked;
+  if (ciWrap) ciWrap.classList.toggle('section-hidden', !on);
+  if (wtHtWrap) wtHtWrap.classList.toggle('section-hidden', !on);
+  if (on) {
+    checkCIAnthropometrics();
+    recalcCardiacIndex();
+  } else {
+    clearCardiacIndexValidationUI();
+  }
+}
+
 /** When PWD is off: LVOT diameter stays enabled; SV/CO and VTI deltas are disabled (not hidden). */
 function refreshVTISectionPWDFields() {
   const pwd = isMachinePWDEnabled();
@@ -4673,6 +4808,7 @@ function refreshMachineCapabilityFields() {
   refreshPASPGatedVisibility();
   refreshEAFieldVisibility();
   refreshLVFractionalShorteningVisibility();
+  refreshCardiacIndexVisibility();
   refreshVTISectionPWDFields();
   buildLVOTOChips();
   buildTamponadeChips();
@@ -5114,6 +5250,8 @@ function runMainContentSoftValidation() {
   checkHR();
   checkLADiameter();
   checkLAArea();
+  checkCIAnthropometrics();
+  if (document.getElementById('toggle-show-cardiac-index')?.checked) recalcCardiacIndex();
 }
 
 function scheduleMainContentSoftValidation() {
@@ -5269,6 +5407,149 @@ function recalcHaemodynamics() {
     } else coInp.placeholder = '—';
   } else coInp.placeholder = '';
   setAutoCalcSourceVisible(coSrc, coManual, coInp.value.trim() !== '');
+  recalcCardiacIndex();
+}
+
+function recalcCardiacIndex() {
+  const ciInp = document.getElementById('ci-display-input');
+  const ciSrc = document.getElementById('ci-display-source');
+  const hint  = document.getElementById('ci-range-hint');
+  if (!ciInp) return;
+  const manual = isAutoCalcManual(ciInp);
+
+  const wt = parseFloat(document.getElementById('f-weight')?.value);
+  const ht = parseFloat(document.getElementById('f-height')?.value);
+  let bsa = NaN;
+  if (!isNaN(wt) && wt > 0 && !isNaN(ht) && ht > 0) {
+    bsa = Math.sqrt((ht * wt) / 3600);
+  }
+
+  const coVal = parseFloat(getCOCalc());
+
+  if (!isNaN(coVal) && coVal > 0 && !isNaN(bsa) && bsa > 0) {
+    const ci = coVal / bsa;
+    if (!manual) ciInp.value = ci.toFixed(2);
+  } else if (!manual) {
+    ciInp.value = '';
+  }
+
+  if (!manual && ciInp.value.trim() === '') {
+    ciInp.placeholder = 'Requires CO + weight & height';
+  } else {
+    ciInp.placeholder = '';
+  }
+  setAutoCalcSourceVisible(ciSrc, manual, ciInp.value.trim() !== '');
+
+  const highOutHint = document.getElementById('ci-high-output-hint');
+  ciInp.classList.remove('soft-red');
+  if (hint) {
+    hint.textContent = '';
+    hint.classList.remove('show', 'ci-clinical-alert');
+  }
+  if (highOutHint) {
+    highOutHint.textContent = '';
+    highOutHint.classList.remove('show');
+  }
+
+  if (!document.getElementById('toggle-show-cardiac-index')?.checked) return;
+
+  const val = parseFloat(ciInp.value);
+  if (ciInp.value.trim() === '' || isNaN(val) || val <= 0) return;
+
+  const vasoactiveOn = selectedCVSDrugs && selectedCVSDrugs.size > 0;
+  const shockThresh = vasoactiveOn ? 2.2 : 1.8;
+  const shock = val < shockThresh;
+  const belowNormal = val < 2.5;
+  const highOutput = val > 4;
+
+  if (highOutput && highOutHint) {
+    highOutHint.textContent = 'Possible high-output state.';
+    highOutHint.classList.add('show');
+  }
+
+  if (belowNormal) {
+    ciInp.classList.add('soft-red');
+    if (hint) {
+      if (shock) {
+        hint.textContent = vasoactiveOn
+          ? 'Cardiogenic shock (with vasoactive support): below 2.2 L/min/m² threshold.'
+          : 'Cardiogenic shock (without support): below 1.8 L/min/m² threshold.';
+      } else {
+        hint.textContent = 'Below normal range (2.5–4.0 L/min/m²).';
+      }
+      hint.classList.add('show', 'ci-clinical-alert');
+    }
+  }
+}
+
+/** Height/weight plausibility when Cardiac Index mode is on (BSA inputs). */
+function checkCIAnthropometrics() {
+  const heightHint = document.getElementById('height-plaus-hint');
+  const weightHint = document.getElementById('weight-plaus-hint');
+  const hInp = document.getElementById('f-height');
+  const wInp = document.getElementById('f-weight');
+  if (!document.getElementById('toggle-show-cardiac-index')?.checked) {
+    hInp?.classList.remove('soft-red');
+    wInp?.classList.remove('soft-red');
+    heightHint?.classList.remove('show');
+    weightHint?.classList.remove('show');
+    if (heightHint) heightHint.textContent = '';
+    if (weightHint) weightHint.textContent = '';
+    return;
+  }
+
+  const HT_MIN = 120;
+  const HT_MAX = 220;
+  const WT_MIN = 35;
+  const WT_MAX = 200;
+
+  hInp?.classList.remove('soft-red');
+  wInp?.classList.remove('soft-red');
+  heightHint?.classList.remove('show');
+  weightHint?.classList.remove('show');
+  if (heightHint) heightHint.textContent = '';
+  if (weightHint) weightHint.textContent = '';
+
+  const hRaw = hInp?.value?.trim() || '';
+  const wRaw = wInp?.value?.trim() || '';
+  const h = parseFloat(hRaw);
+  const w = parseFloat(wRaw);
+
+  if (hRaw !== '' && !isNaN(h)) {
+    if (h < HT_MIN || h > HT_MAX) {
+      hInp.classList.add('soft-red');
+      if (heightHint) {
+        heightHint.textContent = h < HT_MIN
+          ? 'Unusually low for BSA (warn: minimum 120 cm / 47 in).'
+          : 'Unusually high for BSA (warn: maximum 220 cm / 86 in).';
+        heightHint.classList.add('show');
+      }
+    }
+  }
+
+  if (wRaw !== '' && !isNaN(w)) {
+    if (w < WT_MIN || w > WT_MAX) {
+      wInp.classList.add('soft-red');
+      if (weightHint) {
+        weightHint.textContent = w < WT_MIN
+          ? 'Unusually low for adult BSA (warn: soft minimum 35 kg / 77 lbs).'
+          : 'Unusually high for adult BSA (warn: soft maximum 200 kg / 440 lbs).';
+        weightHint.classList.add('show');
+      }
+    }
+  }
+}
+
+function getCICalc() {
+  const ciInp = document.getElementById('ci-display-input');
+  if (ciInp?.value.trim()) return ciInp.value.trim();
+  const co = parseFloat(getCOCalc());
+  const wt = parseFloat(document.getElementById('f-weight')?.value);
+  const ht = parseFloat(document.getElementById('f-height')?.value);
+  if (isNaN(co) || co <= 0 || isNaN(wt) || wt <= 0 || isNaN(ht) || ht <= 0) return '';
+  const bsa = Math.sqrt((ht * wt) / 3600);
+  if (bsa <= 0) return '';
+  return (co / bsa).toFixed(2);
 }
 
 function recalcFractionalShortening() {
@@ -6099,6 +6380,7 @@ function applySessionDraftPayload(d) {
         'map-display-input': 'map-display-source',
         'sv-display-input': 'sv-display-source',
         'co-display-input': 'co-display-source',
+        'ci-display-input': 'ci-display-source',
         'ea-display-input': 'ea-display-source',
         'eprime-avg-input': 'eprime-avg-source',
         'ee-display-input': 'ee-display-source',
@@ -6204,8 +6486,11 @@ function confirmClear() {
   selectedRightLung.clear();
   selectedLeftLungPEQual.clear();
   selectedRightLungPEQual.clear();
-  updateLeftLungSummary();
-  updateRightLungSummary();
+  document.querySelectorAll('#leftLungPEQualChips .rhythm-chip').forEach(ch => ch.classList.remove('selected'));
+  document.querySelectorAll('#rightLungPEQualChips .rhythm-chip').forEach(ch => ch.classList.remove('selected'));
+  refreshLungGridAllRows();
+  updateLeftLungPESubVisibility();
+  updateRightLungPESubVisibility();
   clearAllAutoCalcManualFlags();
   document.getElementById('ee-single-eprime-warn')?.classList.remove('show');
   document.getElementById('trvmax-rv-warn')?.classList.remove('show');
@@ -6711,6 +6996,10 @@ function buildExportRows() {
     row('Patient ID / Reference', getVal('f-patientId'));
     const sex = getVal('f-sex'); row('Sex', sex === 'male' ? 'Male' : sex === 'female' ? 'Female' : '');
     rowU(isStudyPseudoAnonymised() ? 'Age (band)' : 'Age', getVal('f-age'), isStudyPseudoAnonymised() ? '' : 'years');
+    if (document.getElementById('toggle-show-cardiac-index')?.checked) {
+      rowU('Weight', getVal('f-weight'), 'kg');
+      rowU('Height', getVal('f-height'), 'cm');
+    }
     rowU('Heart Rate', getVal('f-hr'), 'bpm');
     row('Cardiac Rhythm', [...selectedRhythms].join(', '));
     rowU('Systolic BP', getVal('f-sbp'), 'mmHg');
@@ -6757,6 +7046,10 @@ function buildExportRows() {
     if (sv) rowU(isAutoCalcManual(document.getElementById('sv-display-input')) ? 'Stroke Volume — manually entered' : 'Stroke Volume — calculated', sv, 'mL');
     const co = getCOCalc();
     if (co) rowU(isAutoCalcManual(document.getElementById('co-display-input')) ? 'Cardiac Output — manually entered' : 'Cardiac Output — calculated', co, 'L/min');
+    if (document.getElementById('toggle-show-cardiac-index')?.checked) {
+      const ci = getCICalc();
+      if (ci) rowU(isAutoCalcManual(document.getElementById('ci-display-input')) ? 'Cardiac Index — manually entered' : 'Cardiac Index — calculated', ci, 'L/min/m²');
+    }
     const vtiResp = getVal('f-vtiDeltaResp'); if (vtiResp) rowU('VTI % Δ respiration', vtiResp, '%');
     const vtiInt = getVal('f-vtiDeltaIntervention');
     if (vtiInt) {
@@ -7442,9 +7735,25 @@ function doExport() {
 </script>
 <script>
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () =>
-      navigator.serviceWorker.register('./sw.js')
-    );
+    window.addEventListener('load', async () => {
+      const reg = await navigator.serviceWorker.register('./sw.js');
+      setInterval(() => { reg.update(); }, 60 * 60 * 1000);
+    });
+
+    navigator.serviceWorker.addEventListener('message', e => {
+      if (e.data && e.data.type === 'update-available') {
+        showUpdateToast();
+      }
+    });
+  }
+
+  function showUpdateToast() {
+    if (document.getElementById('update-toast')) return;
+    const t = document.createElement('div');
+    t.id = 'update-toast';
+    t.innerHTML = 'A new version is available. <button id="update-toast-btn">Refresh</button>';
+    document.body.appendChild(t);
+    document.getElementById('update-toast-btn').addEventListener('click', () => location.reload());
   }
 </script>
 </body>
