@@ -93,7 +93,8 @@ html[data-theme="dark"] .modal-icon { background: #3f1f24; }
 html[data-theme="dark"] .inline-warn { color: #fcd34d; }
 html[data-theme="dark"] .la-validate-hint.error { color: #fca5a5; }
 html[data-theme="dark"] .settings-machine-cap-block,
-html[data-theme="dark"] .settings-normal-study-block { background: rgba(77, 158, 255, 0.08); }
+html[data-theme="dark"] .settings-normal-study-block,
+html[data-theme="dark"] .settings-haemodynamics-details { background: rgba(77, 158, 255, 0.08); }
 html[data-theme="dark"] .header-dev-stamp { color: #fbbf24; border-color: #f59e0b; background: rgba(217, 119, 6, 0.22); box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.12); }
 html[data-theme="dark"] .about-modal-close:hover { background: rgba(255, 255, 255, 0.08); color: var(--primary-dark); }
 html[data-theme="dark"] select {
@@ -384,6 +385,66 @@ html[data-theme="dark"] .ref-ranges-global-note {
 
 /* ─── MAIN CONTENT ────────────────────────────────────── */
 #mainContent { margin-top: var(--header-h); padding: 16px 16px calc(var(--footer-h) + 40px); max-width: 720px; margin-left: auto; margin-right: auto; }
+
+/* ─── WIDE MODE (desktop only) ────────────────────────── */
+@media (min-width: 900px) {
+  body.wide-mode #mainContent {
+    max-width: 1440px;
+  }
+  body.wide-mode .section-body {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 9px 18px;
+    padding: 11px 14px;
+  }
+  body.wide-mode .section-body > .rv-subheading {
+    margin: 10px 0 4px;
+    padding-top: 8px;
+  }
+  body.wide-mode .field-row.two-col { gap: 9px 10px; }
+  body.wide-mode .field-row.three-col { gap: 8px; }
+  body.wide-mode .section-body .field-group { gap: 4px; }
+  body.wide-mode .form-section { margin-bottom: 10px; }
+  /* Default: all children span half-width so they pair up */
+  body.wide-mode .section-body > * { grid-column: span 2; }
+  /* Standalone field-groups span 1 col for max compaction */
+  body.wide-mode .section-body > .field-group { grid-column: span 1; }
+  /* Only subheadings and complex full-section grids span all 4 cols */
+  body.wide-mode .section-body > .rv-subheading,
+  body.wide-mode .section-body > .valve-grid,
+  body.wide-mode .section-body > .aorta-grid,
+  body.wide-mode .section-body > table.lung-grid,
+  body.wide-mode .section-body > .sum-cond-master-wrap { grid-column: 1 / -1; }
+  /* Demographics: rhythm chips on their own full-width row (avoids stretching HR/BP/MAP row) */
+  body.wide-mode #demographics-cardiac-rhythm-wrap,
+  body.wide-mode #demographics-cvs-drugs-wrap { grid-column: 1 / -1; }
+  /* Pair with Vent/CVP row: half-width textarea on same line as ventilation + CVP */
+  body.wide-mode #demographics-clinical-indication-wrap { grid-column: span 2; }
+  /* RV: full-width rows so the right-hand column lines up with the 4-col section grid */
+  body.wide-mode #sec-rv .section-body > .field-row.three-col,
+  body.wide-mode #rv-vis-function-row { grid-column: 1 / -1; }
+  /* RV: PHT chip groups on their own full-width rows */
+  body.wide-mode #rv-pht-basic-features-wrap,
+  body.wide-mode #rv-pht-advanced-features-wrap { grid-column: 1 / -1; }
+  /* Pericardium: tamponade chips full-width row */
+  body.wide-mode #peri-tamponade-signs-wrap { grid-column: 1 / -1; }
+  /* Summary: single column — FUSIC questions, then significance, impression, actions stacked */
+  body.wide-mode #sec-summary .section-body {
+    grid-template-columns: 1fr;
+    justify-items: stretch;
+  }
+  body.wide-mode #sec-summary .section-body > * { grid-column: 1 / -1; }
+  body.wide-mode #summary-clinical-significance-wrap {
+    justify-self: start;
+    width: 100%;
+    max-width: min(100%, 520px);
+  }
+  /* Scan info card: upgrade from 2-col to 4-col */
+  body.wide-mode .scan-info-body {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 9px 16px;
+    padding: 11px 14px;
+  }
+}
 
 /* ─── SCAN INFO CARD ──────────────────────────────────── */
 #scanInfoCard { background: var(--surface); border: 2px solid var(--primary-light); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; box-shadow: var(--shadow); }
@@ -770,6 +831,15 @@ html[data-theme="dark"] .inline-warn.ci-amber-note { color: #fcd34d; }
 .aorta-card.aorta-alert { background: #fef2f2; border-color: #fca5a5; }
 .aorta-card-title { font-size: 13px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.06em; }
 .aorta-card-full { grid-column: 1 / -1; }
+@media (min-width: 900px) {
+  body.wide-mode .aorta-card {
+    display: grid;
+    grid-template-columns: auto 1fr 1fr 1fr;
+    gap: 8px 14px;
+    align-items: start;
+  }
+  body.wide-mode .aorta-card > .aorta-card-title { align-self: center; }
+}
 
 /* ─── CONDITIONAL ─────────────────────────────────────── */
 .conditional-field { display: none; }
@@ -790,11 +860,30 @@ html[data-theme="dark"] .inline-warn.ci-amber-note { color: #fcd34d; }
 }
 body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block; }
 
-#pasp-field-group-wrap.section-hidden { display: none; }
+#pasp-field-group-wrap.section-hidden,
+#rv-lv-basal-ratio-field-wrap.section-hidden,
+#tapse-pasp-ratio-field-wrap.section-hidden { display: none; }
 #ea-field-group-wrap.section-hidden { display: none; }
-#lv-fs-field-wrap.section-hidden { display: none; }
+#lv-fs-field-wrap.section-hidden,
+#rwt-field-wrap.section-hidden,
+#lv-mass-field-wrap.section-hidden,
+#lvmi-field-wrap.section-hidden,
+#lvidd-index-field-wrap.section-hidden { display: none; }
 #ci-field-wrap.section-hidden { display: none; }
 #ci-wt-ht-fields.section-hidden { display: none; }
+#bsa-field-wrap.section-hidden { display: none; }
+#svi-field-wrap.section-hidden,
+#svr-field-wrap.section-hidden,
+#svri-field-wrap.section-hidden { display: none; }
+#ava-continuity-field-wrap.section-hidden { display: none; }
+.lvot-csa-readout {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.35;
+  margin: 0 0 6px;
+  padding: 2px 2px 0;
+}
 
 /* ─── FOOTER ──────────────────────────────────────────── */
 #stickyFooter {
@@ -1147,6 +1236,86 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
 .settings-machine-cap-block .toggle-thumb { width: 16px; height: 16px; top: 3px; left: 3px; }
 .settings-machine-cap-block .toggle-switch input:checked ~ .toggle-thumb { transform: translateX(18px); }
 .settings-nonfusic-measurements-block { margin-top: 7px; }
+.settings-haemodynamics-details {
+  margin: 6px 0 0;
+  padding: 0;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  background: rgba(21, 101, 168, 0.04);
+}
+.settings-haemodynamics-details > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 8px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.065em;
+  text-transform: uppercase;
+  color: var(--primary-dark);
+  user-select: none;
+}
+.settings-haemodynamics-details > summary::-webkit-details-marker { display: none; }
+.settings-haemodynamics-details[open] > summary { border-bottom: 1px solid var(--border-light); }
+.settings-haemodynamics-details > summary.settings-measure-details-summary {
+  text-transform: none;
+}
+.settings-measure-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+.settings-measure-summary-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+.settings-measure-chevron {
+  display: inline-block;
+  flex-shrink: 0;
+  font-size: 8px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--text-muted);
+  opacity: 0.85;
+  transform: rotate(0deg);
+  transition: transform 0.2s ease, color 0.15s;
+}
+.settings-haemodynamics-details[open] > summary.settings-measure-details-summary .settings-measure-chevron {
+  transform: rotate(90deg);
+  color: var(--primary-dark);
+}
+.settings-measure-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.065em;
+  text-transform: uppercase;
+  color: var(--primary-dark);
+}
+.settings-measure-master-toggle {
+  flex-shrink: 0;
+  margin-top: 0 !important;
+}
+.settings-measure-master-hint {
+  margin: 0 0 6px;
+}
+.settings-haemodynamics-details .settings-measure-details-summary:hover .settings-measure-chevron {
+  color: var(--primary-dark);
+}
+.settings-haemodynamics-details .settings-haemo-inner {
+  padding: 6px 8px 8px;
+}
+.settings-haemodynamics-details .settings-haemo-inner > .settings-machine-cap-desc { margin-top: 0; }
+.settings-haemodynamics-details .settings-haemo-children { padding-left: 10px; border-left: 2px solid var(--primary-light); margin-left: 4px; }
+.settings-haemodynamics-details .settings-haemo-children .toggle-row { padding: 1px 0; align-items: flex-start; }
+.settings-haemodynamics-details .toggle-label { font-size: 12.5px; line-height: 1.22; }
+.settings-haemodynamics-details .toggle-switch { width: 40px; height: 22px; margin-top: 1px; }
+.settings-haemodynamics-details .toggle-track { border-radius: 11px; }
+.settings-haemodynamics-details .toggle-thumb { width: 16px; height: 16px; top: 3px; left: 3px; }
+.settings-haemodynamics-details .toggle-switch input:checked ~ .toggle-thumb { transform: translateX(18px); }
 .settings-normal-study-block {
   margin: 3px 0 0;
   padding: 8px 8px 10px;
@@ -1487,6 +1656,40 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
     page-break-inside: auto;
     margin-bottom: 4px;
   }
+  .print-section--nonfusic-disclaimer {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin: 6px 0 4px;
+    padding: 5px 7px;
+    border: 1px solid #ccc;
+    background: #fff;
+    font-size: 8pt;
+    line-height: 1.35;
+  }
+  .print-nonfusic-disclaimer-intro {
+    margin: 0 0 5px;
+    font-weight: 600;
+    color: #111;
+  }
+  .print-nonfusic-disclaimer-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 3px 10px;
+    margin: 4px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .print-nonfusic-disclaimer-list li {
+    margin: 0;
+    padding: 0;
+    font-size: 7.75pt;
+    line-height: 1.3;
+    word-break: break-word;
+  }
+  .print-nonfusic-li-bullet {
+    margin-right: 0.25em;
+    color: #222;
+  }
   .print-section-title {
     font-size: 8.75pt;
     font-weight: 700;
@@ -1647,6 +1850,17 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
     break-inside: auto;
     page-break-inside: auto;
   }
+  #printReportMount.print-aggressive-2page .print-section--nonfusic-disclaimer {
+    margin: 3px 0 2px;
+    padding: 3px 5px;
+  }
+  #printReportMount.print-aggressive-2page .print-nonfusic-disclaimer-list {
+    gap: 2px 6px;
+    font-size: 6.5pt;
+  }
+  #printReportMount.print-aggressive-2page .print-nonfusic-disclaimer-list li {
+    font-size: 6.5pt;
+  }
 }
 </style>
 </head>
@@ -1715,23 +1929,152 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         </div>
         <div class="settings-machine-cap-block settings-nonfusic-measurements-block">
           <div class="rv-subheading">Non-FUSIC HD measurements</div>
-          <p class="settings-machine-cap-desc">Optional fields beyond the core FUSIC HD template. Turn on to show <strong>PASP</strong> (Right heart), <strong>E/A</strong> (Left atrial pressure), and/or <strong>LV fractional shortening</strong> (LV function). They stay hidden in the form until enabled here.</p>
-          <div class="toggle-row">
-            <div><div class="toggle-label">PASP (Section 4)</div><div class="settings-toggle-hint">Show calculated PASP in Right Heart (needs CWD + TR Vmax)</div></div>
-            <label class="toggle-switch"><input type="checkbox" id="toggle-show-pasp-field"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
-          </div>
-          <div class="toggle-row">
-            <div><div class="toggle-label">E/A ratio</div><div class="settings-toggle-hint">Show E/A in Left Atrial Pressure (needs PWD)</div></div>
-            <label class="toggle-switch"><input type="checkbox" id="toggle-show-ea-field"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
-          </div>
-          <div class="toggle-row">
-            <div><div class="toggle-label">LV fractional shortening</div><div class="settings-toggle-hint">Show auto-calculated FS% in Left Ventricle Section</div></div>
-            <label class="toggle-switch"><input type="checkbox" id="toggle-show-lv-fractional-shortening"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
-          </div>
-          <div class="toggle-row">
-            <div><div class="toggle-label">Cardiac Index</div><div class="settings-toggle-hint">CO adjusted for BSA to allow for standardised haemodynamic assessment. Will add weight and height fields to patient demographics</div></div>
-            <label class="toggle-switch"><input type="checkbox" id="toggle-show-cardiac-index"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
-          </div>
+          <p class="settings-machine-cap-desc">Optional fields beyond the core FUSIC HD template. Open each header to select specific measurements.</p>
+          <details class="settings-haemodynamics-details">
+            <summary class="settings-measure-details-summary">
+              <span class="settings-measure-summary-row">
+                <span class="settings-measure-summary-left">
+                  <span class="settings-measure-chevron" aria-hidden="true">&#9654;</span>
+                  <span class="settings-measure-title">Left ventricle</span>
+                </span>
+                <label class="toggle-switch settings-measure-master-toggle" onclick="event.stopPropagation()"><input type="checkbox" id="toggle-lv-measures-all"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+              </span>
+            </summary>
+            <div class="settings-haemo-inner">
+              <p class="settings-machine-cap-desc">Optional LV geometry and function: fractional shortening (needs LVIDd/LVIDs), relative wall thickness, Devereux LV mass (from linear dimensions in mm), mass index and indexed LVIDd (need height and weight for BSA when those are on).</p>
+              <p class="settings-toggle-hint settings-measure-master-hint">Master switch above turns every option below on or off together.</p>
+              <div class="settings-haemo-children">
+                <div class="toggle-row">
+                  <div><div class="toggle-label">LV fractional shortening</div><div class="settings-toggle-hint">[(LVIDd − LVIDs) / LVIDd] × 100 (%)</div></div>
+                  <label class="toggle-switch"><input type="checkbox" id="toggle-show-lv-fractional-shortening"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                </div>
+                <div class="toggle-row">
+                  <div><div class="toggle-label">Relative wall thickness</div><div class="settings-toggle-hint">(2 × LVPWd) / LVIDd</div></div>
+                  <label class="toggle-switch"><input type="checkbox" id="toggle-show-rwt"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                </div>
+                <div class="toggle-row">
+                  <div><div class="toggle-label">LV mass</div><div class="settings-toggle-hint">0.8 × [1.04 × (LVIDd + IVSd + LVPWd)³ − LVIDd³] + 0.6 (g); linear measures in mm converted to cm</div></div>
+                  <label class="toggle-switch"><input type="checkbox" id="toggle-show-lv-mass"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                </div>
+                <div class="toggle-row">
+                  <div><div class="toggle-label">LV mass index</div><div class="settings-toggle-hint">LV mass / BSA (g/m²)</div></div>
+                  <label class="toggle-switch"><input type="checkbox" id="toggle-show-lvmi"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                </div>
+                <div class="toggle-row">
+                  <div><div class="toggle-label">Indexed LVIDd</div><div class="settings-toggle-hint">LVIDd / BSA (mm/m²)</div></div>
+                  <label class="toggle-switch"><input type="checkbox" id="toggle-show-lvidd-indexed"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                </div>
+              </div>
+            </div>
+          </details>
+          <details class="settings-haemodynamics-details">
+            <summary class="settings-measure-details-summary">
+              <span class="settings-measure-summary-row">
+                <span class="settings-measure-summary-left">
+                  <span class="settings-measure-chevron" aria-hidden="true">&#9654;</span>
+                  <span class="settings-measure-title">Haemodynamics</span>
+                </span>
+                <label class="toggle-switch settings-measure-master-toggle" onclick="event.stopPropagation()"><input type="checkbox" id="toggle-haemodynamics-all"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+              </span>
+            </summary>
+            <div class="settings-haemo-inner">
+              <p class="settings-machine-cap-desc">Optional BSA (Mosteller), stroke volume index, systemic vascular resistance (SVR), SVR index, and cardiac index. Height and weight appear in demographics when any BSA-based measure is enabled.</p>
+              <p class="settings-toggle-hint settings-measure-master-hint">Master switch above turns every option below on or off together.</p>
+              <div class="settings-haemo-children">
+                <div class="toggle-row">
+                  <div><div class="toggle-label">Cardiac index</div><div class="settings-toggle-hint">CO ÷ BSA (L/min/m²). Uses weight, height, and cardiac output</div></div>
+                  <label class="toggle-switch"><input type="checkbox" id="toggle-show-cardiac-index"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                </div>
+                <div class="toggle-row">
+                  <div><div class="toggle-label">BSA</div><div class="settings-toggle-hint">Body surface area — √[(height cm × weight kg) ÷ 3600] (Mosteller), shown near demographics</div></div>
+                  <label class="toggle-switch"><input type="checkbox" id="toggle-show-bsa"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                </div>
+                <div class="toggle-row">
+                  <div><div class="toggle-label">Stroke volume index</div><div class="settings-toggle-hint">Stroke volume ÷ BSA (mL/m²)</div></div>
+                  <label class="toggle-switch"><input type="checkbox" id="toggle-show-svi"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                </div>
+                <div class="toggle-row">
+                  <div><div class="toggle-label">SVR</div><div class="settings-toggle-hint">[(MAP − CVP) ÷ CO] × 80 (Wood units)</div></div>
+                  <label class="toggle-switch"><input type="checkbox" id="toggle-show-svr"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                </div>
+                <div class="toggle-row">
+                  <div><div class="toggle-label">SVR index</div><div class="settings-toggle-hint">SVR × BSA</div></div>
+                  <label class="toggle-switch"><input type="checkbox" id="toggle-show-svri"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                </div>
+              </div>
+            </div>
+          </details>
+          <details class="settings-haemodynamics-details">
+            <summary class="settings-measure-details-summary">
+              <span class="settings-measure-summary-row">
+                <span class="settings-measure-summary-left">
+                  <span class="settings-measure-chevron" aria-hidden="true">&#9654;</span>
+                  <span class="settings-measure-title">Left atrial pressure</span>
+                </span>
+                <label class="toggle-switch settings-measure-master-toggle" onclick="event.stopPropagation()"><input type="checkbox" id="toggle-lap-measures-all"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+              </span>
+            </summary>
+            <div class="settings-haemo-inner">
+              <p class="settings-machine-cap-desc">Optional left atrial pressure–related fields. E/A appears in the Left Atrial Pressure section when pulsed-wave Doppler is enabled in Machine capabilities.</p>
+              <p class="settings-toggle-hint settings-measure-master-hint">Master switch above turns every option below on or off together.</p>
+              <div class="settings-haemo-children">
+                <div class="toggle-row">
+                  <div><div class="toggle-label">E/A ratio</div><div class="settings-toggle-hint">Show calculated E/A in Left Atrial Pressure (needs PWD)</div></div>
+                  <label class="toggle-switch"><input type="checkbox" id="toggle-show-ea-field"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                </div>
+              </div>
+            </div>
+          </details>
+          <details class="settings-haemodynamics-details">
+            <summary class="settings-measure-details-summary">
+              <span class="settings-measure-summary-row">
+                <span class="settings-measure-summary-left">
+                  <span class="settings-measure-chevron" aria-hidden="true">&#9654;</span>
+                  <span class="settings-measure-title">Right heart</span>
+                </span>
+                <label class="toggle-switch settings-measure-master-toggle" onclick="event.stopPropagation()"><input type="checkbox" id="toggle-rh-measures-all"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+              </span>
+            </summary>
+            <div class="settings-haemo-inner">
+              <p class="settings-machine-cap-desc">Optional right-heart haemodynamics: estimated PASP (TR Vmax + CVP or IVC-derived RAP), RV:LV basal diameter ratio, and TAPSE/PASP (uses the same estimated PASP).</p>
+              <p class="settings-toggle-hint settings-measure-master-hint">Master switch above turns every option below on or off together.</p>
+              <div class="settings-haemo-children">
+                <div class="toggle-row">
+                  <div><div class="toggle-label">PASP</div><div class="settings-toggle-hint">Show calculated PASP in Right Heart (needs CWD + TR Vmax, CVP or IVC)</div></div>
+                  <label class="toggle-switch"><input type="checkbox" id="toggle-show-pasp-field"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                </div>
+                <div class="toggle-row">
+                  <div><div class="toggle-label">RV:LV basal diameter ratio</div><div class="settings-toggle-hint">RV basal diameter ÷ LVIDd (both mm)</div></div>
+                  <label class="toggle-switch"><input type="checkbox" id="toggle-show-rv-lv-basal-ratio"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                </div>
+                <div class="toggle-row">
+                  <div><div class="toggle-label">TAPSE / PASP ratio</div><div class="settings-toggle-hint">TAPSE (mm) ÷ estimated PASP (mmHg)</div></div>
+                  <label class="toggle-switch"><input type="checkbox" id="toggle-show-tapse-pasp-ratio"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                </div>
+              </div>
+            </div>
+          </details>
+          <details class="settings-haemodynamics-details">
+            <summary class="settings-measure-details-summary">
+              <span class="settings-measure-summary-row">
+                <span class="settings-measure-summary-left">
+                  <span class="settings-measure-chevron" aria-hidden="true">&#9654;</span>
+                  <span class="settings-measure-title">Valves</span>
+                </span>
+                <label class="toggle-switch settings-measure-master-toggle" onclick="event.stopPropagation()"><input type="checkbox" id="toggle-valve-measures-all"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+              </span>
+            </summary>
+            <div class="settings-haemo-inner">
+              <p class="settings-machine-cap-desc">Optional aortic valve Doppler: continuity-equation valve area (LVOT cross-sectional area × LVOT VTI ÷ AV VTI). LVOT CSA is shown next to the result for transparency. Needs LVOT diameter (section 2), LVOT VTI and AV VTI (section 5).</p>
+              <p class="settings-toggle-hint settings-measure-master-hint">Master switch above turns every option below on or off together.</p>
+              <div class="settings-haemo-children">
+                <div class="toggle-row">
+                  <div><div class="toggle-label">Aortic valve area (continuity)</div><div class="settings-toggle-hint">LVOT CSA × (LVOT VTI ÷ AV VTI), cm²</div></div>
+                  <label class="toggle-switch"><input type="checkbox" id="toggle-show-ava-continuity"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                </div>
+              </div>
+            </div>
+          </details>
         </div>
         <div class="settings-normal-study-block">
           <div class="rv-subheading">Normal study helper</div>
@@ -1757,6 +2100,13 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
           </div>
           <label class="toggle-switch"><input type="checkbox" id="toggle-warn-before-unload" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
         </div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Wide mode</div>
+            <div class="settings-toggle-hint">Expands the form to fill the screen width on desktop, arranging sections side-by-side to reduce scrolling. No effect on mobile.</div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="toggle-wide-mode"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
       </div>
     </div>
     <div class="settings-group">
@@ -1772,9 +2122,16 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         <div class="toggle-row">
           <div>
             <div class="toggle-label">Summary near top of export</div>
-            <div class="settings-toggle-hint">When on, <strong>Summary &amp; conclusions</strong> then <strong>FUSIC HD questions</strong> (if shown) appear in exported text, Excel, and print <strong>after Patient demographics</strong> and <strong>before Left ventricle</strong>. Turn off to keep them at the end of the report (FUSIC questions first, then summary at the bottom).</div>
+            <div class="settings-toggle-hint">When on, <strong>FUSIC HD questions</strong> (if shown), <strong>Summary &amp; conclusions</strong>, then the <strong>non-FUSIC HD disclaimer</strong> (if any) appear in exported text, Excel, and print <strong>after Patient demographics</strong> and <strong>before Left ventricle</strong>. Turn off to keep the same block at the end of the report.</div>
           </div>
           <label class="toggle-switch"><input type="checkbox" id="toggle-export-summary-near-top" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Non-FUSIC HD Measurement Disclaimer</div>
+            <div class="settings-toggle-hint">Adds a disclaimer to any exported results flagging the non-FUSIC HD measurements present, noting that they may not have been factored into the clinical interpretation.</div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="toggle-export-nonfusic-disclaimer" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
         </div>
         <div class="toggle-row">
           <div>
@@ -1902,14 +2259,26 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <div id="ci-wt-ht-fields" class="field-row two-col section-hidden">
         <div class="field-group">
           <label class="field-label" for="f-weight">Weight <span class="unit">(kg)</span></label>
-          <input type="number" id="f-weight" placeholder="e.g. 70" min="1" max="400" step="0.1" oninput="checkCIAnthropometrics(); recalcCardiacIndex();">
+          <input type="number" id="f-weight" placeholder="e.g. 70" min="1" max="400" step="0.1" oninput="checkCIAnthropometrics(); recalcCardiacIndex(); recalcBSAField(); recalcDerivedHaemodynamics(); recalcLVOptionalMeasures();">
           <div id="weight-plaus-hint" class="inline-warn"></div>
         </div>
         <div class="field-group">
           <label class="field-label" for="f-height">Height <span class="unit">(cm)</span></label>
-          <input type="number" id="f-height" placeholder="e.g. 170" min="30" max="280" step="0.1" oninput="checkCIAnthropometrics(); recalcCardiacIndex();">
+          <input type="number" id="f-height" placeholder="e.g. 170" min="30" max="280" step="0.1" oninput="checkCIAnthropometrics(); recalcCardiacIndex(); recalcBSAField(); recalcDerivedHaemodynamics(); recalcLVOptionalMeasures();">
           <div id="height-plaus-hint" class="inline-warn"></div>
         </div>
+      </div>
+
+      <div id="bsa-field-wrap" class="field-group section-hidden">
+        <label class="field-label" for="bsa-display-input">BSA <span class="unit">(m²)</span><span class="field-label-source-tag" id="bsa-display-source" hidden></span></label>
+        <div class="calc-display calc-display-editable" id="bsa-display">
+          <div class="calc-editable-value-line">
+            <span class="calc-editable-prefix">BSA:</span>
+            <input type="text" class="calc-editable-value auto-calc-input" id="bsa-display-input" inputmode="decimal" autocomplete="off" aria-label="Body surface area square metres">
+            <span class="calc-editable-suffix">m²</span>
+          </div>
+        </div>
+        <div class="calc-hint">Mosteller: √[(height cm × weight kg) ÷ 3600]</div>
       </div>
 
       <div class="field-group">
@@ -1918,23 +2287,17 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         <div id="hr-warn" class="inline-warn">Unusual value.</div>
       </div>
 
-      <div class="field-group">
-        <label class="field-label">Cardiac Rhythm <span class="unit">(tap to select — multiple allowed)</span></label>
-        <div id="rhythmChips" class="rhythm-chips"></div>
-        <div id="rhythmSummary" class="rhythm-summary">None selected</div>
-      </div>
-
       <div class="field-row two-col">
         <div class="field-group">
           <label class="field-label">Blood Pressure <span class="unit">(mmHg)</span></label>
           <div class="field-row two-col" style="gap:10px;">
             <div class="field-group">
               <label class="field-label" for="f-sbp">Systolic</label>
-              <input type="number" id="f-sbp" placeholder="e.g. 120" min="0" max="350" step="1" oninput="recalcMAP()">
+              <input type="number" id="f-sbp" placeholder="e.g. 120" min="0" max="350" step="1" oninput="recalcMAP(); recalcDerivedHaemodynamics();">
             </div>
             <div class="field-group">
               <label class="field-label" for="f-dbp">Diastolic</label>
-              <input type="number" id="f-dbp" placeholder="e.g. 70" min="0" max="250" step="1" oninput="recalcMAP()">
+              <input type="number" id="f-dbp" placeholder="e.g. 70" min="0" max="250" step="1" oninput="recalcMAP(); recalcDerivedHaemodynamics();">
             </div>
           </div>
         </div>
@@ -1949,6 +2312,12 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
           </div>
           <div class="calc-hint">MAP = (SBP + 2×DBP) / 3</div>
         </div>
+      </div>
+
+      <div class="field-group" id="demographics-cardiac-rhythm-wrap">
+        <label class="field-label">Cardiac Rhythm <span class="unit">(tap to select — multiple allowed)</span></label>
+        <div id="rhythmChips" class="rhythm-chips"></div>
+        <div id="rhythmSummary" class="rhythm-summary">None selected</div>
       </div>
 
       <div class="field-row two-col">
@@ -1966,21 +2335,21 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         </div>
         <div class="field-group">
           <label class="field-label" for="f-cvp">CVP <span class="unit">(mmHg)</span></label>
-          <input type="number" id="f-cvp" placeholder="e.g. 8" min="0" max="120" step="0.1" oninput="recalcPASPCVP()" onchange="recalcPASPCVP()">
+          <input type="number" id="f-cvp" placeholder="e.g. 8" min="0" max="120" step="0.1" oninput="recalcPASPCVP(); recalcDerivedHaemodynamics();" onchange="recalcPASPCVP(); recalcDerivedHaemodynamics();">
         </div>
       </div>
 
-      <div class="field-group">
+      <div class="field-group" id="demographics-clinical-indication-wrap">
+        <label class="field-label" for="f-indication">Clinical Indication</label>
+        <textarea id="f-indication" placeholder="Describe clinical indication for scan..." rows="3"></textarea>
+        <p class="anonymise-pii-reminder">Ensure you have removed all patient identifiable information.</p>
+      </div>
+
+      <div class="field-group" id="demographics-cvs-drugs-wrap">
         <label class="field-label">CVS Drugs <span class="unit">(tap to select — multiple allowed)</span></label>
         <div id="cvsDrugChips" class="rhythm-chips"></div>
         <div id="cvsDrugSummary" class="rhythm-summary">None selected</div>
         <div id="cvs-drug-details-panel" class="conditional-field" aria-live="polite"></div>
-      </div>
-
-      <div class="field-group">
-        <label class="field-label" for="f-indication">Clinical Indication</label>
-        <textarea id="f-indication" placeholder="Describe clinical indication for scan..." rows="3"></textarea>
-        <p class="anonymise-pii-reminder">Ensure you have removed all patient identifiable information.</p>
       </div>
 
     </div>
@@ -2002,20 +2371,64 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         </div>
         <div class="field-group">
           <label class="field-label" for="f-lvids">LVIDs <span class="unit">(mm)</span></label>
-          <input type="number" id="f-lvids" placeholder="e.g. 32" min="5" max="100" step="0.1">
+          <input type="number" id="f-lvids" placeholder="e.g. 32" min="5" max="100" step="0.1" oninput="scheduleMainContentSoftValidation()">
         </div>
       </div>
       <div class="field-row two-col">
         <div class="field-group">
           <label class="field-label" for="f-ivsd">IVSd <span class="unit">(mm)</span></label>
-          <input type="number" id="f-ivsd" placeholder="e.g. 9" min="3" max="30" step="0.1">
+          <input type="number" id="f-ivsd" placeholder="e.g. 9" min="3" max="30" step="0.1" oninput="scheduleMainContentSoftValidation()">
           <div class="calc-hint">Normal &lt;12 mm</div>
         </div>
         <div class="field-group">
           <label class="field-label" for="f-lvpwd">LVPWd <span class="unit">(mm)</span></label>
-          <input type="number" id="f-lvpwd" placeholder="e.g. 9" min="3" max="30" step="0.1">
+          <input type="number" id="f-lvpwd" placeholder="e.g. 9" min="3" max="30" step="0.1" oninput="scheduleMainContentSoftValidation()">
           <div class="calc-hint">Normal &lt;12 mm</div>
         </div>
+      </div>
+
+      <div id="rwt-field-wrap" class="field-group section-hidden">
+        <label class="field-label" for="rwt-display-input">Relative wall thickness<span class="field-label-source-tag" id="rwt-display-source" hidden></span></label>
+        <div class="calc-display calc-display-editable" id="rwt-display">
+          <div class="calc-editable-value-line">
+            <span class="calc-editable-prefix">RWT:</span>
+            <input type="text" class="calc-editable-value auto-calc-input" id="rwt-display-input" inputmode="decimal" autocomplete="off" aria-label="Relative wall thickness">
+          </div>
+        </div>
+        <div class="calc-hint">(2 × LVPWd) / LVIDd</div>
+      </div>
+      <div id="lv-mass-field-wrap" class="field-group section-hidden">
+        <label class="field-label" for="lv-mass-display-input">LV mass <span class="unit">(g)</span><span class="field-label-source-tag" id="lv-mass-display-source" hidden></span></label>
+        <div class="calc-display calc-display-editable" id="lv-mass-display">
+          <div class="calc-editable-value-line">
+            <span class="calc-editable-prefix">LVM:</span>
+            <input type="text" class="calc-editable-value auto-calc-input" id="lv-mass-display-input" inputmode="decimal" autocomplete="off" aria-label="Left ventricular mass grams">
+            <span class="calc-editable-suffix">g</span>
+          </div>
+        </div>
+        <div class="calc-hint">0.8 × [1.04 × (LVIDd + IVSd + LVPWd)³ − LVIDd³] + 0.6 — linear mm → cm</div>
+      </div>
+      <div id="lvmi-field-wrap" class="field-group section-hidden">
+        <label class="field-label" for="lvmi-display-input">LV mass index <span class="unit">(g/m²)</span><span class="field-label-source-tag" id="lvmi-display-source" hidden></span></label>
+        <div class="calc-display calc-display-editable" id="lvmi-display">
+          <div class="calc-editable-value-line">
+            <span class="calc-editable-prefix">LVMI:</span>
+            <input type="text" class="calc-editable-value auto-calc-input" id="lvmi-display-input" inputmode="decimal" autocomplete="off" aria-label="LV mass index">
+            <span class="calc-editable-suffix">g/m²</span>
+          </div>
+        </div>
+        <div class="calc-hint">LV mass ÷ BSA — uses LV mass field if shown, else calculated mass</div>
+      </div>
+      <div id="lvidd-index-field-wrap" class="field-group section-hidden">
+        <label class="field-label" for="lvidd-index-display-input">Indexed LVIDd <span class="unit">(mm/m²)</span><span class="field-label-source-tag" id="lvidd-index-display-source" hidden></span></label>
+        <div class="calc-display calc-display-editable" id="lvidd-index-display">
+          <div class="calc-editable-value-line">
+            <span class="calc-editable-prefix">LVIDd<sub>i</sub>:</span>
+            <input type="text" class="calc-editable-value auto-calc-input" id="lvidd-index-display-input" inputmode="decimal" autocomplete="off" aria-label="Indexed LVIDd millimetres per square metre">
+            <span class="calc-editable-suffix">mm/m²</span>
+          </div>
+        </div>
+        <div class="calc-hint">LVIDd ÷ BSA</div>
       </div>
 
       <div class="field-group">
@@ -2089,7 +2502,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <div class="rv-subheading">VTI, Stroke Volume &amp; Cardiac Output</div>
 
       <!-- LVOT measurements (HD) -->
-      <div class="field-row three-col">
+      <div class="field-row two-col">
         <div class="field-group">
           <label class="field-label" for="f-lvotDiam">LVOT Diameter <span class="unit">(cm)</span></label>
           <input type="number" id="f-lvotDiam" placeholder="e.g. 2.0" min="0.5" max="4" step="0.01" oninput="recalcHaemodynamics()">
@@ -2100,10 +2513,10 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
             <input type="number" id="f-lvotVTI" placeholder="e.g. 18" min="0" max="60" step="0.1" oninput="mirrorLVOTVTI('f-lvotVTI')" onchange="mirrorLVOTVTI('f-lvotVTI')">
           </div>
         </div>
-        <div class="field-group" style="visibility:hidden;"></div>
       </div>
 
-      <!-- SV + CO auto-calc -->
+      <!-- SV + CO auto-calc (PWD: LVOT VTI) -->
+      <div id="mc-pwd-sv-co-wrap" class="mc-doppler-wrap">
       <div class="field-row two-col">
         <div class="field-group">
           <label class="field-label" for="sv-display-input">Stroke Volume <span class="unit">(mL)</span><span class="field-label-source-tag" id="sv-display-source" hidden></span></label>
@@ -2128,6 +2541,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
           <div class="calc-hint">⟵ Also requires Heart Rate (Section 1)</div>
         </div>
       </div>
+      </div>
 
       <div id="ci-field-wrap" class="section-hidden">
         <div class="field-group">
@@ -2145,6 +2559,49 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         </div>
       </div>
 
+      <div id="svi-field-wrap" class="section-hidden">
+        <div class="field-group">
+          <label class="field-label" for="svi-display-input">Stroke volume index <span class="unit">(mL/m²)</span><span class="field-label-source-tag" id="svi-display-source" hidden></span></label>
+          <div class="calc-display calc-display-editable" id="svi-display">
+            <div class="calc-editable-value-line">
+              <span class="calc-editable-prefix">SVI:</span>
+              <input type="text" class="calc-editable-value auto-calc-input" id="svi-display-input" inputmode="decimal" autocomplete="off" aria-label="Stroke volume index">
+              <span class="calc-editable-suffix">mL/m²</span>
+            </div>
+          </div>
+          <div class="calc-hint">Stroke volume ÷ BSA</div>
+        </div>
+      </div>
+
+      <div id="svr-field-wrap" class="section-hidden">
+        <div class="field-group">
+          <label class="field-label" for="svr-display-input">SVR <span class="unit">(Wood units)</span><span class="field-label-source-tag" id="svr-display-source" hidden></span></label>
+          <div class="calc-display calc-display-editable" id="svr-display">
+            <div class="calc-editable-value-line">
+              <span class="calc-editable-prefix">SVR:</span>
+              <input type="text" class="calc-editable-value auto-calc-input" id="svr-display-input" inputmode="decimal" autocomplete="off" aria-label="Systemic vascular resistance Wood units">
+              <span class="calc-editable-suffix"></span>
+            </div>
+          </div>
+          <div class="calc-hint">[(MAP − CVP) ÷ CO] × 80 — MAP, CVP (Section 1), CO above</div>
+        </div>
+      </div>
+
+      <div id="svri-field-wrap" class="section-hidden">
+        <div class="field-group">
+          <label class="field-label" for="svri-display-input">SVR index <span class="unit">(Wood units·m²)</span><span class="field-label-source-tag" id="svri-display-source" hidden></span></label>
+          <div class="calc-display calc-display-editable" id="svri-display">
+            <div class="calc-editable-value-line">
+              <span class="calc-editable-prefix">SVRI:</span>
+              <input type="text" class="calc-editable-value auto-calc-input" id="svri-display-input" inputmode="decimal" autocomplete="off" aria-label="SVR index">
+              <span class="calc-editable-suffix"></span>
+            </div>
+          </div>
+          <div class="calc-hint">SVR × BSA</div>
+        </div>
+      </div>
+
+      <div id="mc-pwd-vti-intervention-wrap" class="mc-doppler-wrap">
       <div class="field-row two-col">
         <div class="field-group">
           <div class="vti-delta-resp-primary" id="vti-delta-resp-primary">
@@ -2180,6 +2637,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
             </div>
           </div>
         </div>
+      </div>
       </div>
 
     </div>
@@ -2327,19 +2785,19 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <div class="chevron"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div>
     </div>
     <div class="section-body">
-      <div class="field-group">
-        <label class="field-label" for="f-rvVisualSize">RV size visual estimation</label>
-        <select id="f-rvVisualSize" data-important="true" onchange="syncPHTBasicAutoSelections()">
-          <option value="">— Select —</option>
-          <option>Normal</option>
-          <option>Dilated</option>
-        </select>
-      </div>
-      <div class="field-row two-col">
+      <div class="field-row three-col">
+        <div class="field-group">
+          <label class="field-label" for="f-rvVisualSize">RV size visual estimation</label>
+          <select id="f-rvVisualSize" data-important="true" onchange="syncPHTBasicAutoSelections()">
+            <option value="">— Select —</option>
+            <option>Normal</option>
+            <option>Dilated</option>
+          </select>
+        </div>
         <div class="field-group">
           <label class="field-label" for="f-rvBasalDiam">RV basal diameter <span class="unit">(mm)</span></label>
           <p class="calc-hint">Normal &lt;45 mm</p>
-          <input type="number" id="f-rvBasalDiam" placeholder="e.g. 38" min="0" max="120" step="0.1" oninput="syncPHTBasicAutoSelections()" onchange="syncPHTBasicAutoSelections()">
+          <input type="number" id="f-rvBasalDiam" placeholder="e.g. 38" min="0" max="120" step="0.1" oninput="syncPHTBasicAutoSelections(); scheduleMainContentSoftValidation()" onchange="syncPHTBasicAutoSelections()">
           <div id="rv-basal-hint" class="la-validate-hint" aria-live="polite"></div>
         </div>
         <div class="field-group">
@@ -2378,8 +2836,19 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         </div>
       </div>
 
+      <div id="rv-lv-basal-ratio-field-wrap" class="field-group section-hidden">
+        <label class="field-label" for="rv-lv-basal-ratio-display-input">RV:LV basal diameter ratio<span class="field-label-source-tag" id="rv-lv-basal-ratio-display-source" hidden></span></label>
+        <div class="calc-display calc-display-editable" id="rv-lv-basal-ratio-display">
+          <div class="calc-editable-value-line">
+            <span class="calc-editable-prefix">RV/LV:</span>
+            <input type="text" class="calc-editable-value auto-calc-input" id="rv-lv-basal-ratio-display-input" inputmode="decimal" autocomplete="off" aria-label="RV to LV basal diameter ratio">
+          </div>
+        </div>
+        <div class="calc-hint">RV basal diameter ÷ LVIDd (section 2), both in mm</div>
+      </div>
+
       <div class="rv-subheading">Function assessment</div>
-      <div class="field-row two-col">
+      <div class="field-row two-col" id="rv-vis-function-row">
         <div class="field-group">
           <label class="field-label" for="f-rvVisLongitudinal">Visual impression — longitudinal systolic function</label>
           <select id="f-rvVisLongitudinal" data-important="true">
@@ -2407,7 +2876,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         <div class="field-group">
           <label class="field-label" for="f-tapse">TAPSE <span class="unit">(mm)</span></label>
           <p class="calc-hint">Normal &gt;17 mm</p>
-          <input type="number" id="f-tapse" placeholder="e.g. 20" min="0" max="80" step="0.1">
+          <input type="number" id="f-tapse" placeholder="e.g. 20" min="0" max="80" step="0.1" oninput="scheduleMainContentSoftValidation()">
           <div id="rv-tapse-hint" class="la-validate-hint" aria-live="polite"></div>
         </div>
         <div id="mc-tdi-rv-sprime-wrap" class="mc-doppler-wrap">
@@ -2440,12 +2909,22 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
           <div class="calc-hint">PASP ≈ 4×TR Vmax² + RAP (mmHg). RAP = CVP when entered; if CVP blank, mean RAP is inferred from IVC diameter + collapse (published table).</div>
         </div>
       </div>
-      <div class="field-group">
+      <div id="tapse-pasp-ratio-field-wrap" class="field-group section-hidden">
+        <label class="field-label" for="tapse-pasp-ratio-display-input">TAPSE / PASP ratio <span class="unit">(mm/mmHg)</span><span class="field-label-source-tag" id="tapse-pasp-ratio-display-source" hidden></span></label>
+        <div class="calc-display calc-display-editable" id="tapse-pasp-ratio-display">
+          <div class="calc-editable-value-line">
+            <input type="text" class="calc-editable-value auto-calc-input" id="tapse-pasp-ratio-display-input" inputmode="decimal" autocomplete="off" aria-label="TAPSE divided by PASP mm per mmHg">
+            <span class="calc-editable-suffix">mm/mmHg</span>
+          </div>
+        </div>
+        <div class="calc-hint">TAPSE ÷ estimated PASP (same calculation as PASP above: TR Vmax + CVP or IVC-derived RAP)</div>
+      </div>
+      <div class="field-group" id="rv-pht-basic-features-wrap">
         <label class="field-label">Basic Features of PHT <span class="unit">(tap to select — multiple allowed)</span></label>
         <div id="phtBasicChips" class="rhythm-chips"></div>
         <div id="phtBasicSummary" class="rhythm-summary">None selected</div>
       </div>
-      <div class="field-group">
+      <div class="field-group" id="rv-pht-advanced-features-wrap">
         <label class="field-label">Advanced Features of PHT <span class="unit">(tap to select — multiple allowed)</span></label>
         <div id="phtAdvChips" class="rhythm-chips"></div>
         <div id="phtAdvSummary" class="rhythm-summary">None selected</div>
@@ -2502,6 +2981,18 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
               </div>
             </div>
           </div>
+          <div id="ava-continuity-field-wrap" class="field-group section-hidden">
+            <div class="lvot-csa-readout" id="lvot-csa-readout" aria-live="polite"></div>
+            <label class="field-label" for="ava-continuity-display-input">Aortic valve area (continuity) <span class="unit">(cm²)</span><span class="field-label-source-tag" id="ava-continuity-display-source" hidden></span></label>
+            <div class="calc-display calc-display-editable" id="ava-continuity-display">
+              <div class="calc-editable-value-line">
+                <span class="calc-editable-prefix">AVA:</span>
+                <input type="text" class="calc-editable-value auto-calc-input" id="ava-continuity-display-input" inputmode="decimal" autocomplete="off" aria-label="Aortic valve area continuity equation square centimetres">
+                <span class="calc-editable-suffix">cm²</span>
+              </div>
+            </div>
+            <div class="calc-hint">LVOT CSA × (LVOT VTI ÷ AV VTI) — uses LVOT diameter from section 2</div>
+          </div>
         </div>
         <div class="valve-card">
           <div class="valve-card-title">🫀 Tricuspid</div>
@@ -2556,7 +3047,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
           <option>Loculated</option>
         </select>
       </div>
-      <div class="field-group">
+      <div class="field-group" id="peri-tamponade-signs-wrap">
         <label class="field-label">Signs of Tamponade <span class="unit">(tap to select — multiple allowed)</span></label>
         <div id="tamponadeChips" class="rhythm-chips"></div>
         <div id="tamponadeSummary" class="rhythm-summary">None selected</div>
@@ -2811,18 +3302,18 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         </div>
       </div>
       </div>
-      <div class="field-group">
-        <label class="field-label" for="f-impression">Overall Impression</label>
-        <textarea id="f-impression" data-important="true" placeholder="Summarise the key echocardiographic findings and their clinical context..." rows="4"></textarea>
-        <p class="anonymise-pii-reminder">Ensure you have removed all patient identifiable information.</p>
-      </div>
-      <div class="field-group">
+      <div class="field-group" id="summary-clinical-significance-wrap">
         <label class="field-label" for="f-significance">Clinical Significance</label>
         <select id="f-significance" data-important="true">
           <option value="">— Select —</option><option>Normal study</option><option>Abnormal — expected</option><option>Abnormal — new finding</option><option>Critical finding</option>
         </select>
       </div>
-      <div class="field-group">
+      <div class="field-group" id="summary-overall-impression-wrap">
+        <label class="field-label" for="f-impression">Overall Impression</label>
+        <textarea id="f-impression" data-important="true" placeholder="Summarise the key echocardiographic findings and their clinical context..." rows="4"></textarea>
+        <p class="anonymise-pii-reminder">Ensure you have removed all patient identifiable information.</p>
+      </div>
+      <div class="field-group" id="summary-recommended-actions-wrap">
         <label class="field-label" for="f-actions">Recommended Actions</label>
         <textarea id="f-actions" placeholder="Recommended clinical actions, follow-up, or referrals..." rows="2"></textarea>
         <p class="anonymise-pii-reminder">Ensure you have removed all patient identifiable information.</p>
@@ -3548,14 +4039,61 @@ const SESSION_DRAFT_TOGGLE_IDS = [
   'toggle-machine-cwd',
   'toggle-machine-pwd',
   'toggle-machine-tdi',
+  'toggle-rh-measures-all',
   'toggle-show-pasp-field',
+  'toggle-show-rv-lv-basal-ratio',
+  'toggle-show-tapse-pasp-ratio',
   'toggle-show-ea-field',
+  'toggle-lap-measures-all',
+  'toggle-lv-measures-all',
   'toggle-show-lv-fractional-shortening',
+  'toggle-show-rwt',
+  'toggle-show-lv-mass',
+  'toggle-show-lvmi',
+  'toggle-show-lvidd-indexed',
+  'toggle-haemodynamics-all',
   'toggle-show-cardiac-index',
+  'toggle-show-bsa',
+  'toggle-show-svi',
+  'toggle-show-svr',
+  'toggle-show-svri',
+  'toggle-valve-measures-all',
+  'toggle-show-ava-continuity',
   'toggle-omit-empty-export',
   'toggle-export-summary-near-top',
+  'toggle-export-nonfusic-disclaimer',
   'toggle-export-aggressive-2page'
 ];
+const HAEMODYNAMICS_CHILD_TOGGLE_IDS = [
+  'toggle-show-cardiac-index',
+  'toggle-show-bsa',
+  'toggle-show-svi',
+  'toggle-show-svr',
+  'toggle-show-svri'
+];
+const LV_MEASURES_CHILD_TOGGLE_IDS = [
+  'toggle-show-lv-fractional-shortening',
+  'toggle-show-rwt',
+  'toggle-show-lv-mass',
+  'toggle-show-lvmi',
+  'toggle-show-lvidd-indexed'
+];
+const VALVE_MEASURES_CHILD_TOGGLE_IDS = [
+  'toggle-show-ava-continuity'
+];
+const RH_MEASURES_CHILD_TOGGLE_IDS = [
+  'toggle-show-pasp-field',
+  'toggle-show-rv-lv-basal-ratio',
+  'toggle-show-tapse-pasp-ratio'
+];
+const LAP_MEASURES_CHILD_TOGGLE_IDS = [
+  'toggle-show-ea-field'
+];
+let _syncingHaemodynamicsMaster = false;
+let _syncingLAPMaster = false;
+let _syncingLVMaster = false;
+let _syncingValveMaster = false;
+let _syncingRHMaster = false;
 let sessionRestoreInProgress = false;
 let sessionDraftSaveTimer = null;
 
@@ -3575,6 +4113,23 @@ const SUMMARY_CONDITIONS = [
 ];
 
 const THEME_STORAGE_KEY = 'fusic-hd-theme';
+const WIDE_MODE_STORAGE_KEY = 'fusic-hd-wide-mode';
+
+function applyWideMode(on) {
+  document.body.classList.toggle('wide-mode', !!on);
+  const el = document.getElementById('toggle-wide-mode');
+  if (el) el.checked = !!on;
+  try { localStorage.setItem(WIDE_MODE_STORAGE_KEY, on ? '1' : '0'); } catch(e) {}
+}
+
+function initWideModeToggle() {
+  try {
+    if (localStorage.getItem(WIDE_MODE_STORAGE_KEY) === '1') applyWideMode(true);
+  } catch(e) {}
+  document.getElementById('toggle-wide-mode')?.addEventListener('change', e => {
+    applyWideMode(e.target.checked);
+  });
+}
 
 function initThemeToggle() {
   const btn = document.getElementById('themeToggleBtn');
@@ -3603,6 +4158,7 @@ function initThemeToggle() {
 // ─── INIT ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initThemeToggle();
+  initWideModeToggle();
   const sessionDraft = tryReadSessionDraftForRestore();
   if (!sessionDraft) {
     const now = new Date();
@@ -3628,10 +4184,26 @@ document.addEventListener('DOMContentLoaded', () => {
   toggleSummarySectionVisibility(!!document.getElementById('toggle-show-summary-section')?.checked);
   document.getElementById('toggle-fusic-hd-questions')?.addEventListener('change', e => toggleFusicHdQuestionsSection(e.target.checked));
   document.getElementById('toggle-show-summary-section')?.addEventListener('change', e => toggleSummarySectionVisibility(!!e.target.checked));
-  document.getElementById('toggle-show-pasp-field')?.addEventListener('change', refreshPASPGatedVisibility);
-  document.getElementById('toggle-show-ea-field')?.addEventListener('change', refreshEAFieldVisibility);
-  document.getElementById('toggle-show-lv-fractional-shortening')?.addEventListener('change', refreshLVFractionalShorteningVisibility);
-  document.getElementById('toggle-show-cardiac-index')?.addEventListener('change', refreshCardiacIndexVisibility);
+  document.getElementById('toggle-rh-measures-all')?.addEventListener('change', onRHMasterChange);
+  RH_MEASURES_CHILD_TOGGLE_IDS.forEach(id => {
+    document.getElementById(id)?.addEventListener('change', onRHMeasuresChildToggleChange);
+  });
+  document.getElementById('toggle-lap-measures-all')?.addEventListener('change', onLAPMasterChange);
+  LAP_MEASURES_CHILD_TOGGLE_IDS.forEach(id => {
+    document.getElementById(id)?.addEventListener('change', onLAPMeasuresChildToggleChange);
+  });
+  document.getElementById('toggle-lv-measures-all')?.addEventListener('change', onLVMasterChange);
+  LV_MEASURES_CHILD_TOGGLE_IDS.forEach(id => {
+    document.getElementById(id)?.addEventListener('change', onLVMeasuresChildToggleChange);
+  });
+  document.getElementById('toggle-haemodynamics-all')?.addEventListener('change', onHaemodynamicsMasterChange);
+  HAEMODYNAMICS_CHILD_TOGGLE_IDS.forEach(id => {
+    document.getElementById(id)?.addEventListener('change', onHaemodynamicsChildToggleChange);
+  });
+  document.getElementById('toggle-valve-measures-all')?.addEventListener('change', onValveMasterChange);
+  VALVE_MEASURES_CHILD_TOGGLE_IDS.forEach(id => {
+    document.getElementById(id)?.addEventListener('change', onValveMeasuresChildToggleChange);
+  });
   document.getElementById('toggle-machine-cwd')?.addEventListener('change', refreshMachineCapabilityFields);
   document.getElementById('toggle-machine-pwd')?.addEventListener('change', refreshMachineCapabilityFields);
   document.getElementById('toggle-machine-tdi')?.addEventListener('change', refreshMachineCapabilityFields);
@@ -3667,17 +4239,33 @@ document.addEventListener('DOMContentLoaded', () => {
   bindAutoCalcInput('sv-display-input', 'sv-display-source', recalcHaemodynamics);
   bindAutoCalcInput('co-display-input', 'co-display-source', recalcHaemodynamics);
   bindAutoCalcInput('ci-display-input', 'ci-display-source', recalcCardiacIndex);
-  bindAutoCalcInput('fs-display-input', 'fs-display-source', recalcFractionalShortening);
+  bindAutoCalcInput('bsa-display-input', 'bsa-display-source', () => {
+    recalcCardiacIndex();
+    recalcDerivedHaemodynamics();
+    recalcLVOptionalMeasures();
+  });
+  bindAutoCalcInput('svi-display-input', 'svi-display-source', recalcDerivedHaemodynamics);
+  bindAutoCalcInput('svr-display-input', 'svr-display-source', recalcDerivedHaemodynamics);
+  bindAutoCalcInput('svri-display-input', 'svri-display-source', recalcDerivedHaemodynamics);
+  bindAutoCalcInput('fs-display-input', 'fs-display-source', recalcLVOptionalMeasures);
+  bindAutoCalcInput('rwt-display-input', 'rwt-display-source', recalcLVOptionalMeasures);
+  bindAutoCalcInput('lv-mass-display-input', 'lv-mass-display-source', recalcLVOptionalMeasures);
+  bindAutoCalcInput('lvmi-display-input', 'lvmi-display-source', recalcLVOptionalMeasures);
+  bindAutoCalcInput('lvidd-index-display-input', 'lvidd-index-display-source', recalcLVOptionalMeasures);
   bindAutoCalcInput('ea-display-input', 'ea-display-source', recalcEA);
   bindAutoCalcInput('eprime-avg-input', 'eprime-avg-source', recalcEe);
   bindAutoCalcInput('ee-display-input', 'ee-display-source', recalcEe);
   bindAutoCalcInput('di-display-input', 'di-display-source', recalcDI);
+  bindAutoCalcInput('rv-lv-basal-ratio-display-input', 'rv-lv-basal-ratio-display-source', recalcRightHeartDerivedRatios);
+  bindAutoCalcInput('tapse-pasp-ratio-display-input', 'tapse-pasp-ratio-display-source', recalcRightHeartDerivedRatios);
+  bindAutoCalcInput('ava-continuity-display-input', 'ava-continuity-display-source', recalcAVAContinuity);
   bindAutoCalcInput('rri-display-input', 'rri-display-source', recalcRRI);
   recalcMAP();
   recalcHaemodynamics();
   recalcEA();
   recalcEe();
   recalcDI();
+  recalcAVAContinuity();
   recalcRRI();
   runMainContentSoftValidation();
   syncPHTBasicAutoSelections();
@@ -3804,6 +4392,8 @@ function buildCVSDrugChips() {
       updateCVSDrugSummary();
       updateCVSDrugDetailsUI();
       recalcCardiacIndex();
+      recalcBSAField();
+      recalcDerivedHaemodynamics();
     });
     c.appendChild(chip);
   });
@@ -4211,6 +4801,44 @@ function recalcDI() {
     inp.value = '';
   }
   inp.placeholder = (!manual && inp.value.trim() === '') ? 'Enter AV VTI and LVOT VTI' : '';
+  setAutoCalcSourceVisible(src, manual, inp.value.trim() !== '');
+  recalcAVAContinuity();
+}
+
+/** LVOT cross-sectional area (cm²) from diameter (cm): π × (d/2)² */
+function getLVOTCSA_cm2() {
+  const d = parseFloat(document.getElementById('f-lvotDiam')?.value);
+  if (isNaN(d) || d <= 0) return NaN;
+  const r = d / 2;
+  return Math.PI * r * r;
+}
+
+function recalcAVAContinuity() {
+  const readout = document.getElementById('lvot-csa-readout');
+  const inp = document.getElementById('ava-continuity-display-input');
+  const src = document.getElementById('ava-continuity-display-source');
+  if (!readout || !inp) return;
+  if (!document.getElementById('toggle-show-ava-continuity')?.checked) {
+    readout.textContent = '';
+    if (!isAutoCalcManual(inp)) inp.value = '';
+    setAutoCalcSourceVisible(src, isAutoCalcManual(inp), false);
+    return;
+  }
+  const csa = getLVOTCSA_cm2();
+  if (!isNaN(csa) && csa > 0) {
+    readout.textContent = `LVOT CSA (auto): ${csa.toFixed(2)} cm² — π × (LVOT diameter ÷ 2)²`;
+  } else {
+    readout.textContent = 'LVOT CSA (auto): — enter LVOT diameter (section 2)';
+  }
+  const manual = isAutoCalcManual(inp);
+  const lvotVTI = parseFloat(document.getElementById('f-lvotVTI')?.value);
+  const avVTI = parseFloat(document.getElementById('f-avVTI')?.value);
+  if (!isNaN(csa) && csa > 0 && !isNaN(lvotVTI) && lvotVTI > 0 && !isNaN(avVTI) && avVTI > 0) {
+    if (!manual) inp.value = (csa * (lvotVTI / avVTI)).toFixed(2);
+  } else if (!manual) {
+    inp.value = '';
+  }
+  inp.placeholder = (!manual && inp.value.trim() === '') ? 'Requires LVOT diameter, LVOT VTI & AV VTI' : '';
   setAutoCalcSourceVisible(src, manual, inp.value.trim() !== '');
 }
 
@@ -4704,11 +5332,68 @@ function setMachineCapWrapHidden(id, hidden) {
   if (w) w.classList.toggle('section-hidden', hidden);
 }
 
+function syncRHMasterToggle() {
+  const master = document.getElementById('toggle-rh-measures-all');
+  if (!master) return;
+  master.checked = RH_MEASURES_CHILD_TOGGLE_IDS.every(id => !!document.getElementById(id)?.checked);
+}
+
+function onRHMasterChange(ev) {
+  if (_syncingRHMaster) return;
+  _syncingRHMaster = true;
+  const on = ev.target.checked;
+  RH_MEASURES_CHILD_TOGGLE_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.checked = on;
+  });
+  _syncingRHMaster = false;
+  refreshRightHeartOptionalVisibility();
+}
+
+function onRHMeasuresChildToggleChange() {
+  if (_syncingRHMaster) return;
+  syncRHMasterToggle();
+  refreshRightHeartOptionalVisibility();
+}
+
+function refreshRightHeartOptionalVisibility() {
+  const paspWrap = document.getElementById('pasp-field-group-wrap');
+  if (paspWrap) {
+    const paspOn = !!document.getElementById('toggle-show-pasp-field')?.checked;
+    paspWrap.classList.toggle('section-hidden', !(paspOn && isMachineCWDEnabled()));
+  }
+  document.getElementById('rv-lv-basal-ratio-field-wrap')?.classList.toggle('section-hidden', !document.getElementById('toggle-show-rv-lv-basal-ratio')?.checked);
+  document.getElementById('tapse-pasp-ratio-field-wrap')?.classList.toggle('section-hidden', !document.getElementById('toggle-show-tapse-pasp-ratio')?.checked);
+  recalcPASPCVP();
+  syncRHMasterToggle();
+}
+
 function refreshPASPGatedVisibility() {
-  const wrap = document.getElementById('pasp-field-group-wrap');
-  if (!wrap) return;
-  const settingsOn = !!document.getElementById('toggle-show-pasp-field')?.checked;
-  wrap.classList.toggle('section-hidden', !(settingsOn && isMachineCWDEnabled()));
+  refreshRightHeartOptionalVisibility();
+}
+
+function syncLAPMasterToggle() {
+  const master = document.getElementById('toggle-lap-measures-all');
+  if (!master) return;
+  master.checked = LAP_MEASURES_CHILD_TOGGLE_IDS.every(id => !!document.getElementById(id)?.checked);
+}
+
+function onLAPMasterChange(ev) {
+  if (_syncingLAPMaster) return;
+  _syncingLAPMaster = true;
+  const on = ev.target.checked;
+  LAP_MEASURES_CHILD_TOGGLE_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.checked = on;
+  });
+  _syncingLAPMaster = false;
+  refreshEAFieldVisibility();
+}
+
+function onLAPMeasuresChildToggleChange() {
+  if (_syncingLAPMaster) return;
+  syncLAPMasterToggle();
+  refreshEAFieldVisibility();
 }
 
 function refreshEAFieldVisibility() {
@@ -4716,14 +5401,87 @@ function refreshEAFieldVisibility() {
   if (!wrap) return;
   const settingsOn = !!document.getElementById('toggle-show-ea-field')?.checked;
   wrap.classList.toggle('section-hidden', !(settingsOn && isMachinePWDEnabled()));
+  syncLAPMasterToggle();
+}
+
+function syncLVMasterToggle() {
+  const master = document.getElementById('toggle-lv-measures-all');
+  if (!master) return;
+  master.checked = LV_MEASURES_CHILD_TOGGLE_IDS.every(id => !!document.getElementById(id)?.checked);
+}
+
+function onLVMasterChange(ev) {
+  if (_syncingLVMaster) return;
+  _syncingLVMaster = true;
+  const on = ev.target.checked;
+  LV_MEASURES_CHILD_TOGGLE_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.checked = on;
+  });
+  _syncingLVMaster = false;
+  refreshLVMeasuresOptionalVisibility();
+}
+
+function onLVMeasuresChildToggleChange() {
+  if (_syncingLVMaster) return;
+  syncLVMasterToggle();
+  refreshLVMeasuresOptionalVisibility();
+}
+
+function refreshLVMeasuresOptionalVisibility() {
+  const fsOn = !!document.getElementById('toggle-show-lv-fractional-shortening')?.checked;
+  const rwtOn = !!document.getElementById('toggle-show-rwt')?.checked;
+  const lmOn = !!document.getElementById('toggle-show-lv-mass')?.checked;
+  const lvmiOn = !!document.getElementById('toggle-show-lvmi')?.checked;
+  const lvidIdxOn = !!document.getElementById('toggle-show-lvidd-indexed')?.checked;
+  document.getElementById('lv-fs-field-wrap')?.classList.toggle('section-hidden', !fsOn);
+  document.getElementById('rwt-field-wrap')?.classList.toggle('section-hidden', !rwtOn);
+  document.getElementById('lv-mass-field-wrap')?.classList.toggle('section-hidden', !lmOn);
+  document.getElementById('lvmi-field-wrap')?.classList.toggle('section-hidden', !lvmiOn);
+  document.getElementById('lvidd-index-field-wrap')?.classList.toggle('section-hidden', !lvidIdxOn);
+  const needAnthro = needsAnthropometricsForBSA();
+  document.getElementById('ci-wt-ht-fields')?.classList.toggle('section-hidden', !needAnthro);
+  checkCIAnthropometrics();
+  recalcLVOptionalMeasures();
+  syncLVMasterToggle();
 }
 
 function refreshLVFractionalShorteningVisibility() {
-  const wrap = document.getElementById('lv-fs-field-wrap');
-  if (!wrap) return;
-  const settingsOn = !!document.getElementById('toggle-show-lv-fractional-shortening')?.checked;
-  wrap.classList.toggle('section-hidden', !settingsOn);
-  if (settingsOn) recalcFractionalShortening();
+  refreshLVMeasuresOptionalVisibility();
+}
+
+function syncValveMasterToggle() {
+  const master = document.getElementById('toggle-valve-measures-all');
+  if (!master) return;
+  master.checked = VALVE_MEASURES_CHILD_TOGGLE_IDS.every(id => !!document.getElementById(id)?.checked);
+}
+
+function onValveMasterChange(ev) {
+  if (_syncingValveMaster) return;
+  _syncingValveMaster = true;
+  const on = ev.target.checked;
+  VALVE_MEASURES_CHILD_TOGGLE_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.checked = on;
+  });
+  _syncingValveMaster = false;
+  refreshValveOptionalVisibility();
+}
+
+function onValveMeasuresChildToggleChange() {
+  if (_syncingValveMaster) return;
+  syncValveMasterToggle();
+  refreshValveOptionalVisibility();
+}
+
+function refreshValveOptionalVisibility() {
+  const on =
+    !!document.getElementById('toggle-show-ava-continuity')?.checked &&
+    isMachinePWDEnabled() &&
+    isMachineCWDEnabled();
+  document.getElementById('ava-continuity-field-wrap')?.classList.toggle('section-hidden', !on);
+  recalcAVAContinuity();
+  syncValveMasterToggle();
 }
 
 function clearCardiacIndexValidationUI() {
@@ -4738,42 +5496,56 @@ function clearCardiacIndexValidationUI() {
     hiHint.textContent = '';
     hiHint.classList.remove('show');
   }
-  document.getElementById('f-height')?.classList.remove('soft-red');
-  document.getElementById('f-weight')?.classList.remove('soft-red');
-  document.getElementById('height-plaus-hint')?.classList.remove('show');
-  document.getElementById('weight-plaus-hint')?.classList.remove('show');
+}
+
+function syncHaemodynamicsMasterToggle() {
+  const master = document.getElementById('toggle-haemodynamics-all');
+  if (!master) return;
+  master.checked = HAEMODYNAMICS_CHILD_TOGGLE_IDS.every(id => !!document.getElementById(id)?.checked);
+}
+
+function onHaemodynamicsMasterChange(ev) {
+  if (_syncingHaemodynamicsMaster) return;
+  _syncingHaemodynamicsMaster = true;
+  const on = ev.target.checked;
+  HAEMODYNAMICS_CHILD_TOGGLE_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.checked = on;
+  });
+  _syncingHaemodynamicsMaster = false;
+  refreshHaemodynamicsOptionalVisibility();
+}
+
+function onHaemodynamicsChildToggleChange() {
+  if (_syncingHaemodynamicsMaster) return;
+  syncHaemodynamicsMasterToggle();
+  refreshHaemodynamicsOptionalVisibility();
+}
+
+function refreshHaemodynamicsOptionalVisibility() {
+  const pwd = isMachinePWDEnabled();
+  const ciOn = !!document.getElementById('toggle-show-cardiac-index')?.checked;
+  const bsaOn = !!document.getElementById('toggle-show-bsa')?.checked;
+  const sviOn = !!document.getElementById('toggle-show-svi')?.checked;
+  const svrOn = !!document.getElementById('toggle-show-svr')?.checked;
+  const svriOn = !!document.getElementById('toggle-show-svri')?.checked;
+  document.getElementById('ci-field-wrap')?.classList.toggle('section-hidden', !ciOn || !pwd);
+  document.getElementById('bsa-field-wrap')?.classList.toggle('section-hidden', !bsaOn);
+  document.getElementById('svi-field-wrap')?.classList.toggle('section-hidden', !sviOn || !pwd);
+  document.getElementById('svr-field-wrap')?.classList.toggle('section-hidden', !svrOn || !pwd);
+  document.getElementById('svri-field-wrap')?.classList.toggle('section-hidden', !svriOn || !pwd);
+  const needAnthro = needsAnthropometricsForBSA();
+  document.getElementById('ci-wt-ht-fields')?.classList.toggle('section-hidden', !needAnthro);
+  if (!ciOn) clearCardiacIndexValidationUI();
+  checkCIAnthropometrics();
+  recalcCardiacIndex();
+  recalcBSAField();
+  recalcDerivedHaemodynamics();
+  syncHaemodynamicsMasterToggle();
 }
 
 function refreshCardiacIndexVisibility() {
-  const ciWrap = document.getElementById('ci-field-wrap');
-  const wtHtWrap = document.getElementById('ci-wt-ht-fields');
-  const on = !!document.getElementById('toggle-show-cardiac-index')?.checked;
-  if (ciWrap) ciWrap.classList.toggle('section-hidden', !on);
-  if (wtHtWrap) wtHtWrap.classList.toggle('section-hidden', !on);
-  if (on) {
-    checkCIAnthropometrics();
-    recalcCardiacIndex();
-  } else {
-    clearCardiacIndexValidationUI();
-  }
-}
-
-/** When PWD is off: LVOT diameter stays enabled; SV/CO and VTI deltas are disabled (not hidden). */
-function refreshVTISectionPWDFields() {
-  const pwd = isMachinePWDEnabled();
-  const hint = 'Pulsed-wave (PWD) Doppler is off — enable PWD in Settings to use this field.';
-  [['sv-display-input', hint], ['co-display-input', hint], ['f-vtiDeltaResp', hint], ['f-vtiDeltaIntervention', hint], ['f-vtiInterventionDetails', hint]]
-    .forEach(([id, title]) => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.disabled = !pwd;
-      if (pwd) el.removeAttribute('title');
-      else el.title = title;
-    });
-  ['vti-int-plr', 'vti-int-fluids', 'vti-int-pressor', 'vti-int-inotropes'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.disabled = !pwd;
-  });
+  refreshHaemodynamicsOptionalVisibility();
 }
 
 function refreshMachineCapabilityFields() {
@@ -4794,6 +5566,8 @@ function refreshMachineCapabilityFields() {
   const tdi = isMachineTDIEnabled();
   setMachineCapWrapHidden('mc-tdi-lv-sprime-wrap', !tdi);
   setMachineCapWrapHidden('mc-pwd-lvot-main-wrap', !pwd);
+  setMachineCapWrapHidden('mc-pwd-sv-co-wrap', !pwd);
+  setMachineCapWrapHidden('mc-pwd-vti-intervention-wrap', !pwd);
   setMachineCapWrapHidden('mc-pwd-mv-inflow-wrap', !pwd);
   setMachineCapWrapHidden('mc-tdi-eprime-row-wrap', !tdi);
   setMachineCapWrapHidden('mc-tdi-ee-wrap', !tdi);
@@ -4805,16 +5579,16 @@ function refreshMachineCapabilityFields() {
   setMachineCapWrapHidden('mc-di-wrap', !cwd || !pwd);
   setMachineCapWrapHidden('mc-cwd-trvmax-valve-wrap', !cwd);
   setMachineCapWrapHidden('mc-pwd-veins-wrap', !pwd);
-  refreshPASPGatedVisibility();
+  refreshRightHeartOptionalVisibility();
   refreshEAFieldVisibility();
-  refreshLVFractionalShorteningVisibility();
-  refreshCardiacIndexVisibility();
-  refreshVTISectionPWDFields();
+  refreshLVMeasuresOptionalVisibility();
+  refreshHaemodynamicsOptionalVisibility();
+  refreshValveOptionalVisibility();
   buildLVOTOChips();
   buildTamponadeChips();
   buildPHTAdvancedChips();
   recalcHaemodynamics();
-  recalcFractionalShortening();
+  recalcLVOptionalMeasures();
   refreshScanInfoMachineLimits();
   updateScanInfoCollapseAllButton();
 }
@@ -5244,7 +6018,7 @@ const MAIN_CONTENT_SOFT_VALIDATION_MS = 480;
 function runMainContentSoftValidation() {
   refreshRVFieldValidations();
   checkLVIDdHint();
-  recalcFractionalShortening();
+  recalcLVOptionalMeasures();
   checkScanDateNotFuture();
   checkAge();
   checkHR();
@@ -5252,6 +6026,10 @@ function runMainContentSoftValidation() {
   checkLAArea();
   checkCIAnthropometrics();
   if (document.getElementById('toggle-show-cardiac-index')?.checked) recalcCardiacIndex();
+  recalcBSAField();
+  recalcDerivedHaemodynamics();
+  recalcAVAContinuity();
+  recalcRightHeartDerivedRatios();
 }
 
 function scheduleMainContentSoftValidation() {
@@ -5408,6 +6186,9 @@ function recalcHaemodynamics() {
   } else coInp.placeholder = '';
   setAutoCalcSourceVisible(coSrc, coManual, coInp.value.trim() !== '');
   recalcCardiacIndex();
+  recalcBSAField();
+  recalcDerivedHaemodynamics();
+  recalcAVAContinuity();
 }
 
 function recalcCardiacIndex() {
@@ -5417,12 +6198,7 @@ function recalcCardiacIndex() {
   if (!ciInp) return;
   const manual = isAutoCalcManual(ciInp);
 
-  const wt = parseFloat(document.getElementById('f-weight')?.value);
-  const ht = parseFloat(document.getElementById('f-height')?.value);
-  let bsa = NaN;
-  if (!isNaN(wt) && wt > 0 && !isNaN(ht) && ht > 0) {
-    bsa = Math.sqrt((ht * wt) / 3600);
-  }
+  const bsa = getBSAMosteller();
 
   const coVal = parseFloat(getCOCalc());
 
@@ -5482,13 +6258,99 @@ function recalcCardiacIndex() {
   }
 }
 
-/** Height/weight plausibility when Cardiac Index mode is on (BSA inputs). */
+function recalcBSAField() {
+  const inp = document.getElementById('bsa-display-input');
+  const src = document.getElementById('bsa-display-source');
+  if (!inp) return;
+  if (!document.getElementById('toggle-show-bsa')?.checked) {
+    if (!isAutoCalcManual(inp)) inp.value = '';
+    if (src) setAutoCalcSourceVisible(src, isAutoCalcManual(inp), false);
+    return;
+  }
+  const manual = isAutoCalcManual(inp);
+  const bsa = getBSAMosteller();
+  if (!isNaN(bsa) && bsa > 0) {
+    if (!manual) inp.value = bsa.toFixed(2);
+  } else if (!manual) {
+    inp.value = '';
+  }
+  inp.placeholder = (!manual && inp.value.trim() === '') ? 'Requires weight & height (Section 1)' : '';
+  if (src) setAutoCalcSourceVisible(src, manual, inp.value.trim() !== '');
+}
+
+function recalcDerivedHaemodynamics() {
+  if (document.getElementById('toggle-show-svi')?.checked) {
+    const inp = document.getElementById('svi-display-input');
+    const src = document.getElementById('svi-display-source');
+    if (inp) {
+      const manual = isAutoCalcManual(inp);
+      const sv = parseFloat(getSVCalc());
+      const bsa = getBSAMosteller();
+      if (!isNaN(sv) && sv > 0 && !isNaN(bsa) && bsa > 0) {
+        if (!manual) inp.value = (sv / bsa).toFixed(0);
+      } else if (!manual) {
+        inp.value = '';
+      }
+      inp.placeholder = (!manual && inp.value.trim() === '') ? 'Requires SV + weight & height' : '';
+      if (src) setAutoCalcSourceVisible(src, manual, inp.value.trim() !== '');
+    }
+  }
+
+  if (document.getElementById('toggle-show-svr')?.checked) {
+    const inp = document.getElementById('svr-display-input');
+    const src = document.getElementById('svr-display-source');
+    if (inp) {
+      const manual = isAutoCalcManual(inp);
+      const map = parseFloat(getMAPCalc());
+      const cvp = parseFloat(document.getElementById('f-cvp')?.value);
+      const co = parseFloat(getCOCalc());
+      if (!isNaN(map) && !isNaN(cvp) && !isNaN(co) && co > 0) {
+        const svr = ((map - cvp) / co) * 80;
+        if (Number.isFinite(svr) && !manual) inp.value = svr.toFixed(0);
+      } else if (!manual) {
+        inp.value = '';
+      }
+      inp.placeholder = (!manual && inp.value.trim() === '') ? 'Requires MAP, CVP & CO' : '';
+      if (src) setAutoCalcSourceVisible(src, manual, inp.value.trim() !== '');
+    }
+  }
+
+  if (document.getElementById('toggle-show-svri')?.checked) {
+    const inp = document.getElementById('svri-display-input');
+    const src = document.getElementById('svri-display-source');
+    if (inp) {
+      const manual = isAutoCalcManual(inp);
+      let svrNum = NaN;
+      const svrInp = document.getElementById('svr-display-input');
+      const svrTog = document.getElementById('toggle-show-svr')?.checked;
+      if (svrTog && svrInp && svrInp.value.trim()) {
+        svrNum = parseFloat(svrInp.value);
+      }
+      if (isNaN(svrNum) || svrNum <= 0) {
+        const map = parseFloat(getMAPCalc());
+        const cvp = parseFloat(document.getElementById('f-cvp')?.value);
+        const co = parseFloat(getCOCalc());
+        if (!isNaN(map) && !isNaN(cvp) && !isNaN(co) && co > 0) svrNum = ((map - cvp) / co) * 80;
+      }
+      const bsa = getBSAMosteller();
+      if (!isNaN(svrNum) && svrNum > 0 && !isNaN(bsa) && bsa > 0) {
+        if (!manual) inp.value = (svrNum * bsa).toFixed(0);
+      } else if (!manual) {
+        inp.value = '';
+      }
+      inp.placeholder = (!manual && inp.value.trim() === '') ? 'Requires SVR + BSA' : '';
+      if (src) setAutoCalcSourceVisible(src, manual, inp.value.trim() !== '');
+    }
+  }
+}
+
+/** Height/weight plausibility when any BSA-based haemodynamic measure is on. */
 function checkCIAnthropometrics() {
   const heightHint = document.getElementById('height-plaus-hint');
   const weightHint = document.getElementById('weight-plaus-hint');
   const hInp = document.getElementById('f-height');
   const wInp = document.getElementById('f-weight');
-  if (!document.getElementById('toggle-show-cardiac-index')?.checked) {
+  if (!needsAnthropometricsForBSA()) {
     hInp?.classList.remove('soft-red');
     wInp?.classList.remove('soft-red');
     heightHint?.classList.remove('show');
@@ -5540,24 +6402,208 @@ function checkCIAnthropometrics() {
   }
 }
 
+/** Mosteller BSA (m²) from weight (kg) and height (cm); NaN if invalid. */
+function getBSAMosteller() {
+  const wt = parseFloat(document.getElementById('f-weight')?.value);
+  const ht = parseFloat(document.getElementById('f-height')?.value);
+  if (isNaN(wt) || wt <= 0 || isNaN(ht) || ht <= 0) return NaN;
+  return Math.sqrt((ht * wt) / 3600);
+}
+
+function needsAnthropometricsForBSA() {
+  return !!(
+    document.getElementById('toggle-show-cardiac-index')?.checked ||
+    document.getElementById('toggle-show-bsa')?.checked ||
+    document.getElementById('toggle-show-svi')?.checked ||
+    document.getElementById('toggle-show-svri')?.checked ||
+    document.getElementById('toggle-show-lvmi')?.checked ||
+    document.getElementById('toggle-show-lvidd-indexed')?.checked
+  );
+}
+
 function getCICalc() {
   const ciInp = document.getElementById('ci-display-input');
   if (ciInp?.value.trim()) return ciInp.value.trim();
   const co = parseFloat(getCOCalc());
-  const wt = parseFloat(document.getElementById('f-weight')?.value);
-  const ht = parseFloat(document.getElementById('f-height')?.value);
-  if (isNaN(co) || co <= 0 || isNaN(wt) || wt <= 0 || isNaN(ht) || ht <= 0) return '';
-  const bsa = Math.sqrt((ht * wt) / 3600);
-  if (bsa <= 0) return '';
+  const bsa = getBSAMosteller();
+  if (isNaN(co) || co <= 0 || isNaN(bsa) || bsa <= 0) return '';
   return (co / bsa).toFixed(2);
 }
 
-function recalcFractionalShortening() {
+function getBSACalc() {
+  const inp = document.getElementById('bsa-display-input');
+  if (inp?.value.trim()) return inp.value.trim();
+  const bsa = getBSAMosteller();
+  if (isNaN(bsa) || bsa <= 0) return '';
+  return bsa.toFixed(2);
+}
+
+function getSVICalc() {
+  const inp = document.getElementById('svi-display-input');
+  if (inp?.value.trim()) return inp.value.trim();
+  const sv = parseFloat(getSVCalc());
+  const bsa = getBSAMosteller();
+  if (!isNaN(sv) && sv > 0 && !isNaN(bsa) && bsa > 0) return (sv / bsa).toFixed(0);
+  return '';
+}
+
+function getSVRCalc() {
+  const inp = document.getElementById('svr-display-input');
+  if (inp?.value.trim()) return inp.value.trim();
+  const map = parseFloat(getMAPCalc());
+  const cvp = parseFloat(document.getElementById('f-cvp')?.value);
+  const co = parseFloat(getCOCalc());
+  if (!isNaN(map) && !isNaN(cvp) && !isNaN(co) && co > 0) {
+    const svr = ((map - cvp) / co) * 80;
+    if (Number.isFinite(svr)) return svr.toFixed(0);
+  }
+  return '';
+}
+
+function getSVRICalc() {
+  const inp = document.getElementById('svri-display-input');
+  if (inp?.value.trim()) return inp.value.trim();
+  let svrNum = NaN;
+  const svrInp = document.getElementById('svr-display-input');
+  const svrTog = document.getElementById('toggle-show-svr')?.checked;
+  if (svrTog && svrInp && svrInp.value.trim()) svrNum = parseFloat(svrInp.value);
+  if (isNaN(svrNum) || svrNum <= 0) {
+    const map = parseFloat(getMAPCalc());
+    const cvp = parseFloat(document.getElementById('f-cvp')?.value);
+    const co = parseFloat(getCOCalc());
+    if (!isNaN(map) && !isNaN(cvp) && !isNaN(co) && co > 0) svrNum = ((map - cvp) / co) * 80;
+  }
+  const bsa = getBSAMosteller();
+  if (!isNaN(svrNum) && svrNum > 0 && !isNaN(bsa) && bsa > 0) return (svrNum * bsa).toFixed(0);
+  return '';
+}
+
+/** Devereux LV mass (g) from LVIDd, IVSd, LVPWd in mm; NaN if insufficient. */
+function getLVMassFromDimensionsGrams() {
+  const lvidDmm = parseFloat(document.getElementById('f-lvidd')?.value);
+  const ivsdMm = parseFloat(document.getElementById('f-ivsd')?.value);
+  const lvpwdMm = parseFloat(document.getElementById('f-lvpwd')?.value);
+  if (isNaN(lvidDmm) || lvidDmm <= 0 || isNaN(ivsdMm) || ivsdMm <= 0 || isNaN(lvpwdMm) || lvpwdMm <= 0) return NaN;
+  const d = lvidDmm / 10;
+  const ivs = ivsdMm / 10;
+  const pw = lvpwdMm / 10;
+  const sum = d + ivs + pw;
+  return 0.8 * (1.04 * (sum * sum * sum) - d * d * d) + 0.6;
+}
+
+function getLVMassGramsForLVMI() {
+  const massOn = document.getElementById('toggle-show-lv-mass')?.checked;
+  const massInp = document.getElementById('lv-mass-display-input');
+  if (massOn && massInp?.value.trim()) {
+    const v = parseFloat(massInp.value);
+    if (!isNaN(v) && v > 0) return v;
+  }
+  return getLVMassFromDimensionsGrams();
+}
+
+function recalcRelativeWallThickness() {
+  const inp = document.getElementById('rwt-display-input');
+  const src = document.getElementById('rwt-display-source');
+  if (!inp) return;
+  if (!document.getElementById('toggle-show-rwt')?.checked) {
+    if (!isAutoCalcManual(inp)) inp.value = '';
+    setAutoCalcSourceVisible(src, isAutoCalcManual(inp), false);
+    return;
+  }
+  const manual = isAutoCalcManual(inp);
   const lvidD = parseFloat(document.getElementById('f-lvidd')?.value);
-  const lvidS = parseFloat(document.getElementById('f-lvids')?.value);
+  const lvpwd = parseFloat(document.getElementById('f-lvpwd')?.value);
+  if (!isNaN(lvidD) && lvidD > 0 && !isNaN(lvpwd) && lvpwd > 0) {
+    if (!manual) inp.value = ((2 * lvpwd) / lvidD).toFixed(3);
+  } else if (!manual) {
+    inp.value = '';
+  }
+  inp.placeholder = (!manual && inp.value.trim() === '') ? 'Requires LVIDd & LVPWd' : '';
+  setAutoCalcSourceVisible(src, manual, inp.value.trim() !== '');
+}
+
+function recalcLVMassField() {
+  const inp = document.getElementById('lv-mass-display-input');
+  const src = document.getElementById('lv-mass-display-source');
+  if (!inp) return;
+  if (!document.getElementById('toggle-show-lv-mass')?.checked) {
+    if (!isAutoCalcManual(inp)) inp.value = '';
+    setAutoCalcSourceVisible(src, isAutoCalcManual(inp), false);
+    return;
+  }
+  const manual = isAutoCalcManual(inp);
+  const m = getLVMassFromDimensionsGrams();
+  if (!isNaN(m) && m > 0) {
+    if (!manual) inp.value = m.toFixed(0);
+  } else if (!manual) {
+    inp.value = '';
+  }
+  inp.placeholder = (!manual && inp.value.trim() === '') ? 'Requires LVIDd, IVSd & LVPWd' : '';
+  setAutoCalcSourceVisible(src, manual, inp.value.trim() !== '');
+}
+
+function recalcLVMIField() {
+  const inp = document.getElementById('lvmi-display-input');
+  const src = document.getElementById('lvmi-display-source');
+  if (!inp) return;
+  if (!document.getElementById('toggle-show-lvmi')?.checked) {
+    if (!isAutoCalcManual(inp)) inp.value = '';
+    setAutoCalcSourceVisible(src, isAutoCalcManual(inp), false);
+    return;
+  }
+  const manual = isAutoCalcManual(inp);
+  const massG = getLVMassGramsForLVMI();
+  const bsa = getBSAMosteller();
+  if (!isNaN(massG) && massG > 0 && !isNaN(bsa) && bsa > 0) {
+    if (!manual) inp.value = (massG / bsa).toFixed(1);
+  } else if (!manual) {
+    inp.value = '';
+  }
+  inp.placeholder = (!manual && inp.value.trim() === '') ? 'Requires LV mass data + weight & height' : '';
+  setAutoCalcSourceVisible(src, manual, inp.value.trim() !== '');
+}
+
+function recalcLVIDdIndexedField() {
+  const inp = document.getElementById('lvidd-index-display-input');
+  const src = document.getElementById('lvidd-index-display-source');
+  if (!inp) return;
+  if (!document.getElementById('toggle-show-lvidd-indexed')?.checked) {
+    if (!isAutoCalcManual(inp)) inp.value = '';
+    setAutoCalcSourceVisible(src, isAutoCalcManual(inp), false);
+    return;
+  }
+  const manual = isAutoCalcManual(inp);
+  const lvidD = parseFloat(document.getElementById('f-lvidd')?.value);
+  const bsa = getBSAMosteller();
+  if (!isNaN(lvidD) && lvidD > 0 && !isNaN(bsa) && bsa > 0) {
+    if (!manual) inp.value = (lvidD / bsa).toFixed(1);
+  } else if (!manual) {
+    inp.value = '';
+  }
+  inp.placeholder = (!manual && inp.value.trim() === '') ? 'Requires LVIDd + weight & height' : '';
+  setAutoCalcSourceVisible(src, manual, inp.value.trim() !== '');
+}
+
+function recalcLVOptionalMeasures() {
+  recalcFractionalShortening();
+  recalcRelativeWallThickness();
+  recalcLVMassField();
+  recalcLVMIField();
+  recalcLVIDdIndexedField();
+}
+
+function recalcFractionalShortening() {
   const inp = document.getElementById('fs-display-input');
   const src = document.getElementById('fs-display-source');
   if (!inp) return;
+  if (!document.getElementById('toggle-show-lv-fractional-shortening')?.checked) {
+    if (!isAutoCalcManual(inp)) inp.value = '';
+    inp.placeholder = '—';
+    setAutoCalcSourceVisible(src, isAutoCalcManual(inp), false);
+    return;
+  }
+  const lvidD = parseFloat(document.getElementById('f-lvidd')?.value);
+  const lvidS = parseFloat(document.getElementById('f-lvids')?.value);
   const manual = isAutoCalcManual(inp);
   let fs = NaN;
   if (!isNaN(lvidD) && lvidD > 0 && !isNaN(lvidS) && lvidS < lvidD) {
@@ -5682,11 +6728,13 @@ function recalcPASPCVP() {
   const trv = parseFloat(document.getElementById('f-trVmax')?.value);
   if (trEmpty || isNaN(trv) || trv <= 0) {
     el.innerHTML = '<span class="calc-empty">Enter TR Vmax</span>';
+    recalcRightHeartDerivedRatios();
     return;
   }
   const ctx = computePASPContext();
   if (!ctx) {
     el.innerHTML = '<span class="calc-empty">Enter CVP (Section 1) or IVC diameter + collapsibility (Veins)</span>';
+    recalcRightHeartDerivedRatios();
     return;
   }
   const val = ctx.pasp.toFixed(0);
@@ -5695,6 +6743,55 @@ function recalcPASPCVP() {
   } else {
     el.innerHTML = `PASP: <span class="calc-val">${val} mmHg</span><div class="pasp-estimate-note"><strong>Estimation:</strong> CVP not entered. Mean RAP for this tool is taken as <strong>${ctx.rapMid} mmHg</strong> (IVC table category ~${ctx.rapBand} mmHg: diameter vs collapsibility). This is <strong>not</strong> a measured CVP — use with caution.</div>`;
   }
+  recalcRightHeartDerivedRatios();
+}
+
+function recalcRVLVBasalRatioField() {
+  const inp = document.getElementById('rv-lv-basal-ratio-display-input');
+  const src = document.getElementById('rv-lv-basal-ratio-display-source');
+  if (!inp) return;
+  if (!document.getElementById('toggle-show-rv-lv-basal-ratio')?.checked) {
+    if (!isAutoCalcManual(inp)) inp.value = '';
+    setAutoCalcSourceVisible(src, isAutoCalcManual(inp), false);
+    return;
+  }
+  const manual = isAutoCalcManual(inp);
+  const rv = parseFloat(document.getElementById('f-rvBasalDiam')?.value);
+  const lvid = parseFloat(document.getElementById('f-lvidd')?.value);
+  if (!isNaN(rv) && rv > 0 && !isNaN(lvid) && lvid > 0) {
+    if (!manual) inp.value = (rv / lvid).toFixed(3);
+  } else if (!manual) {
+    inp.value = '';
+  }
+  inp.placeholder = (!manual && inp.value.trim() === '') ? 'Requires RV basal diameter & LVIDd' : '';
+  setAutoCalcSourceVisible(src, manual, inp.value.trim() !== '');
+}
+
+function recalcTAPSEPASPRatioField() {
+  const inp = document.getElementById('tapse-pasp-ratio-display-input');
+  const src = document.getElementById('tapse-pasp-ratio-display-source');
+  if (!inp) return;
+  if (!document.getElementById('toggle-show-tapse-pasp-ratio')?.checked) {
+    if (!isAutoCalcManual(inp)) inp.value = '';
+    setAutoCalcSourceVisible(src, isAutoCalcManual(inp), false);
+    return;
+  }
+  const manual = isAutoCalcManual(inp);
+  const tapse = parseFloat(document.getElementById('f-tapse')?.value);
+  const ctx = computePASPContext();
+  const pasp = ctx && ctx.pasp > 0 ? ctx.pasp : NaN;
+  if (!isNaN(tapse) && tapse > 0 && !isNaN(pasp) && pasp > 0) {
+    if (!manual) inp.value = (tapse / pasp).toFixed(3);
+  } else if (!manual) {
+    inp.value = '';
+  }
+  inp.placeholder = (!manual && inp.value.trim() === '') ? 'Requires TAPSE & estimable PASP (TR Vmax + CVP or IVC)' : '';
+  setAutoCalcSourceVisible(src, manual, inp.value.trim() !== '');
+}
+
+function recalcRightHeartDerivedRatios() {
+  recalcRVLVBasalRatioField();
+  recalcTAPSEPASPRatioField();
 }
 
 function recalcEA() {
@@ -5950,6 +7047,7 @@ function recalcMAP() {
   }
   inp.placeholder = (!manual && inp.value.trim() === '') ? 'Enter systolic and diastolic BP' : '';
   setAutoCalcSourceVisible(src, manual, inp.value.trim() !== '');
+  recalcDerivedHaemodynamics();
 }
 
 /** Parse calendar date from scan date field (native date or text e.g. after anonymisation). */
@@ -6298,6 +7396,11 @@ function applySettingsTogglesFromDraft(st) {
   toggleFusicHdQuestionsSection(!!document.getElementById('toggle-fusic-hd-questions')?.checked);
   toggleSummarySectionVisibility(!!document.getElementById('toggle-show-summary-section')?.checked);
   refreshMachineCapabilityFields();
+  syncHaemodynamicsMasterToggle();
+  syncLVMasterToggle();
+  syncValveMasterToggle();
+  syncRHMasterToggle();
+  syncLAPMasterToggle();
 }
 
 function applySessionDraftPayload(d) {
@@ -6381,12 +7484,23 @@ function applySessionDraftPayload(d) {
         'sv-display-input': 'sv-display-source',
         'co-display-input': 'co-display-source',
         'ci-display-input': 'ci-display-source',
+        'bsa-display-input': 'bsa-display-source',
+        'svi-display-input': 'svi-display-source',
+        'svr-display-input': 'svr-display-source',
+        'svri-display-input': 'svri-display-source',
         'ea-display-input': 'ea-display-source',
         'eprime-avg-input': 'eprime-avg-source',
         'ee-display-input': 'ee-display-source',
         'di-display-input': 'di-display-source',
         'rri-display-input': 'rri-display-source',
-        'fs-display-input': 'fs-display-source'
+        'fs-display-input': 'fs-display-source',
+        'rwt-display-input': 'rwt-display-source',
+        'lv-mass-display-input': 'lv-mass-display-source',
+        'lvmi-display-input': 'lvmi-display-source',
+        'lvidd-index-display-input': 'lvidd-index-display-source',
+        'ava-continuity-display-input': 'ava-continuity-display-source',
+        'rv-lv-basal-ratio-display-input': 'rv-lv-basal-ratio-display-source',
+        'tapse-pasp-ratio-display-input': 'tapse-pasp-ratio-display-source'
       };
       const sid = srcMap[id];
       if (sid) setAutoCalcSourceVisible(document.getElementById(sid), inp.dataset.manual === '1', !!inp.value.trim());
@@ -6622,6 +7736,42 @@ function getFractionalShorteningCalc() {
   if (fs < 0 || fs > 100) return '';
   return fs.toFixed(1);
 }
+
+function getRWTCalc() {
+  const inp = document.getElementById('rwt-display-input');
+  if (inp?.value.trim()) return inp.value.trim();
+  const lvidD = parseFloat(document.getElementById('f-lvidd')?.value);
+  const lvpwd = parseFloat(document.getElementById('f-lvpwd')?.value);
+  if (isNaN(lvidD) || lvidD <= 0 || isNaN(lvpwd) || lvpwd <= 0) return '';
+  return ((2 * lvpwd) / lvidD).toFixed(3);
+}
+
+function getLVMassCalc() {
+  const inp = document.getElementById('lv-mass-display-input');
+  if (inp?.value.trim()) return inp.value.trim();
+  const m = getLVMassFromDimensionsGrams();
+  if (isNaN(m) || m <= 0) return '';
+  return m.toFixed(0);
+}
+
+function getLVMICalc() {
+  const inp = document.getElementById('lvmi-display-input');
+  if (inp?.value.trim()) return inp.value.trim();
+  const massG = getLVMassGramsForLVMI();
+  const bsa = getBSAMosteller();
+  if (isNaN(massG) || massG <= 0 || isNaN(bsa) || bsa <= 0) return '';
+  return (massG / bsa).toFixed(1);
+}
+
+function getLVIDdIndexedCalc() {
+  const inp = document.getElementById('lvidd-index-display-input');
+  if (inp?.value.trim()) return inp.value.trim();
+  const lvidD = parseFloat(document.getElementById('f-lvidd')?.value);
+  const bsa = getBSAMosteller();
+  if (isNaN(lvidD) || lvidD <= 0 || isNaN(bsa) || bsa <= 0) return '';
+  return (lvidD / bsa).toFixed(1);
+}
+
 function getEACalc() {
   const inp = document.getElementById('ea-display-input');
   if (inp?.value.trim()) return inp.value.trim();
@@ -6663,6 +7813,17 @@ function getDICalc() {
   if (isNaN(lvotVTI) || isNaN(avVTI) || avVTI <= 0 || lvotVTI <= 0) return '';
   return (lvotVTI / avVTI).toFixed(2);
 }
+
+function getAVAContinuityCalc() {
+  const inp = document.getElementById('ava-continuity-display-input');
+  if (inp?.value.trim()) return inp.value.trim();
+  const csa = getLVOTCSA_cm2();
+  const lvotVTI = parseFloat(document.getElementById('f-lvotVTI')?.value);
+  const avVTI = parseFloat(document.getElementById('f-avVTI')?.value);
+  if (isNaN(csa) || csa <= 0 || isNaN(lvotVTI) || lvotVTI <= 0 || isNaN(avVTI) || avVTI <= 0) return '';
+  return (csa * (lvotVTI / avVTI)).toFixed(2);
+}
+
 function getMAPCalc() {
   const inp = document.getElementById('map-display-input');
   if (inp?.value.trim()) return inp.value.trim();
@@ -6695,6 +7856,25 @@ function getPASPCVPCalc() {
     rapMid: ctx.mode === 'ivc' ? ctx.rapMid : null
   };
 }
+
+function getRVLVBasalRatioCalc() {
+  const inp = document.getElementById('rv-lv-basal-ratio-display-input');
+  if (inp?.value.trim()) return inp.value.trim();
+  const rv = parseFloat(document.getElementById('f-rvBasalDiam')?.value);
+  const lvid = parseFloat(document.getElementById('f-lvidd')?.value);
+  if (isNaN(rv) || rv <= 0 || isNaN(lvid) || lvid <= 0) return '';
+  return (rv / lvid).toFixed(3);
+}
+
+function getTAPSEPASPRatioCalc() {
+  const inp = document.getElementById('tapse-pasp-ratio-display-input');
+  if (inp?.value.trim()) return inp.value.trim();
+  const tapse = parseFloat(document.getElementById('f-tapse')?.value);
+  const ctx = computePASPContext();
+  if (!ctx || !(ctx.pasp > 0) || isNaN(tapse) || tapse <= 0) return '';
+  return (tapse / ctx.pasp).toFixed(3);
+}
+
 function getPericardialLocations() {
   return ['Global','Anterior','Posterior','Lateral'].filter(l => document.getElementById(`f-peri${l}`)?.checked).join(', ');
 }
@@ -6923,6 +8103,70 @@ function initExportSplitControl() {
 }
 
 // ─── EXPORT DATA (shared by Excel + plain-text clipboard) ─
+const NONFUSIC_HD_DISCLAIMER_EXPORT_INTRO =
+  'The following measurements are auto-calculated from echo-derived data and fall outside the scope of FUSIC HD. They are provided as supplementary data for clinicians holding advanced echocardiography accreditations and have not contributed to the clinical assessment or conclusions of this report:';
+
+const NONFUSIC_HD_EXPORT_MEASURE_OPTIONS = [
+  { id: 'toggle-show-pasp-field', label: 'PASP (estimated)' },
+  { id: 'toggle-show-rv-lv-basal-ratio', label: 'RV:LV basal diameter ratio' },
+  { id: 'toggle-show-tapse-pasp-ratio', label: 'TAPSE / PASP ratio' },
+  { id: 'toggle-show-ea-field', label: 'E/A ratio' },
+  { id: 'toggle-show-lv-fractional-shortening', label: 'LV fractional shortening' },
+  { id: 'toggle-show-rwt', label: 'Relative wall thickness' },
+  { id: 'toggle-show-lv-mass', label: 'LV mass' },
+  { id: 'toggle-show-lvmi', label: 'LV mass index' },
+  { id: 'toggle-show-lvidd-indexed', label: 'Indexed LVIDd' },
+  { id: 'toggle-show-cardiac-index', label: 'Cardiac index' },
+  { id: 'toggle-show-bsa', label: 'BSA (body surface area)' },
+  { id: 'toggle-show-svi', label: 'Stroke volume index' },
+  { id: 'toggle-show-svr', label: 'Systemic vascular resistance (SVR)' },
+  { id: 'toggle-show-svri', label: 'SVR index' },
+  { id: 'toggle-show-ava-continuity', label: 'Aortic valve area (continuity equation)' }
+];
+
+function getNonFusicHdEnabledMeasureLabelsForExport() {
+  return NONFUSIC_HD_EXPORT_MEASURE_OPTIONS.filter(({ id }) => document.getElementById(id)?.checked).map(({ label }) => label);
+}
+
+function appendNonFusicHdDisclaimerExportRows(rows) {
+  const t = document.getElementById('toggle-export-nonfusic-disclaimer');
+  if (!t?.checked) return;
+  const items = getNonFusicHdEnabledMeasureLabelsForExport();
+  if (!items.length) return;
+  rows.push({ t: 'blank' });
+  rows.push({ t: 'nonFusicDisclaimer', intro: NONFUSIC_HD_DISCLAIMER_EXPORT_INTRO, items });
+}
+
+const NONFUSIC_DISCLAIMER_EXPORT_COLUMNS = 3;
+
+function formatNonFusicDisclaimerItemsPlainColumns(items, nCols) {
+  const lines = [];
+  for (let i = 0; i < items.length; i += nCols) {
+    const rowParts = [];
+    for (let j = 0; j < nCols; j++) {
+      const it = items[i + j];
+      if (it != null && it !== '') rowParts.push(`• ${it}`);
+    }
+    if (rowParts.length) lines.push(rowParts.join('          '));
+  }
+  return lines;
+}
+
+/** Remove disclaimer if both FUSIC questions and Summary sections were omitted (omit-empty). */
+function pruneOrphanNonFusicDisclaimerExportRows(rows) {
+  const idx = rows.findIndex(r => r.t === 'nonFusicDisclaimer');
+  if (idx < 0) return;
+  const stillHas = rows.some(
+    r => r.t === 'section' && (r.title === 'FUSIC HD QUESTIONS' || r.title === 'SUMMARY & CONCLUSIONS')
+  );
+  if (stillHas) return;
+  let start = idx;
+  if (start > 0 && rows[start - 1].t === 'blank') start--;
+  let del = idx - start + 1;
+  if (idx + 1 < rows.length && rows[idx + 1].t === 'blank') del++;
+  rows.splice(start, del);
+}
+
 function buildExportRows() {
   const { date: nd, time: nt } = getNow();
   const scanDateRaw = getVal('f-scanDate');
@@ -6996,9 +8240,19 @@ function buildExportRows() {
     row('Patient ID / Reference', getVal('f-patientId'));
     const sex = getVal('f-sex'); row('Sex', sex === 'male' ? 'Male' : sex === 'female' ? 'Female' : '');
     rowU(isStudyPseudoAnonymised() ? 'Age (band)' : 'Age', getVal('f-age'), isStudyPseudoAnonymised() ? '' : 'years');
-    if (document.getElementById('toggle-show-cardiac-index')?.checked) {
+    if (needsAnthropometricsForBSA()) {
       rowU('Weight', getVal('f-weight'), 'kg');
       rowU('Height', getVal('f-height'), 'cm');
+    }
+    if (document.getElementById('toggle-show-bsa')?.checked) {
+      const bsa = getBSACalc();
+      if (bsa) {
+        rowU(
+          isAutoCalcManual(document.getElementById('bsa-display-input')) ? 'BSA — manually entered' : 'BSA — calculated',
+          bsa,
+          'm²'
+        );
+      }
     }
     rowU('Heart Rate', getVal('f-hr'), 'bpm');
     row('Cardiac Rhythm', [...selectedRhythms].join(', '));
@@ -7023,6 +8277,22 @@ function buildExportRows() {
     rowU('LVIDs', getVal('f-lvids'), 'mm');
     rowU('IVSd', getVal('f-ivsd'), 'mm');
     rowU('LVPWd', getVal('f-lvpwd'), 'mm');
+    if (document.getElementById('toggle-show-rwt')?.checked) {
+      const rwt = getRWTCalc();
+      if (rwt) row(isAutoCalcManual(document.getElementById('rwt-display-input')) ? 'Relative wall thickness — manually entered' : 'Relative wall thickness — calculated', rwt);
+    }
+    if (document.getElementById('toggle-show-lv-mass')?.checked) {
+      const lm = getLVMassCalc();
+      if (lm) rowU(isAutoCalcManual(document.getElementById('lv-mass-display-input')) ? 'LV mass — manually entered' : 'LV mass — calculated', lm, 'g');
+    }
+    if (document.getElementById('toggle-show-lvmi')?.checked) {
+      const lvmi = getLVMICalc();
+      if (lvmi) rowU(isAutoCalcManual(document.getElementById('lvmi-display-input')) ? 'LV mass index — manually entered' : 'LV mass index — calculated', lvmi, 'g/m²');
+    }
+    if (document.getElementById('toggle-show-lvidd-indexed')?.checked) {
+      const li = getLVIDdIndexedCalc();
+      if (li) rowU(isAutoCalcManual(document.getElementById('lvidd-index-display-input')) ? 'Indexed LVIDd — manually entered' : 'Indexed LVIDd — calculated', li, 'mm/m²');
+    }
     row('Visual LV size', getVal('f-visualLvSize'));
     row('Visual EF', getVal('f-ef'));
     rowU('EF (Simpson\'s biplane)', getVal('f-efSimpsonBiplane'), '%');
@@ -7049,6 +8319,18 @@ function buildExportRows() {
     if (document.getElementById('toggle-show-cardiac-index')?.checked) {
       const ci = getCICalc();
       if (ci) rowU(isAutoCalcManual(document.getElementById('ci-display-input')) ? 'Cardiac Index — manually entered' : 'Cardiac Index — calculated', ci, 'L/min/m²');
+    }
+    if (document.getElementById('toggle-show-svi')?.checked) {
+      const svi = getSVICalc();
+      if (svi) rowU(isAutoCalcManual(document.getElementById('svi-display-input')) ? 'Stroke volume index — manually entered' : 'Stroke volume index — calculated', svi, 'mL/m²');
+    }
+    if (document.getElementById('toggle-show-svr')?.checked) {
+      const svr = getSVRCalc();
+      if (svr) rowU(isAutoCalcManual(document.getElementById('svr-display-input')) ? 'SVR — manually entered' : 'SVR — calculated', svr, 'Wood units');
+    }
+    if (document.getElementById('toggle-show-svri')?.checked) {
+      const svri = getSVRICalc();
+      if (svri) rowU(isAutoCalcManual(document.getElementById('svri-display-input')) ? 'SVR index — manually entered' : 'SVR index — calculated', svri, 'Wood units·m²');
     }
     const vtiResp = getVal('f-vtiDeltaResp'); if (vtiResp) rowU('VTI % Δ respiration', vtiResp, '%');
     const vtiInt = getVal('f-vtiDeltaIntervention');
@@ -7121,6 +8403,29 @@ function buildExportRows() {
         else row('PASP — calculated (4×TR Vmax² + IVC-estimated RAP)', `${paspCtx.mmHg} mmHg (mean RAP ${paspCtx.rapMid} mmHg, table category ~${paspCtx.rapBand}; CVP not entered — estimate)`);
       }
     }
+    if (document.getElementById('toggle-show-rv-lv-basal-ratio')?.checked) {
+      const rvlv = getRVLVBasalRatioCalc();
+      if (rvlv) {
+        row(
+          isAutoCalcManual(document.getElementById('rv-lv-basal-ratio-display-input'))
+            ? 'RV:LV basal diameter ratio — manually entered'
+            : 'RV:LV basal diameter ratio — calculated',
+          rvlv
+        );
+      }
+    }
+    if (document.getElementById('toggle-show-tapse-pasp-ratio')?.checked) {
+      const tp = getTAPSEPASPRatioCalc();
+      if (tp) {
+        rowU(
+          isAutoCalcManual(document.getElementById('tapse-pasp-ratio-display-input'))
+            ? 'TAPSE / PASP ratio — manually entered'
+            : 'TAPSE / PASP ratio — calculated',
+          tp,
+          'mm/mmHg'
+        );
+      }
+    }
     row('Basic Features of PHT', selectedPHTBasic.size ? [...selectedPHTBasic].join(', ') : '');
     row('Advanced Features of PHT', selectedPHTAdvanced.size ? [...selectedPHTAdvanced].join(', ') : '');
   });
@@ -7140,7 +8445,9 @@ function buildExportRows() {
           (isMachineCWDEnabled() && getVal('f-avVTI')) ||
           (isMachinePWDEnabled() && getVal('f-lvotVTI')) ||
           (isMachineCWDEnabled() && isMachinePWDEnabled() && getDICalc()) ||
-          selectedLVOTO.size
+          selectedLVOTO.size ||
+          (document.getElementById('toggle-show-ava-continuity')?.checked &&
+            (getVal('f-lvotDiam') || getVal('f-avVTI') || getVal('f-lvotVTI') || getAVAContinuityCalc()))
         );
         if (sten || app || reg || hasTric || hasAort) {
           subhdr(`${v.name} Valve`);
@@ -7153,6 +8460,20 @@ function buildExportRows() {
             if (isMachineCWDEnabled() && isMachinePWDEnabled()) {
               const di = getDICalc();
               if (di) row(isAutoCalcManual(document.getElementById('di-display-input')) ? '  Dimensionless Index — manually entered' : '  Dimensionless Index — calculated', di);
+            }
+            if (document.getElementById('toggle-show-ava-continuity')?.checked) {
+              const csa = getLVOTCSA_cm2();
+              if (!isNaN(csa) && csa > 0) rowU('  LVOT cross-sectional area (auto)', csa.toFixed(2), 'cm²');
+              const ava = getAVAContinuityCalc();
+              if (ava) {
+                rowU(
+                  isAutoCalcManual(document.getElementById('ava-continuity-display-input'))
+                    ? '  Aortic valve area (continuity) — manually entered'
+                    : '  Aortic valve area (continuity) — calculated',
+                  ava,
+                  'cm²'
+                );
+              }
             }
             row('  Features of LVOTO / SAM', selectedLVOTO.size ? [...selectedLVOTO].join(', ') : '');
           }
@@ -7266,15 +8587,24 @@ function buildExportRows() {
         actions: getVal('f-actions')
       });
     });
+    appendNonFusicHdDisclaimerExportRows(rows);
   }
 
+  pruneOrphanNonFusicDisclaimerExportRows(rows);
   return rows;
 }
 
 /**
- * When Settings → Summary near top is on, move SUMMARY & CONCLUSIONS + FUSIC HD QUESTIONS (in that order)
+ * When Settings → Summary near top is on, move FUSIC HD QUESTIONS + SUMMARY & CONCLUSIONS + non-FUSIC disclaimer (if any)
  * to immediately after PATIENT DEMOGRAPHICS (before LEFT VENTRICLE). Used for text, Excel, print.
  */
+function findSummaryBundleTailEnd(rows, summaryConclusionsBlockIdx) {
+  let tailEnd = summaryConclusionsBlockIdx + 1;
+  if (rows[tailEnd]?.t === 'blank') tailEnd++;
+  if (rows[tailEnd]?.t === 'nonFusicDisclaimer') tailEnd++;
+  return tailEnd;
+}
+
 function reorderExportRowsSummaryNearTop(rows) {
   const t = document.getElementById('toggle-export-summary-near-top');
   if (!t || !t.checked) return rows.slice();
@@ -7313,14 +8643,14 @@ function reorderExportRowsSummaryNearTop(rows) {
 
   if (tailStart <= lvBlankIdx) return rows.slice();
 
-  const tailEnd = blockEnd + 1;
+  const tailEnd = findSummaryBundleTailEnd(rows, blockEnd);
   let chunk;
   if (fusicIdx >= 0 && sumIdx > fusicIdx) {
     const blankBeforeSum = sumIdx - 1;
     if (rows[blankBeforeSum]?.t === 'blank') {
       const summaryPart = rows.slice(blankBeforeSum, tailEnd);
       const fusicPart = rows.slice(tailStart, blankBeforeSum);
-      chunk = summaryPart.concat(fusicPart);
+      chunk = fusicPart.concat(summaryPart);
     } else {
       chunk = rows.slice(tailStart, tailEnd);
     }
@@ -7353,6 +8683,12 @@ function formatExportRowsAsPlainText(rows) {
     } else if (r.t === 'subhdr') {
       if (lines.length && lines[lines.length - 1] !== '') lines.push('');
       lines.push(r.value);
+    } else if (r.t === 'nonFusicDisclaimer') {
+      if (lines.length && lines[lines.length - 1] !== '') lines.push('');
+      lines.push(r.intro);
+      formatNonFusicDisclaimerItemsPlainColumns(r.items, NONFUSIC_DISCLAIMER_EXPORT_COLUMNS).forEach(line => {
+        if (line) lines.push(line);
+      });
     } else if (r.t === 'summaryConclusionsBlock') {
       const sig = (r.significance || '').trim();
       const imp = (r.impression || '').trim();
@@ -7480,6 +8816,15 @@ function renderExportRowsToPrintHTML(rows) {
         v: `<div class="print-meta-v">${esc(r.value)}</div>`
       });
       flushMetaPairs(false);
+    } else if (r.t === 'nonFusicDisclaimer') {
+      closeMeta();
+      closeSection();
+      parts.push('<section class="print-section print-section--nonfusic-disclaimer" aria-label="Non-FUSIC HD measurement disclaimer">');
+      parts.push('<h2 class="print-section-title">Non-FUSIC HD measurement disclaimer</h2>');
+      parts.push(`<p class="print-nonfusic-disclaimer-intro">${esc(r.intro)}</p>`);
+      parts.push('<ul class="print-nonfusic-disclaimer-list">');
+      for (const item of r.items) parts.push(`<li><span class="print-nonfusic-li-bullet">•</span> ${esc(item)}</li>`);
+      parts.push('</ul></section>');
     } else if (r.t === 'section') {
       closeMeta();
       closeSection();
@@ -7677,6 +9022,26 @@ function doExport() {
       merges.push({ s: { r: sheetRi, c: 0 }, e: { r: sheetRi, c: 1 } });
       rStyle[sheetRi] = 'subhdr';
       sheetRi++;
+    } else if (r.t === 'nonFusicDisclaimer') {
+      wsData.push(['Non-FUSIC HD measurement disclaimer', '', '']);
+      merges.push({ s: { r: sheetRi, c: 0 }, e: { r: sheetRi, c: 2 } });
+      rStyle[sheetRi] = 'nonfusicHdr';
+      sheetRi++;
+      wsData.push([r.intro, '', '']);
+      merges.push({ s: { r: sheetRi, c: 0 }, e: { r: sheetRi, c: 2 } });
+      rStyle[sheetRi] = 'nonfusicIntro';
+      sheetRi++;
+      const nc = NONFUSIC_DISCLAIMER_EXPORT_COLUMNS;
+      for (let i = 0; i < r.items.length; i += nc) {
+        const row3 = [];
+        for (let j = 0; j < nc; j++) {
+          const it = r.items[i + j];
+          row3.push(it != null && it !== '' ? `• ${it}` : '');
+        }
+        wsData.push(row3);
+        rStyle[sheetRi] = 'nonfusicBullet';
+        sheetRi++;
+      }
     } else if (r.t === 'row') {
       wsData.push([r.label, r.value]);
       rStyle[sheetRi] = 'row';
@@ -7706,20 +9071,24 @@ function doExport() {
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(wsData);
   ws['!merges'] = merges;
-  ws['!cols'] = [{ wch:38 }, { wch:46 }];
+  ws['!cols'] = [{ wch: 30 }, { wch: 30 }, { wch: 30 }];
 
   try {
-    wsData.forEach((_, ri) => {
+    wsData.forEach((rowArr, ri) => {
       const st = rStyle[ri];
-      [0,1].forEach(ci => {
-        const ref = XLSX.utils.encode_cell({r:ri,c:ci});
-        if (!ws[ref]) return;
+      const maxCi = Math.max(1, (rowArr && rowArr.length) ? rowArr.length - 1 : 1);
+      for (let ci = 0; ci <= maxCi; ci++) {
+        const ref = XLSX.utils.encode_cell({ r: ri, c: ci });
+        if (!ws[ref]) continue;
         if (st==='title')   ws[ref].s = { font:{bold:true,sz:16,color:{rgb:'1565A8'}}, alignment:{horizontal:'left',wrapText:true} };
         else if (st==='section') ws[ref].s = { font:{bold:true,sz:11,color:{rgb:'1E3A5F'}}, fill:{fgColor:{rgb:'DBEAFE'}}, alignment:{horizontal:'left'} };
+        else if (st==='nonfusicHdr') ws[ref].s = { font:{bold:true,sz:11,color:{rgb:'1E3A5F'}}, fill:{fgColor:{rgb:'DBEAFE'}}, alignment:{horizontal:'left',wrapText:true} };
+        else if (st==='nonfusicIntro') ws[ref].s = { font:{bold:true,sz:10}, alignment:{horizontal:'left',wrapText:true} };
+        else if (st==='nonfusicBullet') ws[ref].s = { font:{sz:10}, alignment:{horizontal:'left',wrapText:true} };
         else if (st==='subhdr') ws[ref].s = { font:{bold:true,sz:10,color:{rgb:'1E3A5F'}}, fill:{fgColor:{rgb:'F3F4F6'}}, alignment:{horizontal:'left',wrapText:true} };
         else if (st==='meta')   ws[ref].s = ci===0 ? { font:{bold:true,sz:10,color:{rgb:'3D5170'}}, alignment:{horizontal:'right'} } : { font:{sz:10}, alignment:{horizontal:'left',wrapText:true} };
         else if (st==='row')    ws[ref].s = ci===0 ? { font:{bold:true,sz:10}, alignment:{horizontal:'right'} } : { font:{sz:10}, alignment:{horizontal:'left',wrapText:true} };
-      });
+      }
     });
   } catch(e) { /* silently skip */ }
 
