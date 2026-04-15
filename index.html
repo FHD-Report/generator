@@ -1504,6 +1504,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
 .settings-machine-cap-block .toggle-thumb { width: 16px; height: 16px; top: 3px; left: 3px; }
 .settings-machine-cap-block .toggle-switch input:checked ~ .toggle-thumb { transform: translateX(18px); }
 .settings-nonfusic-measurements-block { margin-top: 7px; }
+.settings-nonfusic-global-toggle-row { margin: 6px 0 0; padding: 8px 10px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); background: rgba(21, 101, 168, 0.04); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .settings-haemodynamics-details {
   margin: 6px 0 0;
   padding: 0;
@@ -2544,6 +2545,10 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
               </div>
             </div>
           </details>
+          <div class="settings-nonfusic-global-toggle-row">
+            <span class="settings-measure-title">Toggle all</span>
+            <label class="toggle-switch settings-measure-master-toggle"><input type="checkbox" id="toggle-nonfusic-measures-all"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+          </div>
         </div>
         <div class="settings-normal-study-block">
           <div class="rv-subheading">Normal study helper</div>
@@ -3959,9 +3964,10 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
     <div class="about-modal-body">
       <div class="about-version" aria-label="Application version">
         <span class="about-version-label">Version</span>
-        <span class="about-version-num">0.1</span>
+        <span class="about-version-num">0.18</span>
       </div>
       <p>This FUSIC HD Report Generator was created by Dr Christopher Partridge, a FUSIC HD accredited anaesthetics trainee, as a free tool to support point-of-care echocardiography reporting in acute and critical care settings.</p>
+      <p><strong>This tool is not affiliated with the Intensive Care Society.</strong></p>
 
       <h3>How It Works</h3>
       <p>This application is a single, self-contained HTML file. It runs entirely within your browser — no internet connection is required beyond the initial page load, no data is sent to any server, and nothing is stored anywhere. When you export (for example to Excel), the file is generated locally on your device. Plain-text export only copies to your clipboard. Once the browser tab is closed, all entered information is permanently gone.</p>
@@ -3976,8 +3982,8 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <p>Use of this application does not constitute or replace a formal echocardiography report verified by an accredited practitioner. Clinicians using this tool remain personally and professionally responsible for the accuracy and appropriateness of all data entered, all interpretations made, and all clinical actions taken on the basis of those findings. Supervision requirements applicable to your scope of practice, employer, and training programme remain in effect regardless of the supervision status selected within this tool.</p>
       <p>This software is provided as-is, without warranty of any kind. The author accepts no liability for clinical outcomes arising from its use.</p>
 
-      <h3>Open Source</h3>
-      <p>This project is open source and free to use, adapt, and distribute. If you find it useful or have suggestions for improvement, contributions are welcome.</p>
+      <h3>Usage &amp; Permissions</h3>
+      <p>This tool is proprietary and all rights are reserved. It may not be copied, modified, redistributed, or used as the basis for derivative works without explicit written permission. If you have suggestions for improvement, feedback is always welcome.</p>
     </div>
   </div>
 </div>
@@ -5123,6 +5129,7 @@ const SESSION_DRAFT_TOGGLE_IDS = [
   'toggle-show-svr',
   'toggle-show-svri',
   'toggle-valve-measures-all',
+  'toggle-nonfusic-measures-all',
   'toggle-show-ava-continuity',
   'toggle-omit-empty-export',
   'toggle-export-summary-near-top',
@@ -5154,11 +5161,19 @@ const RH_MEASURES_CHILD_TOGGLE_IDS = [
 const LAP_MEASURES_CHILD_TOGGLE_IDS = [
   'toggle-show-ea-field'
 ];
+const NONFUSIC_MEASURES_ALL_CHILD_TOGGLE_IDS = [
+  ...LV_MEASURES_CHILD_TOGGLE_IDS,
+  ...HAEMODYNAMICS_CHILD_TOGGLE_IDS,
+  ...LAP_MEASURES_CHILD_TOGGLE_IDS,
+  ...RH_MEASURES_CHILD_TOGGLE_IDS,
+  ...VALVE_MEASURES_CHILD_TOGGLE_IDS
+];
 let _syncingHaemodynamicsMaster = false;
 let _syncingLAPMaster = false;
 let _syncingLVMaster = false;
 let _syncingValveMaster = false;
 let _syncingRHMaster = false;
+let _syncingNonfusicMeasuresGlobalMaster = false;
 let sessionRestoreInProgress = false;
 let sessionDraftSaveTimer = null;
 
@@ -5272,6 +5287,7 @@ document.addEventListener('DOMContentLoaded', () => {
   VALVE_MEASURES_CHILD_TOGGLE_IDS.forEach(id => {
     document.getElementById(id)?.addEventListener('change', onValveMeasuresChildToggleChange);
   });
+  document.getElementById('toggle-nonfusic-measures-all')?.addEventListener('change', onNonfusicMeasuresGlobalMasterChange);
   document.getElementById('toggle-machine-cwd')?.addEventListener('change', refreshMachineCapabilityFields);
   document.getElementById('toggle-machine-pwd')?.addEventListener('change', refreshMachineCapabilityFields);
   document.getElementById('toggle-machine-tdi')?.addEventListener('change', refreshMachineCapabilityFields);
@@ -6424,6 +6440,33 @@ function setMachineCapWrapHidden(id, hidden) {
   if (w) w.classList.toggle('section-hidden', hidden);
 }
 
+function syncNonfusicMeasuresGlobalMasterToggle() {
+  const master = document.getElementById('toggle-nonfusic-measures-all');
+  if (!master || _syncingNonfusicMeasuresGlobalMaster) return;
+  master.checked = NONFUSIC_MEASURES_ALL_CHILD_TOGGLE_IDS.every(id => !!document.getElementById(id)?.checked);
+}
+
+function onNonfusicMeasuresGlobalMasterChange(ev) {
+  if (_syncingNonfusicMeasuresGlobalMaster) return;
+  _syncingNonfusicMeasuresGlobalMaster = true;
+  const on = ev.target.checked;
+  NONFUSIC_MEASURES_ALL_CHILD_TOGGLE_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.checked = on;
+  });
+  _syncingNonfusicMeasuresGlobalMaster = false;
+  syncLVMasterToggle();
+  syncHaemodynamicsMasterToggle();
+  syncLAPMasterToggle();
+  syncRHMasterToggle();
+  syncValveMasterToggle();
+  refreshLVMeasuresOptionalVisibility();
+  refreshHaemodynamicsOptionalVisibility();
+  refreshEAFieldVisibility();
+  refreshRightHeartOptionalVisibility();
+  refreshValveOptionalVisibility();
+}
+
 function syncRHMasterToggle() {
   const master = document.getElementById('toggle-rh-measures-all');
   if (!master) return;
@@ -6440,12 +6483,14 @@ function onRHMasterChange(ev) {
   });
   _syncingRHMaster = false;
   refreshRightHeartOptionalVisibility();
+  syncNonfusicMeasuresGlobalMasterToggle();
 }
 
 function onRHMeasuresChildToggleChange() {
   if (_syncingRHMaster) return;
   syncRHMasterToggle();
   refreshRightHeartOptionalVisibility();
+  syncNonfusicMeasuresGlobalMasterToggle();
 }
 
 function refreshRightHeartOptionalVisibility() {
@@ -6480,12 +6525,14 @@ function onLAPMasterChange(ev) {
   });
   _syncingLAPMaster = false;
   refreshEAFieldVisibility();
+  syncNonfusicMeasuresGlobalMasterToggle();
 }
 
 function onLAPMeasuresChildToggleChange() {
   if (_syncingLAPMaster) return;
   syncLAPMasterToggle();
   refreshEAFieldVisibility();
+  syncNonfusicMeasuresGlobalMasterToggle();
 }
 
 function refreshEAFieldVisibility() {
@@ -6512,12 +6559,14 @@ function onLVMasterChange(ev) {
   });
   _syncingLVMaster = false;
   refreshLVMeasuresOptionalVisibility();
+  syncNonfusicMeasuresGlobalMasterToggle();
 }
 
 function onLVMeasuresChildToggleChange() {
   if (_syncingLVMaster) return;
   syncLVMasterToggle();
   refreshLVMeasuresOptionalVisibility();
+  syncNonfusicMeasuresGlobalMasterToggle();
 }
 
 function refreshLVMeasuresOptionalVisibility() {
@@ -6558,12 +6607,14 @@ function onValveMasterChange(ev) {
   });
   _syncingValveMaster = false;
   refreshValveOptionalVisibility();
+  syncNonfusicMeasuresGlobalMasterToggle();
 }
 
 function onValveMeasuresChildToggleChange() {
   if (_syncingValveMaster) return;
   syncValveMasterToggle();
   refreshValveOptionalVisibility();
+  syncNonfusicMeasuresGlobalMasterToggle();
 }
 
 function refreshValveOptionalVisibility() {
@@ -6606,12 +6657,14 @@ function onHaemodynamicsMasterChange(ev) {
   });
   _syncingHaemodynamicsMaster = false;
   refreshHaemodynamicsOptionalVisibility();
+  syncNonfusicMeasuresGlobalMasterToggle();
 }
 
 function onHaemodynamicsChildToggleChange() {
   if (_syncingHaemodynamicsMaster) return;
   syncHaemodynamicsMasterToggle();
   refreshHaemodynamicsOptionalVisibility();
+  syncNonfusicMeasuresGlobalMasterToggle();
 }
 
 function refreshHaemodynamicsOptionalVisibility() {
@@ -8785,6 +8838,7 @@ function applySettingsTogglesFromDraft(st) {
   syncValveMasterToggle();
   syncRHMasterToggle();
   syncLAPMasterToggle();
+  syncNonfusicMeasuresGlobalMasterToggle();
 }
 
 function applySessionDraftPayload(d) {
@@ -9413,7 +9467,7 @@ function triggerExportFromModal(format) {
   else if (format === 'edec') openEdecEditor();
 }
 
-const EXPORT_DISCLAIMER_TEXT = 'Disclaimer: This text is a draft export for clinical review only. It is not a final report and must not be entered into any patient record without formal verification, appropriate clinical review, and sign-off.';
+const EXPORT_DISCLAIMER_TEXT = 'Disclaimer: The above report has been generated by a reporting tool in active development. It is not a final report and must not be entered into any patient record without formal verification, appropriate clinical review, and sign-off where required.';
 
 function getPlainTextReportFullString() {
   const rows = getExportRowsOrdered();
