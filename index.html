@@ -72,6 +72,7 @@ html[data-theme="dark"] {
 html[data-theme="dark"] .section-header { border-bottom-color: rgba(77, 158, 255, 0.15); }
 html[data-theme="dark"] .section-header:hover { background: #2a3a52; }
 html[data-theme="dark"] .section-header:active { background: #263548; }
+html[data-theme="dark"] body.compact-mode .section-header { border-bottom-color: rgba(77, 158, 255, 0.10); }
 html[data-theme="dark"] .eprime-avg-display-box { background: #222b3c; }
 html[data-theme="dark"] input:focus, html[data-theme="dark"] textarea:focus, html[data-theme="dark"] select:focus {
   box-shadow: 0 0 0 3px rgba(77, 158, 255, 0.22);
@@ -332,6 +333,218 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 html[data-theme="dark"] .ref-ranges-global-note {
   border-color: rgba(77, 158, 255, 0.22);
 }
+
+/* ─── EDEC EDITOR (full-screen) ──────────────────────── */
+.edec-editor-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 360;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.22s ease, visibility 0.22s;
+}
+.edec-editor-panel.open {
+  opacity: 1;
+  pointer-events: all;
+  visibility: visible;
+}
+.edec-editor-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  background: var(--surface);
+  border-bottom: 2px solid var(--primary-light);
+  box-shadow: var(--shadow);
+}
+.edec-editor-header h2 {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--section-hdr-text);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.edec-editor-header .btn { min-height: 38px; font-size: 13px; }
+.edec-editor-close {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.edec-editor-close:hover {
+  background: var(--primary-xlight);
+  color: var(--primary);
+}
+.edec-editor-close svg { width: 22px; height: 22px; }
+.edec-editor-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 16px 32px;
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+}
+.edec-section-heading {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--primary-dark);
+  margin: 24px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--primary);
+}
+.edec-section-heading:first-child { margin-top: 0; }
+.edec-desktop-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--primary-xlight);
+  border: 1px solid rgba(21, 101, 168, 0.18);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.edec-interp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+@media (max-width: 640px) {
+  .edec-interp-grid { grid-template-columns: 1fr; }
+}
+.edec-interp-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.edec-interp-field textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 8px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text);
+  background: var(--surface);
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.edec-interp-field textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(21, 101, 168, 0.13);
+}
+.edec-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.edec-summary-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.edec-summary-field select,
+.edec-summary-field textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text);
+  background: var(--surface);
+  box-sizing: border-box;
+}
+.edec-summary-field textarea { min-height: 60px; resize: vertical; }
+.edec-summary-field select:focus,
+.edec-summary-field textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(21, 101, 168, 0.13);
+}
+
+/* Compact measurements reference table */
+.edec-meas-wrap {
+  overflow-x: auto;
+  margin-top: 4px;
+}
+.edec-meas-outer {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  min-width: 700px;
+}
+@media (max-width: 800px) {
+  .edec-meas-outer { grid-template-columns: 1fr 1fr; min-width: 440px; }
+}
+.edec-meas-block {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  overflow: hidden;
+}
+.edec-meas-block-title {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  background: #1e3a5f;
+  padding: 3px 8px;
+  margin: 0;
+}
+html[data-theme="dark"] .edec-meas-block-title { background: #2a4c6e; }
+.edec-meas-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+  line-height: 1.3;
+}
+.edec-meas-table td {
+  padding: 2px 7px;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: top;
+}
+.edec-meas-table tr:last-child td { border-bottom: none; }
+.edec-meas-table td:first-child {
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  width: 55%;
+}
+.edec-meas-table td:last-child {
+  color: var(--text-mid);
+  text-align: right;
+  white-space: nowrap;
+}
 #themeToggleBtn .theme-icon-moon, #themeToggleBtn .theme-icon-sun { display: flex; align-items: center; justify-content: center; }
 #themeToggleBtn .theme-icon-sun { display: none; }
 
@@ -386,64 +599,87 @@ html[data-theme="dark"] .ref-ranges-global-note {
 /* ─── MAIN CONTENT ────────────────────────────────────── */
 #mainContent { margin-top: var(--header-h); padding: 16px 16px calc(var(--footer-h) + 40px); max-width: 720px; margin-left: auto; margin-right: auto; }
 
-/* ─── WIDE MODE (desktop only) ────────────────────────── */
+/* ─── COMPACT MODE (desktop only) ─────────────────────── */
 @media (min-width: 900px) {
-  body.wide-mode #mainContent {
-    max-width: 1440px;
+  body.compact-mode #mainContent {
+    max-width: 100%;
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-top: 10px;
   }
-  body.wide-mode .section-body {
+  body.compact-mode .form-section { margin-bottom: 6px; }
+  body.compact-mode .section-header { padding: 7px 12px; }
+  body.compact-mode .section-title { font-size: 13px; gap: 6px; }
+  body.compact-mode .section-icon { width: 22px; height: 22px; font-size: 11px; border-radius: 4px; }
+  body.compact-mode .chevron svg { width: 15px; height: 15px; }
+  body.compact-mode .section-body {
     grid-template-columns: repeat(4, 1fr);
-    gap: 9px 18px;
-    padding: 11px 14px;
+    gap: 5px 14px;
+    padding: 8px 12px 10px;
   }
-  body.wide-mode .section-body > .rv-subheading {
-    margin: 10px 0 4px;
-    padding-top: 8px;
-  }
-  body.wide-mode .field-row.two-col { gap: 9px 10px; }
-  body.wide-mode .field-row.three-col { gap: 8px; }
-  body.wide-mode .section-body .field-group { gap: 4px; }
-  body.wide-mode .form-section { margin-bottom: 10px; }
+  body.compact-mode .section-body .field-group { gap: 2px; }
+  body.compact-mode label.field-label { font-size: 11px; }
+  body.compact-mode label.field-label .unit { font-size: 10px; }
+  body.compact-mode input[type="text"],
+  body.compact-mode input[type="number"],
+  body.compact-mode input[type="date"],
+  body.compact-mode textarea,
+  body.compact-mode select { padding: 6px 8px; font-size: 13px; }
+  body.compact-mode textarea { min-height: 28px; }
+  body.compact-mode .calc-hint { font-size: 10px; padding: 1px 2px 0; }
+  body.compact-mode .rv-subheading { font-size: 11px; margin: 4px 0 2px; padding-top: 4px; }
+  body.compact-mode .rv-subheading:first-child { margin-top: 0; padding-top: 0; }
+  body.compact-mode .field-row.two-col { gap: 5px 10px; }
+  body.compact-mode .field-row.three-col { gap: 5px 8px; }
   /* Default: all children span half-width so they pair up */
-  body.wide-mode .section-body > * { grid-column: span 2; }
+  body.compact-mode .section-body > * { grid-column: span 2; }
   /* Standalone field-groups span 1 col for max compaction */
-  body.wide-mode .section-body > .field-group { grid-column: span 1; }
-  /* Only subheadings and complex full-section grids span all 4 cols */
-  body.wide-mode .section-body > .rv-subheading,
-  body.wide-mode .section-body > .valve-grid,
-  body.wide-mode .section-body > .aorta-grid,
-  body.wide-mode .section-body > table.lung-grid,
-  body.wide-mode .section-body > .sum-cond-master-wrap { grid-column: 1 / -1; }
-  /* Demographics: rhythm chips on their own full-width row (avoids stretching HR/BP/MAP row) */
-  body.wide-mode #demographics-cardiac-rhythm-wrap,
-  body.wide-mode #demographics-cvs-drugs-wrap { grid-column: 1 / -1; }
-  /* Pair with Vent/CVP row: half-width textarea on same line as ventilation + CVP */
-  body.wide-mode #demographics-clinical-indication-wrap { grid-column: span 2; }
-  /* RV: full-width rows so the right-hand column lines up with the 4-col section grid */
-  body.wide-mode #sec-rv .section-body > .field-row.three-col,
-  body.wide-mode #rv-vis-function-row { grid-column: 1 / -1; }
-  /* RV: PHT chip groups on their own full-width rows */
-  body.wide-mode #rv-pht-basic-features-wrap,
-  body.wide-mode #rv-pht-advanced-features-wrap { grid-column: 1 / -1; }
-  /* Pericardium: tamponade chips full-width row */
-  body.wide-mode #peri-tamponade-signs-wrap { grid-column: 1 / -1; }
-  /* Summary: single column — FUSIC questions, then significance, impression, actions stacked */
-  body.wide-mode #sec-summary .section-body {
+  body.compact-mode .section-body > .field-group { grid-column: span 1; }
+  /* Subheadings and complex full-section grids span all 4 cols */
+  body.compact-mode .section-body > .rv-subheading,
+  body.compact-mode .section-body > .valve-grid,
+  body.compact-mode .section-body > .aorta-grid,
+  body.compact-mode .section-body > table.lung-grid,
+  body.compact-mode .section-body > .sum-cond-master-wrap { grid-column: 1 / -1; }
+  /* Demographics: rhythm / drugs chips on their own full-width row */
+  body.compact-mode #demographics-cardiac-rhythm-wrap,
+  body.compact-mode #demographics-cvs-drugs-wrap { grid-column: 1 / -1; }
+  body.compact-mode #demographics-clinical-indication-wrap { grid-column: span 2; }
+  /* RV: full-width rows for three-col and vis-function */
+  body.compact-mode #sec-rv .section-body > .field-row.three-col,
+  body.compact-mode #rv-vis-function-row { grid-column: 1 / -1; }
+  /* RV: PHT chip groups full-width */
+  body.compact-mode #rv-pht-basic-features-wrap,
+  body.compact-mode #rv-pht-advanced-features-wrap { grid-column: 1 / -1; }
+  /* Pericardium: tamponade chips full-width */
+  body.compact-mode #peri-tamponade-signs-wrap { grid-column: 1 / -1; }
+  /* Summary: single column */
+  body.compact-mode #sec-summary .section-body {
     grid-template-columns: 1fr;
     justify-items: stretch;
   }
-  body.wide-mode #sec-summary .section-body > * { grid-column: 1 / -1; }
-  body.wide-mode #summary-clinical-significance-wrap {
+  body.compact-mode #sec-summary .section-body > * { grid-column: 1 / -1; }
+  body.compact-mode #summary-clinical-significance-wrap {
     justify-self: start;
     width: 100%;
     max-width: min(100%, 520px);
   }
-  /* Scan info card: upgrade from 2-col to 4-col */
-  body.wide-mode .scan-info-body {
+  /* Scan info card: 4-col compact */
+  body.compact-mode .scan-info-body {
     grid-template-columns: repeat(4, 1fr);
-    gap: 9px 16px;
-    padding: 11px 14px;
+    gap: 5px 14px;
+    padding: 8px 12px;
   }
+  body.compact-mode .scan-info-body .field-group { gap: 2px; }
+  body.compact-mode .scan-info-body label.field-label { font-size: 11px; }
+  body.compact-mode .scan-info-body input[type="text"],
+  body.compact-mode .scan-info-body input[type="date"],
+  body.compact-mode .scan-info-body input[type="time"],
+  body.compact-mode .scan-info-body select { padding: 6px 8px; font-size: 13px; }
+  /* Editable calc displays */
+  body.compact-mode .calc-display.calc-display-editable { padding: 5px 7px; min-height: 30px; }
+  body.compact-mode .la-validate-hint { font-size: 10px; }
+  body.compact-mode .inline-warn { font-size: 10px; }
 }
 
 /* ─── SCAN INFO CARD ──────────────────────────────────── */
@@ -521,9 +757,24 @@ html[data-theme="dark"] .ref-ranges-global-note {
 /* ─── FORM FIELDS ─────────────────────────────────────── */
 .field-group { display: flex; flex-direction: column; gap: 5px; }
 .field-row { display: flex; flex-direction: column; gap: 5px; }
-.field-row.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.field-row.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.field-row.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: stretch; }
+.field-row.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: stretch; }
 .field-row.eprime-row-three { grid-template-columns: 1fr 1fr minmax(118px, 1fr); }
+/* Same-row columns share height; push primary controls to the bottom so inputs align when only some columns have .calc-hint */
+.field-row.two-col > .field-group,
+.field-row.three-col > .field-group { min-height: 100%; }
+.field-row.two-col > .field-group > input,
+.field-row.two-col > .field-group > select,
+.field-row.two-col > .field-group > textarea,
+.field-row.two-col > .field-group > .calc-display,
+.field-row.two-col > .field-group > .field-row,
+.field-row.three-col > .field-group > input,
+.field-row.three-col > .field-group > select,
+.field-row.three-col > .field-group > textarea,
+.field-row.three-col > .field-group > .calc-display,
+.field-row.three-col > .field-group > .field-row {
+  margin-top: auto;
+}
 @media (max-width: 480px) { .field-row.two-col, .field-row.three-col, .field-row.eprime-row-three { grid-template-columns: 1fr; } }
 .eprime-avg-col { min-width: 0; }
 .eprime-avg-col .field-label { font-size: 11.5px; color: var(--text-muted); }
@@ -729,6 +980,7 @@ input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-i
 }
 .rri-ratio-input:focus { outline: none; box-shadow: 0 1px 0 rgba(0,0,0,0.28); border-radius: 1px; }
 .calc-hint { font-size: 11.5px; color: var(--text-muted); font-style: italic; padding: 3px 2px 0; line-height: 1.4; }
+.calc-hint-spacer { visibility: hidden; }
 .pasp-estimate-note {
   font-size: 11px; color: var(--text-mid); line-height: 1.4; margin-top: 8px; padding: 8px 10px;
   background: var(--primary-xlight); border: 1px dashed var(--primary-light); border-radius: var(--radius-sm);
@@ -832,13 +1084,13 @@ html[data-theme="dark"] .inline-warn.ci-amber-note { color: #fcd34d; }
 .aorta-card-title { font-size: 13px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.06em; }
 .aorta-card-full { grid-column: 1 / -1; }
 @media (min-width: 900px) {
-  body.wide-mode .aorta-card {
+  body.compact-mode .aorta-card {
     display: grid;
     grid-template-columns: auto 1fr 1fr 1fr;
-    gap: 8px 14px;
+    gap: 5px 12px;
     align-items: start;
   }
-  body.wide-mode .aorta-card > .aorta-card-title { align-self: center; }
+  body.compact-mode .aorta-card > .aorta-card-title { align-self: center; font-size: 11px; }
 }
 
 /* ─── CONDITIONAL ─────────────────────────────────────── */
@@ -1047,7 +1299,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
 
 /* ─── EXPORT MODAL ───────────────────────────────────── */
 #exportModal.modal-overlay {
-  padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
   align-items: center;
   justify-content: center;
 }
@@ -1056,41 +1308,48 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 20px 26px;
+  gap: 10px;
+  padding: 10px 14px;
   background: var(--primary-xlight);
   border-bottom: 1px solid var(--border-light);
 }
 .export-modal-header h2 {
   margin: 0;
-  font-size: 1.35rem;
+  font-size: 1.08rem;
   font-weight: 700;
   color: var(--primary-dark);
-  line-height: 1.25;
+  line-height: 1.2;
+}
+.export-modal-header .about-modal-close {
+  padding: 4px;
+}
+.export-modal-header .about-modal-close svg {
+  width: 18px;
+  height: 18px;
 }
 .export-modal-scroll {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 26px 28px 28px;
+  padding: 12px 14px 14px;
   -webkit-overflow-scrolling: touch;
 }
 .export-modal-lead {
-  font-size: 15px;
+  font-size: 12.5px;
   color: var(--text-muted);
-  line-height: 1.55;
-  margin: 0 0 24px;
+  line-height: 1.42;
+  margin: 0 0 12px;
   max-width: min(72ch, 100%);
 }
 .export-options-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
+  gap: 10px;
 }
 @media (min-width: 700px) {
   .export-options-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 22px;
+    gap: 12px;
     align-items: stretch;
   }
 }
@@ -1101,40 +1360,43 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
 }
 .export-option-card {
   border: 1px solid var(--border-light);
-  border-radius: var(--radius);
-  padding: 22px 24px;
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
   background: var(--bg);
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
 .export-option-card h3 {
-  margin: 0 0 12px;
-  font-size: 1.05rem;
+  margin: 0 0 6px;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--text);
-  line-height: 1.3;
+  line-height: 1.25;
 }
 .export-option-card p {
   flex: 1;
-  margin: 0 0 20px;
-  font-size: 14.5px;
+  margin: 0 0 10px;
+  font-size: 12.5px;
   color: var(--text-mid);
-  line-height: 1.52;
+  line-height: 1.4;
 }
 .export-option-card .btn {
   width: 100%;
   justify-content: center;
-  min-height: 50px;
+  min-height: 40px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  font-size: 13px;
   margin-top: auto;
 }
 /* Print/PDF: PII caution — mobile viewports only (hidden on larger screens) */
 .export-print-mobile-caution {
   display: none;
-  margin: 0 0 12px;
+  margin: 0 0 8px;
   padding: 0;
-  font-size: 11.5px;
-  line-height: 1.45;
+  font-size: 10.5px;
+  line-height: 1.4;
   font-weight: 500;
   color: var(--text-muted);
   letter-spacing: 0.01em;
@@ -1146,37 +1408,43 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
 }
 .export-option-card p.export-print-mobile-caution {
   flex: 0 0 auto;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 .export-modal-footer-actions {
-  margin-top: 28px;
-  padding-top: 22px;
+  margin-top: 14px;
+  padding-top: 12px;
   border-top: 1px solid var(--border-light);
 }
 .export-modal-footer-actions .btn {
   width: 100%;
-  max-width: 280px;
+  max-width: 260px;
   margin: 0 auto;
   justify-content: center;
-  min-height: 48px;
+  min-height: 40px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  font-size: 13px;
 }
 .export-modal-anonymise-block {
-  margin-top: 26px;
-  padding: 16px 18px;
-  border-radius: var(--radius);
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border-light);
   background: var(--bg);
 }
 .export-modal-anonymise-desc {
-  margin: 0 0 14px;
-  font-size: 14px;
+  margin: 0 0 8px;
+  font-size: 12px;
   color: var(--text-mid);
-  line-height: 1.52;
+  line-height: 1.4;
 }
 .export-modal-anonymise-block .btn {
   width: 100%;
   justify-content: center;
-  min-height: 48px;
+  min-height: 40px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  font-size: 13px;
   box-sizing: border-box;
 }
 
@@ -1187,9 +1455,9 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
 .modal-overlay.open .modal-box { transform: scale(1) translateY(0); }
 /* Export dialog: wider than default modal; wins over .modal-box max-width/padding */
 .modal-box.modal-box--export {
-  max-width: min(820px, calc(100vw - 32px));
+  max-width: min(860px, calc(100vw - 20px));
   width: 100%;
-  max-height: min(92vh, 920px);
+  max-height: min(94vh, 900px);
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -1356,6 +1624,26 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
 .about-modal-body h3:first-of-type { margin-top: 0; }
 .about-modal-body p { margin: 0 0 12px; }
 .about-modal-body p:last-child { margin-bottom: 0; }
+
+/* ─── RWMA 17-SEGMENT MODEL ──────────────────────────── */
+.btn-rwma-segment { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 11px 18px; font-size: 14px; font-weight: 600; color: #fff; background: var(--primary); border: none; border-radius: 8px; cursor: pointer; transition: background 0.15s, box-shadow 0.15s; margin-bottom: 6px; }
+.btn-rwma-segment:hover { background: var(--primary-dark); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+.btn-rwma-segment svg { width: 20px; height: 20px; flex-shrink: 0; }
+.modal-box--rwma { max-width: min(640px, 100%); max-height: min(88vh, 780px); width: 100%; display: flex; flex-direction: column; padding: 0; overflow: hidden; text-align: left; }
+.rwma-modal-body { overflow-y: auto; padding: 18px 20px 22px; }
+.rwma-seg { cursor: pointer; stroke: #fff; stroke-width: 2; transition: opacity 0.1s; }
+.rwma-seg:hover { opacity: 0.82; }
+.rwma-seg-label { pointer-events: none; font-size: 11px; font-weight: 500; text-anchor: middle; dominant-baseline: middle; }
+.rwma-legend-dot { display: inline-block; width: 13px; height: 13px; border-radius: 3px; vertical-align: middle; margin-right: 5px; }
+.rwma-status-item { font-size: 13px; padding: 3px 10px; border-radius: 6px; margin: 2px 4px 2px 0; display: inline-block; }
+#rwma-inline-preview { margin-top: 8px; padding: 12px; border: 1px solid var(--border-light); border-radius: 10px; background: var(--surface); display: none; }
+#rwma-inline-preview .rwma-preview-layout { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+#rwma-inline-preview .rwma-preview-svg-wrap { flex: 0 0 auto; pointer-events: none; }
+#rwma-inline-preview .rwma-preview-summary { flex: 1; min-width: 160px; font-size: 12px; line-height: 1.6; color: var(--text); }
+.rwma-print-block { break-inside: avoid; page-break-inside: avoid; margin: 6px 0; padding: 8px; border: 0.5px solid #ccc; border-radius: 6px; }
+.rwma-print-layout { display: flex; gap: 14px; align-items: flex-start; }
+.rwma-print-summary { flex: 1; font-size: 8pt; line-height: 1.5; }
+.rwma-print-legend { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; font-size: 7pt; }
 
 /* ─── TOAST ───────────────────────────────────────────── */
 #toast {
@@ -1861,6 +2149,187 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
   #printReportMount.print-aggressive-2page .print-nonfusic-disclaimer-list li {
     font-size: 6.5pt;
   }
+  .rwma-print-block { break-inside: avoid; page-break-inside: avoid; border-color: #999; }
+  #printReportMount.print-aggressive-2page .rwma-print-block { padding: 4px; margin: 3px 0; }
+  #printReportMount.print-aggressive-2page .rwma-print-summary { font-size: 6.5pt; line-height: 1.3; }
+  #printReportMount.print-aggressive-2page .rwma-print-legend { font-size: 6pt; }
+
+  /* ── EDEC-style print layout ──────────────────────── */
+  .edec-print-inner {
+    max-width: 100%;
+    color: #111;
+    line-height: 1.35;
+    font-size: 8.5pt;
+  }
+  .edec-print-title {
+    font-size: 14pt;
+    font-weight: 700;
+    color: #0d3d6b;
+    text-align: center;
+    margin: 0 0 6px 0;
+    padding-bottom: 4px;
+    border-bottom: 2.5px solid #1565a8;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  .edec-print-demo {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8pt;
+    line-height: 1.25;
+    margin-bottom: 6px;
+    border: 1px solid #aaa;
+  }
+  .edec-print-demo td {
+    padding: 2px 6px;
+    border: 1px solid #ccc;
+    vertical-align: top;
+  }
+  .edec-demo-k {
+    font-weight: 600;
+    background: #f3f4f6;
+    color: #222;
+    width: 12%;
+    white-space: nowrap;
+  }
+  .edec-demo-v {
+    color: #111;
+    width: 38%;
+  }
+  .edec-print-indication {
+    font-size: 8.5pt;
+    margin: 4px 0 8px;
+    padding: 4px 6px;
+    border: 1px solid #ccc;
+    background: #fafbfc;
+    line-height: 1.4;
+  }
+  .edec-print-interp {
+    margin-bottom: 4px;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .edec-print-interp-title {
+    font-size: 9pt;
+    font-weight: 700;
+    color: #1e3a5f;
+    margin: 6px 0 1px 0;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .edec-print-interp-body {
+    margin: 0 0 2px 0;
+    font-size: 8.5pt;
+    line-height: 1.4;
+    white-space: pre-wrap;
+  }
+  .edec-print-rwma-embed {
+    margin-top: 4px;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .edec-print-summary-block {
+    margin: 8px 0 6px;
+    padding: 5px 7px;
+    border: 1.5px solid #1565a8;
+    background: #f8fafd;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .edec-print-summary-heading {
+    font-size: 9pt;
+    font-weight: 700;
+    color: #0d3d6b;
+    margin: 0 0 3px 0;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .edec-print-summary-block p {
+    margin: 0 0 3px 0;
+    font-size: 8.5pt;
+    line-height: 1.4;
+  }
+  .edec-print-meas-heading {
+    font-size: 9pt;
+    font-weight: 700;
+    color: #0d3d6b;
+    text-align: center;
+    margin: 8px 0 4px;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  .edec-print-meas-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 7.5pt;
+    line-height: 1.2;
+    border: 1px solid #999;
+  }
+  .edec-print-meas-table th,
+  .edec-print-meas-table td {
+    padding: 1.5px 5px;
+    border: 1px solid #ccc;
+    vertical-align: top;
+  }
+  .edec-meas-hdr-row th {
+    background: #1e3a5f;
+    color: #fff;
+    font-size: 7.5pt;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding: 2px 4px;
+  }
+  .edec-meas-k {
+    font-weight: 600;
+    color: #222;
+    white-space: nowrap;
+    background: #fafafa;
+  }
+  .edec-meas-v {
+    color: #111;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .edec-print-reported-by {
+    margin-top: 10px;
+    padding: 5px 6px;
+    border: 1px solid #999;
+    font-size: 8.5pt;
+  }
+  .edec-print-disclaimer {
+    margin-top: 6px;
+    padding-top: 4px;
+    border-top: 1px solid #999;
+    font-size: 6.5pt;
+    color: #555;
+    line-height: 1.3;
+    font-style: italic;
+  }
+  .edec-print-nonfusic {
+    margin: 4px 0 6px;
+    padding: 5px 7px;
+    border: 1px solid #ccc;
+    background: #fff;
+    font-size: 7.25pt;
+    line-height: 1.35;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .edec-print-nonfusic-intro {
+    margin: 0 0 4px;
+    font-weight: 600;
+    color: #111;
+  }
+  .edec-print-nonfusic-list {
+    margin: 0;
+    padding: 0 0 0 1.1em;
+    color: #222;
+  }
+  .edec-print-nonfusic-list li { margin-bottom: 2px; }
 }
 </style>
 </head>
@@ -2102,10 +2571,10 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         </div>
         <div class="toggle-row">
           <div>
-            <div class="toggle-label">Wide mode</div>
-            <div class="settings-toggle-hint">Expands the form to fill the screen width on desktop, arranging sections side-by-side to reduce scrolling. No effect on mobile.</div>
+            <div class="toggle-label">Compact mode</div>
+            <div class="settings-toggle-hint">Reduces vertical space and uses the full screen width on desktop, fitting more fields into view and minimising scrolling. No effect on mobile.</div>
           </div>
-          <label class="toggle-switch"><input type="checkbox" id="toggle-wide-mode"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+          <label class="toggle-switch"><input type="checkbox" id="toggle-compact-mode"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
         </div>
       </div>
     </div>
@@ -2495,6 +2964,11 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         </select>
       </div>
       <div class="field-group conditional-field" id="f-rwmaDesc-wrap">
+        <button type="button" class="btn-rwma-segment" id="openRwmaModelBtn" onclick="openRwmaModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          17-Segment Model
+        </button>
+        <div id="rwma-inline-preview"></div>
         <label class="field-label" for="f-rwmaDesc">RWMA Description</label>
         <textarea id="f-rwmaDesc" placeholder="Describe territory, wall segments affected..." rows="2"></textarea>
       </div>
@@ -2785,6 +3259,22 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <div class="chevron"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div>
     </div>
     <div class="section-body">
+      <div class="field-row two-col">
+        <div class="field-group">
+          <label class="field-label" for="f-raVisualImpression">RA visual impression</label>
+          <select id="f-raVisualImpression" data-important="true">
+            <option value="">— Select —</option>
+            <option>Normal</option>
+            <option>Dilated</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="f-raArea">RA Area <span class="unit">(cm²)</span></label>
+          <p class="calc-hint">Normal &lt;18 cm²</p>
+          <input type="number" id="f-raArea" placeholder="e.g. 16" min="0" max="80" step="0.1">
+          <div id="rv-ra-area-hint" class="la-validate-hint" aria-live="polite"></div>
+        </div>
+      </div>
       <div class="field-row three-col">
         <div class="field-group">
           <label class="field-label" for="f-rvVisualSize">RV size visual estimation</label>
@@ -2821,21 +3311,12 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
           <div id="rv-rvot-hint" class="la-validate-hint" aria-live="polite"></div>
         </div>
       </div>
-      <div class="field-row two-col">
-        <div class="field-group">
-          <label class="field-label" for="f-rvWallThick">RV wall thickness <span class="unit">(mm)</span></label>
-          <p class="calc-hint">Normal ≤5 mm</p>
-          <input type="number" id="f-rvWallThick" placeholder="e.g. 4" min="0" max="25" step="0.1">
-          <div id="rv-wall-hint" class="la-validate-hint" aria-live="polite"></div>
-        </div>
-        <div class="field-group">
-          <label class="field-label" for="f-raArea">RA area <span class="unit">(cm²)</span></label>
-          <p class="calc-hint">Normal &lt;18 cm²</p>
-          <input type="number" id="f-raArea" placeholder="e.g. 16" min="0" max="80" step="0.1">
-          <div id="rv-ra-area-hint" class="la-validate-hint" aria-live="polite"></div>
-        </div>
+      <div class="field-group">
+        <label class="field-label" for="f-rvWallThick">RV wall thickness <span class="unit">(mm)</span></label>
+        <p class="calc-hint">Normal ≤5 mm</p>
+        <input type="number" id="f-rvWallThick" placeholder="e.g. 4" min="0" max="25" step="0.1">
+        <div id="rv-wall-hint" class="la-validate-hint" aria-live="polite"></div>
       </div>
-
       <div id="rv-lv-basal-ratio-field-wrap" class="field-group section-hidden">
         <label class="field-label" for="rv-lv-basal-ratio-display-input">RV:LV basal diameter ratio<span class="field-label-source-tag" id="rv-lv-basal-ratio-display-source" hidden></span></label>
         <div class="calc-display calc-display-editable" id="rv-lv-basal-ratio-display">
@@ -2868,11 +3349,29 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       </div>
       <div class="field-row three-col">
         <div class="field-group">
-          <label class="field-label" for="f-rvFAC">FAC <span class="unit">(%)</span></label>
-          <p class="calc-hint">Normal &gt;30%</p>
-          <input type="number" id="f-rvFAC" placeholder="e.g. 42" min="0" max="100" step="0.1">
+          <label class="field-label" for="f-rvEDA">RV end-diastolic area <span class="unit">(cm²)</span></label>
+          <p class="calc-hint calc-hint-spacer" aria-hidden="true">&nbsp;</p>
+          <input type="number" id="f-rvEDA" placeholder="e.g. 28" min="0" max="120" step="0.1" oninput="recalcRVFAC(); scheduleMainContentSoftValidation()" onchange="recalcRVFAC(); scheduleMainContentSoftValidation()">
+          <div id="rv-eda-hint" class="la-validate-hint" aria-live="polite"></div>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="f-rvESA">RV end-systolic area <span class="unit">(cm²)</span></label>
+          <p class="calc-hint calc-hint-spacer" aria-hidden="true">&nbsp;</p>
+          <input type="number" id="f-rvESA" placeholder="e.g. 15" min="0" max="120" step="0.1" oninput="recalcRVFAC(); scheduleMainContentSoftValidation()" onchange="recalcRVFAC(); scheduleMainContentSoftValidation()">
+          <div id="rv-esa-hint" class="la-validate-hint" aria-live="polite"></div>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="fac-display-input">FAC <span class="unit">(%)</span><span class="field-label-source-tag" id="fac-display-source" hidden></span></label>
+          <p class="calc-hint">(EDA − ESA) ÷ EDA × 100 — Normal &gt;30%</p>
+          <div class="calc-display calc-display-editable" id="fac-display">
+            <div class="calc-editable-value-line">
+              <input type="text" class="calc-editable-value auto-calc-input" id="fac-display-input" inputmode="decimal" autocomplete="off" aria-label="RV fractional area change percent">
+            </div>
+          </div>
           <div id="rv-fac-hint" class="la-validate-hint" aria-live="polite"></div>
         </div>
+      </div>
+      <div class="field-row two-col">
         <div class="field-group">
           <label class="field-label" for="f-tapse">TAPSE <span class="unit">(mm)</span></label>
           <p class="calc-hint">Normal &gt;17 mm</p>
@@ -3342,6 +3841,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <button type="button" class="footer-export-menu-item" role="menuitem" data-export-format="clipboard-text">Plain text — copy to clipboard</button>
       <button type="button" class="footer-export-menu-item" role="menuitem" data-export-format="plain-text-page">Plain text — full page (select & copy)</button>
       <button type="button" class="footer-export-menu-item" role="menuitem" data-export-format="print-pdf">Print / Save as PDF (A4)</button>
+      <button type="button" class="footer-export-menu-item" role="menuitem" data-export-format="edec">BSE/EDEC Style Report</button>
     </div>
   </div>
 </div>
@@ -3373,7 +3873,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         <div class="export-option-card">
           <h3>Excel workbook (.xlsx)</h3>
           <p>Download a spreadsheet formatted for columns and rows. Useful for filing, further editing in Excel or similar, attaching to notes, or sharing as a file.</p>
-          <button type="button" class="btn btn-primary" onclick="triggerExportFromModal('xlsx')">Download Excel file</button>
+          <button type="button" class="btn btn-secondary" onclick="triggerExportFromModal('xlsx')">Download Excel file</button>
         </div>
         <div class="export-option-card">
           <h3>Plain text — clipboard</h3>
@@ -3390,6 +3890,11 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
           <p>Opens your browser&rsquo;s print dialog with a compact A4 layout. Choose <strong>Save as PDF</strong> and A4 for a two-sided sheet where possible.</p>
           <p class="export-print-mobile-caution" role="note">Caution: saving or printing can place patient-identifiable information on a personal device — follow your organisation&rsquo;s information governance and only use approved workflows.</p>
           <button type="button" class="btn btn-secondary" onclick="triggerExportFromModal('print-pdf')">Print or save as PDF</button>
+        </div>
+        <div class="export-option-card">
+          <h3>BSE/EDEC Style Report</h3>
+          <p>Opens a full-screen editor for free-text clinical interpretation, with a compact measurements table. Generates a PDF in the BSE/EDEC reporting style. We recommend completion on a desktop computer.</p>
+          <button type="button" class="btn btn-secondary" onclick="triggerExportFromModal('edec')">Open BSE/EDEC editor</button>
         </div>
       </div>
       <div class="export-modal-anonymise-block">
@@ -3477,6 +3982,36 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
   </div>
 </div>
 
+<div class="modal-overlay" id="rwmaModal" onclick="if(event.target===this)closeRwmaModal()">
+  <div class="modal-box modal-box--rwma" role="dialog" aria-labelledby="rwmaModalTitle" aria-modal="true" onclick="event.stopPropagation()">
+    <div class="about-modal-header">
+      <h2 id="rwmaModalTitle">17-Segment Wall Motion Model</h2>
+      <button type="button" class="about-modal-close" onclick="closeRwmaModal()" aria-label="Close 17-segment model">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="rwma-modal-body" id="rwmaModalBody">
+      <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start;">
+        <div style="flex:0 0 auto;">
+          <svg id="rwma-svg" width="340" height="340" viewBox="0 0 360 360"></svg>
+          <div style="display:flex; gap:10px; justify-content:center; margin-top:8px; flex-wrap:wrap;">
+            <span><span class="rwma-legend-dot" style="background:#3a9e5f;border:1px solid #2a7a47;"></span><span style="font-size:11px;color:var(--text-muted);">Normal</span></span>
+            <span><span class="rwma-legend-dot" style="background:#f0c430;border:1px solid #c9a010;"></span><span style="font-size:11px;color:var(--text-muted);">Hypokinetic</span></span>
+            <span><span class="rwma-legend-dot" style="background:#e02020;border:1px solid #b01010;"></span><span style="font-size:11px;color:var(--text-muted);">Akinetic</span></span>
+            <span><span class="rwma-legend-dot" style="background:#7c3abf;border:1px solid #5a2490;"></span><span style="font-size:11px;color:var(--text-muted);">Dyskinetic</span></span>
+          </div>
+        </div>
+        <div style="flex:1; min-width:180px;">
+          <p style="font-size:12px; font-weight:500; color:var(--text-muted); margin:0 0 8px;">Tap segment to cycle state</p>
+          <div id="rwma-summary" style="min-height:36px;"></div>
+          <hr style="border:none;border-top:0.5px solid var(--border-light);margin:10px 0;">
+          <div id="rwma-seg-list" style="font-size:12px; color:var(--text-muted); line-height:1.8;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="refRangesPanel" class="ref-ranges-panel" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="refRangesTitle">
   <div class="ref-ranges-header">
     <h2 id="refRangesTitle">Reference ranges</h2>
@@ -3486,6 +4021,53 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
   </div>
   <div class="ref-ranges-scroll" id="refRangesMount"></div>
   <p class="ref-ranges-source">Source: Guidelines for performing a comprehensive haemodynamic assessment with ultrasound. FUSIC® HD. (2026)</p>
+</div>
+
+<div id="edecEditorPanel" class="edec-editor-panel" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="edecEditorTitle">
+  <div class="edec-editor-header">
+    <h2 id="edecEditorTitle">BSE/EDEC Style Report</h2>
+    <button type="button" class="btn btn-primary" id="edecExportPdfBtn">Export as PDF</button>
+    <button type="button" class="btn btn-secondary" id="edecExportTextBtn">Export as plain text</button>
+    <button type="button" class="edec-editor-close" id="edecEditorCloseBtn" aria-label="Close EDEC editor">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="edec-editor-scroll">
+    <p class="edec-desktop-note">We recommend completion on a desktop computer. The free-text fields below will appear in the exported PDF alongside a compact measurements table.</p>
+
+    <h3 class="edec-section-heading">Clinical Interpretation</h3>
+    <div class="edec-interp-grid">
+      <div class="edec-interp-field"><label for="edec-interp-lv">Left Ventricle</label><textarea id="edec-interp-lv" rows="4"></textarea></div>
+      <div class="edec-interp-field"><label for="edec-interp-la">Left Atria</label><textarea id="edec-interp-la" rows="4"></textarea></div>
+      <div class="edec-interp-field"><label for="edec-interp-rh">Right Heart</label><textarea id="edec-interp-rh" rows="4"></textarea></div>
+      <div class="edec-interp-field"><label for="edec-interp-valves">Valves</label><textarea id="edec-interp-valves" rows="4"></textarea></div>
+      <div class="edec-interp-field"><label for="edec-interp-pericardium">Pericardium</label><textarea id="edec-interp-pericardium" rows="4"></textarea></div>
+      <div class="edec-interp-field"><label for="edec-interp-aorta">Aorta</label><textarea id="edec-interp-aorta" rows="4"></textarea></div>
+      <div class="edec-interp-field"><label for="edec-interp-veins">Veins</label><textarea id="edec-interp-veins" rows="4"></textarea></div>
+      <div class="edec-interp-field"><label for="edec-interp-lungs">Lungs</label><textarea id="edec-interp-lungs" rows="4"></textarea></div>
+    </div>
+
+    <h3 class="edec-section-heading">Summary &amp; Conclusions</h3>
+    <div class="edec-summary-grid">
+      <div class="edec-summary-field">
+        <label for="edec-significance">Clinical Significance</label>
+        <select id="edec-significance">
+          <option value="">— Select —</option><option>Normal study</option><option>Abnormal — expected</option><option>Abnormal — new finding</option><option>Critical finding</option>
+        </select>
+      </div>
+      <div class="edec-summary-field">
+        <label for="edec-impression">Overall Impression</label>
+        <textarea id="edec-impression" rows="4"></textarea>
+      </div>
+      <div class="edec-summary-field">
+        <label for="edec-actions">Recommended Actions</label>
+        <textarea id="edec-actions" rows="2"></textarea>
+      </div>
+    </div>
+
+    <h3 class="edec-section-heading">Measurements Reference</h3>
+    <div class="edec-meas-wrap" id="edecMeasMount"></div>
+  </div>
 </div>
 
 <div id="toast"></div>
@@ -3941,6 +4523,489 @@ function closeReferenceRanges() {
   document.getElementById('refRangesBtn')?.focus();
 }
 
+// ─── EDEC EDITOR ────────────────────────────────────────
+let edecPrevOverflow = '';
+const EDEC_INTERP_IDS = ['edec-interp-lv','edec-interp-la','edec-interp-rh','edec-interp-valves','edec-interp-pericardium','edec-interp-aorta','edec-interp-veins','edec-interp-lungs'];
+
+function openEdecEditor() {
+  const panel = document.getElementById('edecEditorPanel');
+  if (!panel) return;
+  edecPrevOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
+
+  document.getElementById('edec-significance').value = document.getElementById('f-significance')?.value || '';
+  document.getElementById('edec-impression').value = document.getElementById('f-impression')?.value || '';
+  document.getElementById('edec-actions').value = document.getElementById('f-actions')?.value || '';
+
+  buildEdecMeasurementsTable();
+
+  panel.classList.add('open');
+  panel.setAttribute('aria-hidden', 'false');
+  document.getElementById('edecEditorCloseBtn')?.focus();
+}
+
+function closeEdecEditor() {
+  const panel = document.getElementById('edecEditorPanel');
+  if (!panel) return;
+
+  document.getElementById('f-significance').value = document.getElementById('edec-significance')?.value ?? '';
+  document.getElementById('f-impression').value = document.getElementById('edec-impression')?.value ?? '';
+  document.getElementById('f-actions').value = document.getElementById('edec-actions')?.value ?? '';
+
+  panel.classList.remove('open');
+  panel.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = edecPrevOverflow;
+}
+
+/* Measurement definitions for the compact table */
+const EDEC_MEAS_GROUPS = [
+  { title: 'LV Size', rows: [
+    ['LVIDd', 'f-lvidd', 'mm'], ['LVIDs', 'f-lvids', 'mm'],
+    ['IVSd', 'f-ivsd', 'mm'], ['LVPWd', 'f-lvpwd', 'mm'],
+    ['LVIDd Indexed', 'lvidd-index-display-input', 'mm/m²'],
+    ['LV Mass', 'lv-mass-display-input', 'g'],
+    ['LVMi', 'lvmi-display-input', 'g/m²'],
+    ['RWT', 'rwt-display-input', ''],
+  ]},
+  { title: 'LV Systolic Function', rows: [
+    ['FS', 'fs-display-input', '%'],
+    ['EF (Simpson\'s)', 'f-efSimpsonBiplane', '%'],
+    ['EF (Visual)', 'f-ef', ''],
+    ['MAPSE', 'f-mapse', 'mm'],
+    ['LV S\'', 'f-lvSPrime', 'cm/s'],
+  ]},
+  { title: 'Haemodynamics', rows: [
+    ['LVOT Diam', 'f-lvotDiam', 'cm'],
+    ['LVOT VTI', 'f-lvotVTI', 'cm'],
+    ['SV (VTI)', 'sv-display-input', 'mL'],
+    ['SVi', 'svi-display-input', 'mL/m²'],
+    ['CO', 'co-display-input', 'L/min'],
+    ['CI', 'ci-display-input', 'L/min/m²'],
+    ['SVR', 'svr-display-input', ''],
+    ['SVRi', 'svri-display-input', ''],
+    ['VTI Δ resp', 'f-vtiDeltaResp', '%'],
+    ['IVC Diam', 'f-ivcDiam', 'mm'],
+    ['IVC Collapse', 'f-ivcCollapse', ''],
+    ['CVP', 'f-cvp', 'mmHg'],
+  ]},
+  { title: 'LV Diastolic Function', rows: [
+    ['E Vel', 'f-eWave', 'cm/s'],
+    ['A Vel', 'f-aWave', 'cm/s'],
+    ['E/A', 'ea-display-input', ''],
+    ['e\' Septal', 'f-eSeptal', 'cm/s'],
+    ['e\' Lateral', 'f-eLateral', 'cm/s'],
+    ['Avg e\'', 'eprime-avg-input', 'cm/s'],
+    ['Avg E/e\'', 'ee-display-input', ''],
+    ['TR Vmax (LAP)', 'f-trVmaxLAP', 'm/s'],
+  ]},
+  { title: 'RV Size & Function', rows: [
+    ['RA Area', 'f-raArea', 'cm²'],
+    ['RV Basal', 'f-rvBasalDiam', 'mm'],
+    ['RV Mid', 'f-rvMidDiam', 'mm'],
+    ['RV Length', 'f-rvLongDiam', 'mm'],
+    ['RVOT Prox', 'f-rvotProx', 'mm'],
+    ['RV Wall', 'f-rvWallThick', 'mm'],
+    ['RV EDA', 'f-rvEDA', 'cm²'],
+    ['RV ESA', 'f-rvESA', 'cm²'],
+    ['FAC', 'fac-display-input', '%'],
+    ['TAPSE', 'f-tapse', 'mm'],
+    ['RV S\'', 'f-rvS', 'cm/s'],
+  ]},
+  { title: 'Aortic Valve', rows: [
+    ['AV VTI', 'f-avVTI', 'cm'],
+    ['DI', 'di-display-input', ''],
+    ['AVA (cont.)', 'ava-continuity-display-input', 'cm²'],
+  ]},
+  { title: 'Tricuspid Valve', rows: [
+    ['TR Vmax', 'f-trVmax', 'm/s'],
+  ]},
+  { title: 'Atria', rows: [
+    ['LA Diam', 'f-laDiamSys', 'mm'],
+    ['LA Area', 'f-laArea', 'cm²'],
+  ]},
+  { title: 'Pericardium', rows: [
+    ['Effusion', 'f-periEffusion', ''],
+  ]},
+  { title: 'Aorta', rows: [
+    ['Root', 'f-aortaRootDiam', 'mm'],
+    ['Ascending', 'f-aortaAscDiam', 'mm'],
+    ['Arch', 'f-aortaArchDiam', 'mm'],
+    ['Descending', 'f-aortaDescDiam', 'mm'],
+    ['Abdominal', 'f-aortaAbdDiam', 'mm'],
+  ]},
+];
+
+function edecGetVal(id) {
+  const el = document.getElementById(id);
+  if (!el) return '';
+  return (el.value || el.textContent || '').trim();
+}
+
+function buildEdecMeasurementsTable() {
+  const mount = document.getElementById('edecMeasMount');
+  if (!mount) return;
+  const esc = escapeHtml;
+  let html = '<div class="edec-meas-outer">';
+  for (const g of EDEC_MEAS_GROUPS) {
+    let rows = '';
+    for (const [label, id, unit] of g.rows) {
+      const v = edecGetVal(id);
+      const display = v ? (unit && v !== '' ? `${v} ${unit}` : v) : '';
+      rows += `<tr><td>${esc(label)}</td><td>${display ? esc(display) : ''}</td></tr>`;
+    }
+    html += `<div class="edec-meas-block"><div class="edec-meas-block-title">${esc(g.title)}</div><table class="edec-meas-table"><tbody>${rows}</tbody></table></div>`;
+  }
+  html += '</div>';
+  mount.innerHTML = html;
+}
+
+/* EDEC PDF export */
+function buildEdecPrintHTML() {
+  const esc = escapeHtml;
+  const gv = id => (document.getElementById(id)?.value || '').trim();
+  const { date: nd, time: nt } = getNow();
+  const scanDateRaw = gv('f-scanDate');
+  const scanDate = scanDateRaw || nd;
+  const scanTime = gv('f-scanTime');
+
+  const parts = ['<div class="edec-print-inner">'];
+
+  parts.push('<h1 class="edec-print-title">Echocardiography Report</h1>');
+
+  /* Demographics table */
+  const demoRows = [
+    ['Name', gv('f-patientName')], ['Study Date', scanDate + (scanTime ? ' ' + scanTime : '')],
+    ['Patient ID', gv('f-patientId')], ['Operator', gv('f-operatorName') || 'Not specified'],
+    ['Age', gv('f-age') ? gv('f-age') + ' years' : ''], ['Height', gv('f-height') ? gv('f-height') + ' cm' : ''],
+    ['Weight', gv('f-weight') ? gv('f-weight') + ' kg' : ''], ['BSA', edecGetVal('bsa-display-input') ? edecGetVal('bsa-display-input') + ' m²' : ''],
+    ['Heart Rate', gv('f-hr') ? gv('f-hr') + ' bpm' : ''], ['Image Quality', gv('f-imageQuality')],
+    ['Rhythm', typeof selectedRhythms !== 'undefined' && selectedRhythms.size ? [...selectedRhythms].join(', ') : ''],
+    ['Report Generated', `${nd} ${nt.slice(0,2)}:${nt.slice(2,4)}:${nt.slice(4,6)}`],
+  ];
+  parts.push('<table class="edec-print-demo"><tbody>');
+  for (let i = 0; i < demoRows.length; i += 2) {
+    const a = demoRows[i], b = demoRows[i+1];
+    parts.push('<tr>');
+    parts.push(`<td class="edec-demo-k">${esc(a[0])}</td><td class="edec-demo-v">${esc(a[1])}</td>`);
+    if (b) parts.push(`<td class="edec-demo-k">${esc(b[0])}</td><td class="edec-demo-v">${esc(b[1])}</td>`);
+    else parts.push('<td class="edec-demo-k"></td><td class="edec-demo-v"></td>');
+    parts.push('</tr>');
+  }
+  parts.push('</tbody></table>');
+
+  /* Indication */
+  const indication = gv('f-indication');
+  if (indication) {
+    parts.push(`<div class="edec-print-indication"><strong>Indication:</strong> ${esc(indication)}</div>`);
+  }
+
+  /* Interpretation sections (free text); RWMA diagram after Left Ventricle, before Left Atria (same rules as structured export) */
+  const interpSections = [
+    ['Left Ventricle', 'edec-interp-lv'], ['Left Atria', 'edec-interp-la'],
+    ['Right Heart', 'edec-interp-rh'], ['Valves', 'edec-interp-valves'],
+    ['Pericardium', 'edec-interp-pericardium'], ['Aorta', 'edec-interp-aorta'],
+    ['Veins', 'edec-interp-veins'], ['Lungs', 'edec-interp-lungs'],
+  ];
+  const interpParts = [];
+  const lvText = gv('edec-interp-lv');
+  let rwmaHtml = '';
+  if (getVal('f-rwma') === 'Present' && typeof RWMA !== 'undefined' && RWMA.hasAbnormal()) {
+    rwmaHtml = buildRwmaPrintSVG(RWMA.getStates());
+  }
+  if (lvText || rwmaHtml) {
+    let inner = '';
+    if (lvText) inner += `<p class="edec-print-interp-body">${esc(lvText)}</p>`;
+    if (rwmaHtml) inner += `<div class="edec-print-rwma-embed">${rwmaHtml}</div>`;
+    interpParts.push(`<div class="edec-print-interp"><h3 class="edec-print-interp-title">Left Ventricle:</h3>${inner}</div>`);
+  }
+  for (const [title, id] of interpSections.slice(1)) {
+    const v = gv(id);
+    if (!v) continue;
+    interpParts.push(`<div class="edec-print-interp"><h3 class="edec-print-interp-title">${esc(title)}:</h3><p class="edec-print-interp-body">${esc(v)}</p></div>`);
+  }
+  const interpHtml = interpParts.join('');
+
+  /* Summary + non-FUSIC disclaimer (FUSIC HD questions are omitted from EDEC/BSE style); order follows summary-near-top toggle */
+  let summaryHtml = '';
+  let nonFusicHtml = '';
+  if (typeof isSummarySectionVisible === 'function' && isSummarySectionVisible()) {
+    const sig = gv('edec-significance');
+    const imp = gv('edec-impression');
+    const act = gv('edec-actions');
+    if (sig || imp || act) {
+      summaryHtml = '<div class="edec-print-summary-block">';
+      summaryHtml += '<h3 class="edec-print-summary-heading">Summary &amp; Conclusions</h3>';
+      if (sig) summaryHtml += `<p><strong>Clinical Significance:</strong> ${esc(sig)}</p>`;
+      if (imp) summaryHtml += `<p><strong>Overall Impression:</strong> ${esc(imp)}</p>`;
+      if (act) summaryHtml += `<p><strong>Recommended Actions:</strong> ${esc(act)}</p>`;
+      summaryHtml += '</div>';
+    }
+
+    const nft = document.getElementById('toggle-export-nonfusic-disclaimer');
+    if (nft?.checked && typeof getNonFusicHdEnabledMeasureLabelsForExport === 'function') {
+      const items = getNonFusicHdEnabledMeasureLabelsForExport();
+      if (items.length && typeof NONFUSIC_HD_DISCLAIMER_EXPORT_INTRO === 'string') {
+        nonFusicHtml =
+          '<div class="edec-print-nonfusic">' +
+          `<p class="edec-print-nonfusic-intro">${esc(NONFUSIC_HD_DISCLAIMER_EXPORT_INTRO)}</p>` +
+          `<ul class="edec-print-nonfusic-list">${items.map(it => `<li>${esc(it)}</li>`).join('')}</ul></div>`;
+      }
+    }
+  }
+
+  const summaryBundleHtml = summaryHtml + nonFusicHtml;
+  const summaryNearTop = !!document.getElementById('toggle-export-summary-near-top')?.checked;
+  if (summaryNearTop) {
+    parts.push(summaryBundleHtml);
+    parts.push(interpHtml);
+  } else {
+    parts.push(interpHtml);
+    parts.push(summaryBundleHtml);
+  }
+
+  /* Measurements table */
+  parts.push('<h3 class="edec-print-meas-heading">Measurements</h3>');
+  parts.push('<table class="edec-print-meas-table"><tbody>');
+
+  const groupsPerRow = 3;
+  for (let gi = 0; gi < EDEC_MEAS_GROUPS.length; gi += groupsPerRow) {
+    const chunk = EDEC_MEAS_GROUPS.slice(gi, gi + groupsPerRow);
+    const maxRows = Math.max(...chunk.map(g => g.rows.length));
+
+    /* Header row */
+    parts.push('<tr class="edec-meas-hdr-row">');
+    for (const g of chunk) {
+      parts.push(`<th colspan="2">${esc(g.title)}</th>`);
+    }
+    for (let pad = chunk.length; pad < groupsPerRow; pad++) parts.push('<th colspan="2"></th>');
+    parts.push('</tr>');
+
+    /* Data rows */
+    for (let ri = 0; ri < maxRows; ri++) {
+      parts.push('<tr>');
+      for (const g of chunk) {
+        if (ri < g.rows.length) {
+          const [label, id, unit] = g.rows[ri];
+          const v = edecGetVal(id);
+          const display = v ? (unit ? `${v} ${unit}` : v) : '';
+          parts.push(`<td class="edec-meas-k">${esc(label)}</td><td class="edec-meas-v">${esc(display)}</td>`);
+        } else {
+          parts.push('<td class="edec-meas-k"></td><td class="edec-meas-v"></td>');
+        }
+      }
+      for (let pad = chunk.length; pad < groupsPerRow; pad++) parts.push('<td></td><td></td>');
+      parts.push('</tr>');
+    }
+  }
+  parts.push('</tbody></table>');
+
+  /* Reported by */
+  parts.push('<div class="edec-print-reported-by"><strong>Reported by:</strong> ' + esc(gv('f-operatorName') || '') + '</div>');
+
+  /* Disclaimer */
+  parts.push(`<p class="edec-print-disclaimer">${esc(EXPORT_DISCLAIMER_TEXT)}</p>`);
+
+  parts.push('</div>');
+  return parts.join('');
+}
+
+function doEdecExportPdf() {
+  closeEdecEditor();
+  const valid = validateForm();
+  const mount = document.getElementById('printReportMount');
+  if (!mount) return;
+  const previousDocumentTitle = document.title;
+
+  mount.innerHTML = buildEdecPrintHTML();
+
+  const pn = (document.getElementById('f-patientName')?.value || '').trim();
+  const pid = (document.getElementById('f-patientId')?.value || '').trim();
+
+  const mask = document.getElementById('fusicPrintMask');
+  const siblings = [...document.body.children].filter(el => el !== mount && el !== mask);
+  const saved = new Map();
+
+  function enterPrintLayout() {
+    if (pn || pid) document.title = pn && pid ? `${pn} / ${pid}` : (pn || pid);
+    if (mask) mask.classList.add('active');
+    siblings.forEach(el => { saved.set(el, el.style.display); el.style.display = 'none'; });
+    mount.style.cssText = 'display:block!important;position:static!important;width:100%!important;height:auto!important;max-height:none!important;overflow:visible!important;pointer-events:auto!important;font-family:Segoe UI,Arial,Helvetica,sans-serif;';
+    mount.setAttribute('aria-hidden', 'false');
+    void mount.offsetHeight;
+  }
+
+  function exitPrintLayout() {
+    document.title = previousDocumentTitle;
+    mount.style.cssText = '';
+    mount.innerHTML = '';
+    mount.setAttribute('aria-hidden', 'true');
+    saved.forEach((v, el) => { el.style.display = v ?? ''; });
+    saved.clear();
+    if (mask) mask.classList.remove('active');
+  }
+
+  enterPrintLayout();
+
+  const isAndroid = /Android/i.test(navigator.userAgent || '');
+  let cleaned = false;
+  function cleanup() {
+    if (cleaned) return;
+    cleaned = true;
+    exitPrintLayout();
+    window.removeEventListener('afterprint', cleanup);
+    window.removeEventListener('focus', cleanup);
+  }
+
+  if (!isAndroid) window.addEventListener('afterprint', cleanup);
+  else window.addEventListener('focus', cleanup, { once: true });
+
+  const delayMs = isAndroid ? 400 : 80;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        window.print();
+        setTimeout(cleanup, isAndroid ? 30000 : 6000);
+      }, delayMs);
+    });
+  });
+
+  showToast(
+    valid ? 'Print dialog opened — choose Save as PDF (A4)' : 'Print prepared — review highlighted fields',
+    valid ? 'success' : 'warn'
+  );
+}
+
+function buildEdecPlainText() {
+  const gv = id => (document.getElementById(id)?.value || '').trim();
+  const { date: nd, time: nt } = getNow();
+  const scanDateRaw = gv('f-scanDate');
+  const scanDate = scanDateRaw || nd;
+  const scanTime = gv('f-scanTime');
+  const lines = [];
+
+  lines.push('Echocardiography Report');
+  lines.push('════════════════════════════════════════════════════');
+  lines.push('');
+
+  const demoRows = [
+    ['Name', gv('f-patientName')],
+    ['Patient ID', gv('f-patientId')],
+    ['Study Date', scanDate + (scanTime ? ' ' + scanTime : '')],
+    ['Operator', gv('f-operatorName') || 'Not specified'],
+    ['Age', gv('f-age') ? gv('f-age') + ' years' : ''],
+    ['Height', gv('f-height') ? gv('f-height') + ' cm' : ''],
+    ['Weight', gv('f-weight') ? gv('f-weight') + ' kg' : ''],
+    ['BSA', edecGetVal('bsa-display-input') ? edecGetVal('bsa-display-input') + ' m²' : ''],
+    ['Heart Rate', gv('f-hr') ? gv('f-hr') + ' bpm' : ''],
+    ['Image Quality', gv('f-imageQuality')],
+    ['Rhythm', typeof selectedRhythms !== 'undefined' && selectedRhythms.size ? [...selectedRhythms].join(', ') : ''],
+    ['Report Generated', `${nd} ${nt.slice(0,2)}:${nt.slice(2,4)}:${nt.slice(4,6)}`],
+  ];
+  for (const [k, v] of demoRows) {
+    if (v) lines.push(`${k}: ${v}`);
+  }
+
+  const indication = gv('f-indication');
+  if (indication) {
+    lines.push('');
+    lines.push(`Indication: ${indication}`);
+  }
+
+  /* Interpretation sections */
+  const interpSections = [
+    ['Left Ventricle', 'edec-interp-lv'], ['Left Atria', 'edec-interp-la'],
+    ['Right Heart', 'edec-interp-rh'], ['Valves', 'edec-interp-valves'],
+    ['Pericardium', 'edec-interp-pericardium'], ['Aorta', 'edec-interp-aorta'],
+    ['Veins', 'edec-interp-veins'], ['Lungs', 'edec-interp-lungs'],
+  ];
+  const interpLines = [];
+  for (const [title, id] of interpSections) {
+    const v = gv(id);
+    if (!v) continue;
+    interpLines.push('');
+    interpLines.push(`${title}:`);
+    interpLines.push(v);
+  }
+
+  /* Summary & Conclusions */
+  const summaryLines = [];
+  const sig = gv('edec-significance');
+  const imp = gv('edec-impression');
+  const act = gv('edec-actions');
+  if (sig || imp || act) {
+    summaryLines.push('');
+    summaryLines.push('SUMMARY & CONCLUSIONS');
+    summaryLines.push('────────────────────────────────────────');
+    if (sig) summaryLines.push(`Clinical Significance: ${sig}`);
+    if (imp) summaryLines.push(`Overall Impression: ${imp}`);
+    if (act) summaryLines.push(`Recommended Actions: ${act}`);
+  }
+
+  /* Non-FUSIC disclaimer */
+  const nonfusicLines = [];
+  const nft = document.getElementById('toggle-export-nonfusic-disclaimer');
+  if (nft?.checked && typeof getNonFusicHdEnabledMeasureLabelsForExport === 'function') {
+    const items = getNonFusicHdEnabledMeasureLabelsForExport();
+    if (items.length && typeof NONFUSIC_HD_DISCLAIMER_EXPORT_INTRO === 'string') {
+      nonfusicLines.push('');
+      nonfusicLines.push(NONFUSIC_HD_DISCLAIMER_EXPORT_INTRO);
+      for (const it of items) nonfusicLines.push(`  • ${it}`);
+    }
+  }
+
+  const summaryNearTop = !!document.getElementById('toggle-export-summary-near-top')?.checked;
+  const bundleLines = summaryLines.concat(nonfusicLines);
+  if (summaryNearTop) {
+    lines.push(...bundleLines, ...interpLines);
+  } else {
+    lines.push(...interpLines, ...bundleLines);
+  }
+
+  /* Measurements */
+  lines.push('');
+  lines.push('MEASUREMENTS');
+  lines.push('════════════════════════════════════════════════════');
+  for (const g of EDEC_MEAS_GROUPS) {
+    const dataRows = [];
+    for (const [label, id, unit] of g.rows) {
+      const v = edecGetVal(id);
+      if (!v) continue;
+      dataRows.push([label, unit ? `${v} ${unit}` : v]);
+    }
+    if (!dataRows.length) continue;
+    lines.push('');
+    lines.push(`  ${g.title}`);
+    const maxK = Math.max(...dataRows.map(r => r[0].length));
+    for (const [k, v] of dataRows) {
+      lines.push(`    ${k.padEnd(maxK + 2)}${v}`);
+    }
+  }
+
+  /* Reported by */
+  const op = gv('f-operatorName');
+  if (op) {
+    lines.push('');
+    lines.push(`Reported by: ${op}`);
+  }
+
+  /* Disclaimer */
+  lines.push('');
+  lines.push('────────────────────────────────────────');
+  lines.push(EXPORT_DISCLAIMER_TEXT);
+
+  return lines.join('\n');
+}
+
+function doEdecExportPlainText() {
+  const text = buildEdecPlainText();
+  const pre = document.getElementById('plainTextReportBody');
+  const overlay = document.getElementById('plainTextReportOverlay');
+  if (pre) pre.textContent = text;
+  overlay?.classList.add('open');
+  if (overlay) overlay.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+
 let selectedRhythms = new Set();
 
 // ─── TAMPONADE (MULTI-SELECT) ───────────────────────────
@@ -4113,21 +5178,24 @@ const SUMMARY_CONDITIONS = [
 ];
 
 const THEME_STORAGE_KEY = 'fusic-hd-theme';
-const WIDE_MODE_STORAGE_KEY = 'fusic-hd-wide-mode';
+const COMPACT_MODE_STORAGE_KEY = 'fusic-hd-compact-mode';
 
-function applyWideMode(on) {
-  document.body.classList.toggle('wide-mode', !!on);
-  const el = document.getElementById('toggle-wide-mode');
+function applyCompactMode(on) {
+  document.body.classList.toggle('compact-mode', !!on);
+  const el = document.getElementById('toggle-compact-mode');
   if (el) el.checked = !!on;
-  try { localStorage.setItem(WIDE_MODE_STORAGE_KEY, on ? '1' : '0'); } catch(e) {}
+  try {
+    localStorage.setItem(COMPACT_MODE_STORAGE_KEY, on ? '1' : '0');
+    localStorage.removeItem('fusic-hd-wide-mode');
+  } catch(e) {}
 }
 
-function initWideModeToggle() {
+function initCompactModeToggle() {
   try {
-    if (localStorage.getItem(WIDE_MODE_STORAGE_KEY) === '1') applyWideMode(true);
+    if (localStorage.getItem(COMPACT_MODE_STORAGE_KEY) === '1' || localStorage.getItem('fusic-hd-wide-mode') === '1') applyCompactMode(true);
   } catch(e) {}
-  document.getElementById('toggle-wide-mode')?.addEventListener('change', e => {
-    applyWideMode(e.target.checked);
+  document.getElementById('toggle-compact-mode')?.addEventListener('change', e => {
+    applyCompactMode(e.target.checked);
   });
 }
 
@@ -4158,7 +5226,7 @@ function initThemeToggle() {
 // ─── INIT ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initThemeToggle();
-  initWideModeToggle();
+  initCompactModeToggle();
   const sessionDraft = tryReadSessionDraftForRestore();
   if (!sessionDraft) {
     const now = new Date();
@@ -4220,6 +5288,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('settingsBtn').addEventListener('click', openSettings);
   document.getElementById('refRangesBtn')?.addEventListener('click', openReferenceRanges);
   document.getElementById('refRangesCloseBtn')?.addEventListener('click', closeReferenceRanges);
+  document.getElementById('edecEditorCloseBtn')?.addEventListener('click', closeEdecEditor);
+  document.getElementById('edecExportPdfBtn')?.addEventListener('click', doEdecExportPdf);
+  document.getElementById('edecExportTextBtn')?.addEventListener('click', doEdecExportPlainText);
   document.getElementById('aboutBtn').addEventListener('click', openAbout);
   document.getElementById('closeSettings').addEventListener('click', closeSettings);
   document.getElementById('overlay').addEventListener('click', closeSettings);
@@ -4248,6 +5319,7 @@ document.addEventListener('DOMContentLoaded', () => {
   bindAutoCalcInput('svr-display-input', 'svr-display-source', recalcDerivedHaemodynamics);
   bindAutoCalcInput('svri-display-input', 'svri-display-source', recalcDerivedHaemodynamics);
   bindAutoCalcInput('fs-display-input', 'fs-display-source', recalcLVOptionalMeasures);
+  bindAutoCalcInput('fac-display-input', 'fac-display-source', recalcRVFAC);
   bindAutoCalcInput('rwt-display-input', 'rwt-display-source', recalcLVOptionalMeasures);
   bindAutoCalcInput('lv-mass-display-input', 'lv-mass-display-source', recalcLVOptionalMeasures);
   bindAutoCalcInput('lvmi-display-input', 'lvmi-display-source', recalcLVOptionalMeasures);
@@ -4849,6 +5921,9 @@ function closeSettings() { document.getElementById('settingsPanel').classList.re
 function openAbout() { document.getElementById('aboutModal').classList.add('open'); }
 function closeAbout() { document.getElementById('aboutModal').classList.remove('open'); }
 
+function openRwmaModal() { RWMA.init(); document.getElementById('rwmaModal').classList.add('open'); }
+function closeRwmaModal() { document.getElementById('rwmaModal').classList.remove('open'); }
+
 const ANONYMISE_CODE_WORDS = ['Alpha','Bravo','Charlie','Delta','Echo','Foxtrot','Golf','Hotel','India','Juliett','Kilo','Lima','Mike','November','Oscar','Papa','Quebec','Romeo','Sierra','Tango','Uniform','Victor','Whiskey','Xray','Yankee','Zulu'];
 
 function isStudyPseudoAnonymised() {
@@ -5004,6 +6079,7 @@ function applyNormalStudyAutofill() {
   const rw = document.getElementById('f-rwma');
   if (rw) {
     rw.value = 'None';
+    RWMA.resetAll();
     checkRWMA();
   }
 
@@ -5052,6 +6128,7 @@ function applyNormalStudyAutofill() {
   setSel('f-rvVisualSize', 'Normal');
   setSel('f-rvVisLongitudinal', 'Normal');
   setSel('f-rvVisRadial', 'Normal');
+  setSel('f-raVisualImpression', 'Normal');
   syncPHTBasicAutoSelections();
 
   setSel('f-bLinesLung', 'No');
@@ -5135,6 +6212,7 @@ function populateDebugTestData() {
   setV('f-mapse', '16');
   setV('f-lvSPrime', '12');
   setV('f-rwma', 'None');
+  RWMA.resetAll();
   setV('f-lvotDiam', '2.1');
   setV('f-lvotVTI', '16');
   setV('f-vtiDeltaResp', '18');
@@ -5164,9 +6242,11 @@ function populateDebugTestData() {
   setV('f-rvotProx', '26');
   setV('f-rvWallThick', '4');
   setV('f-raArea', '14');
+  setV('f-raVisualImpression', 'Normal');
   setV('f-rvVisLongitudinal', 'Normal');
   setV('f-rvVisRadial', 'Normal');
-  setV('f-rvFAC', '45');
+  setV('f-rvEDA', '40');
+  setV('f-rvESA', '22');
   setV('f-tapse', '22');
   setV('f-rvS', '14');
 
@@ -5224,6 +6304,18 @@ function populateDebugTestData() {
   setV('f-impression', 'Hyperdynamic left ventricle with normal systolic function. Stroke volume is borderline-low but demonstrates significant variation with positive pressure ventilation and a >20% increase following a passive leg raise, indicating clear fluid responsiveness. Right ventricle is normal in size and function. IVC is small and completely collapsing. Right basal lung consolidation with focal B-lines consistent with known pneumonia. No features of raised left atrial pressure or venous congestion.');
   setV('f-significance', 'Abnormal — expected');
   setV('f-actions', '1. Give 500ml Plasmalyte fluid bolus and reassess haemodynamics and noradrenaline requirement.\n2. Continue treatment for community-acquired pneumonia.');
+
+  setV('edec-interp-lv', 'LV cavity size visually normal. Wall thickness appears normal. Systolic function is preserved (visual EF and Simpson\'s biplane in the normal range). MAPSE and LV S′ are satisfactory. LVOT VTI is modest with marked respiratory variation on IPPV and a clear step-up after passive leg raise, consistent with preload dependence and fluid responsiveness. No regional wall motion abnormality.');
+  setV('edec-interp-la', 'LA diameter and area are within expected limits for the clinical context. No sonographic pattern suggesting significantly raised left atrial pressure on this limited study; mitral inflow and tissue velocities are not suggestive of markedly elevated filling pressures.');
+  setV('edec-interp-rh', 'RV size visually normal; basal and longitudinal dimensions are unremarkable. Longitudinal and radial function appear preserved (TAPSE and S′ in a satisfactory range). FAC is consistent with normal RV systolic function. RA area and visual impression are normal. TR jet is trivial with no convincing evidence of severe pulmonary hypertension on this sweep.');
+  setV('edec-interp-valves', 'Mitral valve: thin leaflets, no significant stenosis; trivial trace regurgitation only. Aortic valve: trileaflet appearance with calcification; no critical stenosis on colour/Doppler snapshot; trace aortic regurgitation not haemodynamically significant. Tricuspid valve: thin, trivial TR. Pulmonary valve: thin, no significant regurgitation.');
+  setV('edec-interp-pericardium', 'No pericardial effusion. No echocardiographic features of tamponade.');
+  setV('edec-interp-aorta', 'Aortic root and ascending aorta diameters measured in parasternal long-axis are within non-urgent limits on this bedside study. No dissection flap or abnormal colour flow pattern at the segments assessed.');
+  setV('edec-interp-veins', 'IVC is small with >50% respiratory collapse, in keeping with a low right atrial pressure estimate. Hepatic vein Doppler pattern S>D; portal vein pulsatility <0.3; renal intrarenal vein flow continuous — overall pattern not suggestive of venous congestion on VeXUS-style assessment.');
+  setV('edec-interp-lungs', 'Right lung: focal B-lines and consolidation at the base in keeping with the clinical picture of pneumonia. Left lung field assessed appears broadly clear on the views obtained. No large pleural effusion identified on the thoracic windows examined.');
+  setV('edec-significance', 'Abnormal — expected');
+  setV('edec-impression', document.getElementById('f-impression')?.value || '');
+  setV('edec-actions', document.getElementById('f-actions')?.value || '');
 
   checkSupervisionField();
   checkRWMA();
@@ -5640,7 +6732,12 @@ function toggleSection(id) {
 }
 
 // ─── CONDITIONAL FIELDS ────────────────────────────────
-function checkRWMA() { document.getElementById('f-rwmaDesc-wrap').classList.toggle('visible', document.getElementById('f-rwma').value === 'Present'); }
+function checkRWMA() {
+  const show = document.getElementById('f-rwma').value === 'Present';
+  document.getElementById('f-rwmaDesc-wrap').classList.toggle('visible', show);
+  if (show && typeof RWMA !== 'undefined') RWMA.refreshInlinePreview();
+  if (!show) { const p = document.getElementById('rwma-inline-preview'); if (p) p.style.display = 'none'; }
+}
 function checkPericardialEffusion() {
   const v = document.getElementById('f-periEffusion').value;
   const show = v && v !== 'None';
@@ -5651,6 +6748,222 @@ function checkSupervisionField() {
   const v = document.getElementById('f-supervision').value;
   document.getElementById('f-supervisorName-wrap').classList.toggle('visible', v !== 'independent');
 }
+
+// ─── RWMA 17-SEGMENT MODEL ─────────────────────────────
+const RWMA = (function() {
+  const cx = 180, cy = 180;
+  const R0 = 38, R1 = 88, R2 = 135, R3 = 178;
+
+  const NAMES = {
+    1:'Basal anterior',2:'Basal anteroseptal',3:'Basal inferoseptal',
+    4:'Basal inferior',5:'Basal inferolateral',6:'Basal anterolateral',
+    7:'Mid anterior',8:'Mid anteroseptal',9:'Mid inferoseptal',
+    10:'Mid inferior',11:'Mid inferolateral',12:'Mid anterolateral',
+    13:'Apical anterior',14:'Apical septal',15:'Apical inferior',
+    16:'Apical lateral',17:'Apex'
+  };
+
+  const TERRITORY = {
+    1:'LAD',2:'LAD',3:'RCA',4:'RCA',5:'RCA or CX',6:'LAD or CX',
+    7:'LAD',8:'LAD',9:'RCA',10:'RCA',11:'RCA or CX',12:'LAD or CX',
+    13:'LAD',14:'LAD',15:'RCA or LAD',16:'LAD or CX',17:'LAD'
+  };
+
+  const FILLS   = ['#3a9e5f','#f0c430','#e02020','#7c3abf'];
+  const STROKES = ['#2a7a47','#c9a010','#b01010','#5a2490'];
+  const LABELS  = ['#fff','#5a3c00','#fff','#fff'];
+  const MNAMES  = ['Normal','Hypokinetic','Akinetic','Dyskinetic'];
+  const MBG     = ['#d4f0e0','#fff7d0','#ffe0e0','#eedeff'];
+  const MFG     = ['#1a6636','#7a5200','#cc1111','#5a1fa0'];
+
+  const states = {};
+  for (let i = 1; i <= 17; i++) states[i] = 0;
+
+  let inited = false;
+  const pathEls = {};
+  const textEls = {};
+  let circEl = null, circTxt = null;
+
+  function rad(d) { return d * Math.PI / 180; }
+  function pt(r, d) { const a = rad(d - 90); return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; }
+  function arcPath(r1, r2, a1, a2) {
+    const p1 = pt(r2,a1), p2 = pt(r2,a2), p3 = pt(r1,a2), p4 = pt(r1,a1), lg = (a2-a1) > 180 ? 1 : 0;
+    return `M${p1[0]},${p1[1]} A${r2},${r2} 0 ${lg} 1 ${p2[0]},${p2[1]} L${p3[0]},${p3[1]} A${r1},${r1} 0 ${lg} 0 ${p4[0]},${p4[1]} Z`;
+  }
+  function midPt(r1, r2, a1, a2) { return pt((r1+r2)/2, (a1+a2)/2); }
+
+  function makeSeg(svgEl, id, r1, r2, a1, a2) {
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', arcPath(r1,r2,a1,a2));
+    path.setAttribute('class','rwma-seg');
+    path.setAttribute('fill', FILLS[states[id]]);
+    path.setAttribute('stroke', STROKES[states[id]]);
+    const [lx,ly] = midPt(r1,r2,a1,a2);
+    const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+    text.setAttribute('x',lx); text.setAttribute('y',ly);
+    text.setAttribute('class','rwma-seg-label'); text.setAttribute('fill', LABELS[states[id]]);
+    text.textContent = id;
+    g.appendChild(path); g.appendChild(text);
+    g.addEventListener('click', () => {
+      states[id] = (states[id]+1) % 4;
+      applyState(id);
+      updateSummary();
+      refreshInlinePreview();
+    });
+    svgEl.appendChild(g);
+    pathEls[id] = path;
+    textEls[id] = text;
+  }
+
+  function applyState(id) {
+    const s = states[id];
+    if (id === 17) {
+      if (circEl) { circEl.setAttribute('fill', FILLS[s]); circEl.setAttribute('stroke', STROKES[s]); }
+      if (circTxt) circTxt.setAttribute('fill', LABELS[s]);
+    } else {
+      if (pathEls[id]) { pathEls[id].setAttribute('fill', FILLS[s]); pathEls[id].setAttribute('stroke', STROKES[s]); }
+      if (textEls[id]) textEls[id].setAttribute('fill', LABELS[s]);
+    }
+  }
+
+  function init() {
+    if (inited) return;
+    const svgEl = document.getElementById('rwma-svg');
+    if (!svgEl) return;
+    inited = true;
+
+    const ang6 = [-30,30,90,150,210,270,330];
+    const basal = [1,6,5,4,3,2], mid = [7,12,11,10,9,8];
+    for (let i = 0; i < 6; i++) makeSeg(svgEl, basal[i], R2, R3, ang6[i], ang6[i+1]);
+    for (let i = 0; i < 6; i++) makeSeg(svgEl, mid[i], R1, R2, ang6[i], ang6[i+1]);
+    const ang4 = [-45,45,135,225,315];
+    const apical = [13,16,15,14];
+    for (let i = 0; i < 4; i++) makeSeg(svgEl, apical[i], R0, R1, ang4[i], ang4[i+1]);
+
+    circEl = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circEl.setAttribute('cx',cx); circEl.setAttribute('cy',cy); circEl.setAttribute('r',R0);
+    circEl.setAttribute('class','rwma-seg'); circEl.setAttribute('fill', FILLS[states[17]]); circEl.setAttribute('stroke', STROKES[states[17]]);
+    circTxt = document.createElementNS('http://www.w3.org/2000/svg','text');
+    circTxt.setAttribute('x',cx); circTxt.setAttribute('y',cy);
+    circTxt.setAttribute('class','rwma-seg-label'); circTxt.setAttribute('fill', LABELS[states[17]]);
+    circTxt.textContent = '17';
+    circEl.addEventListener('click', () => {
+      states[17] = (states[17]+1) % 4;
+      applyState(17);
+      updateSummary();
+      refreshInlinePreview();
+    });
+    svgEl.appendChild(circEl); svgEl.appendChild(circTxt);
+
+    document.getElementById('rwma-seg-list').innerHTML =
+      Object.entries(NAMES).map(([id,name]) => `<div>${id}. ${name}</div>`).join('');
+
+    updateSummary();
+  }
+
+  function inferArteries() {
+    const arteries = new Set();
+    for (let i = 1; i <= 17; i++) {
+      if (states[i] > 0) TERRITORY[i].split(' or ').forEach(a => arteries.add(a.trim()));
+    }
+    return [...arteries].sort((a,b) => {
+      const order = ['LAD','RCA','CX'];
+      return order.indexOf(a) - order.indexOf(b);
+    });
+  }
+
+  function hasAbnormal() {
+    for (let i = 1; i <= 17; i++) if (states[i] > 0) return true;
+    return false;
+  }
+
+  function buildSummaryHTML() {
+    const groups = [[],[],[],[]];
+    for (let i = 1; i <= 17; i++) groups[states[i]].push(i);
+    const anyAbnormal = groups[1].length || groups[2].length || groups[3].length;
+    if (!anyAbnormal) return '<span style="font-size:13px;color:var(--text-muted);">All segments normal</span>';
+
+    let html = '';
+    [1,2,3].forEach(s => {
+      if (!groups[s].length) return;
+      html += `<div style="margin-bottom:6px;">
+        <span style="font-size:12px;font-weight:500;color:${MFG[s]};">${MNAMES[s]}</span><br>
+        ${groups[s].map(n => `<span class="rwma-status-item" style="background:${MBG[s]};color:${MFG[s]};">${n} – ${NAMES[n]}</span>`).join('')}
+      </div>`;
+    });
+    const arts = inferArteries();
+    html += `<div style="margin-top:8px; padding-top:8px; border-top:0.5px solid var(--border-light);">
+      <span style="font-size:12px; color:var(--text-muted);">Likely vessel(s): </span>
+      <span style="font-size:13px; font-weight:500; color:var(--text);">${arts.join(' or ')}</span>
+    </div>`;
+    return html;
+  }
+
+  function updateSummary() {
+    const el = document.getElementById('rwma-summary');
+    if (el) el.innerHTML = buildSummaryHTML();
+  }
+
+  function buildStaticSVG(width) {
+    const scale = width / 360;
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${width}" viewBox="0 0 360 360">`;
+    const ang6 = [-30,30,90,150,210,270,330];
+    const basal = [1,6,5,4,3,2], mid = [7,12,11,10,9,8];
+    for (let i = 0; i < 6; i++) { const id = basal[i]; const s = states[id]; svg += `<path d="${arcPath(R2,R3,ang6[i],ang6[i+1])}" fill="${FILLS[s]}" stroke="${STROKES[s]}" stroke-width="2"/>`; const [lx,ly] = midPt(R2,R3,ang6[i],ang6[i+1]); svg += `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="500" fill="${LABELS[s]}">${id}</text>`; }
+    for (let i = 0; i < 6; i++) { const id = mid[i]; const s = states[id]; svg += `<path d="${arcPath(R1,R2,ang6[i],ang6[i+1])}" fill="${FILLS[s]}" stroke="${STROKES[s]}" stroke-width="2"/>`; const [lx,ly] = midPt(R1,R2,ang6[i],ang6[i+1]); svg += `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="500" fill="${LABELS[s]}">${id}</text>`; }
+    const ang4 = [-45,45,135,225,315];
+    const apical = [13,16,15,14];
+    for (let i = 0; i < 4; i++) { const id = apical[i]; const s = states[id]; svg += `<path d="${arcPath(R0,R1,ang4[i],ang4[i+1])}" fill="${FILLS[s]}" stroke="${STROKES[s]}" stroke-width="2"/>`; const [lx,ly] = midPt(R0,R1,ang4[i],ang4[i+1]); svg += `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="500" fill="${LABELS[s]}">${id}</text>`; }
+    const s17 = states[17]; svg += `<circle cx="${cx}" cy="${cy}" r="${R0}" fill="${FILLS[s17]}" stroke="${STROKES[s17]}" stroke-width="2"/>`;
+    svg += `<text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="500" fill="${LABELS[s17]}">17</text>`;
+    svg += '</svg>';
+    return svg;
+  }
+
+  function buildCompactSummaryText() {
+    const groups = [[],[],[],[]];
+    for (let i = 1; i <= 17; i++) groups[states[i]].push(i);
+    const lines = [];
+    [1,2,3].forEach(s => {
+      if (!groups[s].length) return;
+      lines.push(`<strong>${MNAMES[s]}:</strong> ${groups[s].map(n => `${n} (${NAMES[n]})`).join(', ')}`);
+    });
+    const arts = inferArteries();
+    if (arts.length) lines.push(`<strong>Likely vessel(s):</strong> ${arts.join(' or ')}`);
+    return lines.join('<br>');
+  }
+
+  function refreshInlinePreview() {
+    const wrap = document.getElementById('rwma-inline-preview');
+    if (!wrap) return;
+    if (!hasAbnormal()) { wrap.style.display = 'none'; return; }
+    wrap.style.display = 'block';
+    wrap.innerHTML = `<div class="rwma-preview-layout">
+      <div class="rwma-preview-svg-wrap">${buildStaticSVG(200)}</div>
+      <div class="rwma-preview-summary">${buildCompactSummaryText()}</div>
+    </div>`;
+  }
+
+  function getStates() { return Object.assign({}, states); }
+
+  function setStates(obj) {
+    for (let i = 1; i <= 17; i++) {
+      states[i] = (obj && typeof obj[i] === 'number') ? obj[i] : 0;
+      if (inited) applyState(i);
+    }
+    if (inited) updateSummary();
+    refreshInlinePreview();
+  }
+
+  function resetAll() {
+    for (let i = 1; i <= 17; i++) states[i] = 0;
+    if (inited) { for (let i = 1; i <= 17; i++) applyState(i); updateSummary(); }
+    refreshInlinePreview();
+  }
+
+  return { init, getStates, setStates, resetAll, hasAbnormal, refreshInlinePreview, buildStaticSVG, buildCompactSummaryText, FILLS, STROKES, LABELS, MNAMES, NAMES };
+})();
 
 function updateLAPRaisedPressureHint() {
   const b = document.getElementById('f-bLinesLung')?.value;
@@ -5687,12 +7000,14 @@ const UNUSUAL_PLAUSIBILITY_RULES = {
   'f-vtiDeltaResp': v => !isNaN(v) && v > 100,
   'f-vtiDeltaIntervention': v => !isNaN(v) && v > 100,
   'f-laArea': v => !isNaN(v) && (v < 5 || v > 60),
-  'f-raArea': v => !isNaN(v) && (v < 5 || v > 60),
+  'f-raArea': v => !isNaN(v) && (v < 8 || v > 28),
   'f-rvBasalDiam': v => !isNaN(v) && (v < 10 || v > 80),
   'f-rvMidDiam': v => !isNaN(v) && (v < 10 || v > 80),
   'f-rvLongDiam': v => !isNaN(v) && (v < 10 || v > 80),
   'f-rvWallThick': v => !isNaN(v) && (v < 2 || v > 20),
-  'f-rvFAC': v => !isNaN(v) && (v < 5 || v > 80),
+  'f-rvEDA': v => !isNaN(v) && (v < 4 || v > 70),
+  'f-rvESA': v => !isNaN(v) && (v < 3 || v > 65),
+  'fac-display-input': v => !isNaN(v) && (v < 5 || v > 80),
   'f-tapse': v => !isNaN(v) && (v < 2 || v > 40),
   'f-rvS': v => !isNaN(v) && (v < 2 || v > 35),
   'fs-display-input': v => !isNaN(v) && (v < 8 || v > 60)
@@ -5701,7 +7016,7 @@ const UNUSUAL_PLAUSIBILITY_RULES = {
 const UNUSUAL_MERGE_WITH_CLINICAL = new Set([
   'f-laArea', 'f-raArea',
   'f-rvBasalDiam', 'f-rvMidDiam', 'f-rvLongDiam', 'f-rvWallThick',
-  'f-rvFAC', 'f-tapse', 'f-rvS'
+  'f-rvEDA', 'f-rvESA', 'fac-display-input', 'f-tapse', 'f-rvS'
 ]);
 
 const UNUSUAL_STANDALONE_SOFTRED = new Set(Object.keys(UNUSUAL_PLAUSIBILITY_RULES));
@@ -5925,21 +7240,65 @@ function checkRAArea() {
   if (!inp || !hint) return;
   const v = parseFloat(inp.value);
   hint.textContent = '';
+  hint.classList.remove('show', 'dilated', 'neutral', 'error');
+  inp.classList.remove('soft-red');
+  if (inp.value.trim() === '' || isNaN(v)) return;
+  const unusual = evalUnusualPlausibility('f-raArea');
+  applyUnusualWarn('f-raArea', unusual);
+  if (unusual) {
+    hint.textContent = v < 8
+      ? 'Unusual value — below typical plausible range (&lt;8 cm²).'
+      : 'Unusual value — above typical plausible range (&gt;28 cm²).';
+    hint.classList.add('show', 'error');
+  } else if (v >= 18) {
+    hint.textContent = 'Enlarged relative to typical normal (&lt;18 cm²).';
+    hint.classList.add('show', 'dilated');
+  }
+  inp.classList.toggle('soft-red', unusual || v >= 18);
+}
+
+function checkRVEDA() {
+  const inp = document.getElementById('f-rvEDA');
+  const hint = document.getElementById('rv-eda-hint');
+  if (!inp || !hint) return;
+  const v = parseFloat(inp.value);
+  hint.textContent = '';
   hint.classList.remove('show', 'dilated', 'neutral');
   inp.classList.remove('soft-red');
   if (inp.value.trim() === '' || isNaN(v)) return;
-  const clinicalRed = v >= 18;
+  const clinicalRed = v >= 40;
   if (clinicalRed) {
-    hint.textContent = 'Enlarged — at or above typical reference (≥18 cm²).';
+    hint.textContent = 'Enlarged — at or above typical upper reference (≥40 cm²).';
     hint.classList.add('show', 'dilated');
   }
-  const unusual = evalUnusualPlausibility('f-raArea');
-  applyUnusualWarn('f-raArea', unusual);
+  const unusual = evalUnusualPlausibility('f-rvEDA');
+  applyUnusualWarn('f-rvEDA', unusual);
   inp.classList.toggle('soft-red', clinicalRed || unusual);
 }
 
+function checkRVESA() {
+  const inp = document.getElementById('f-rvESA');
+  const hint = document.getElementById('rv-esa-hint');
+  if (!inp || !hint) return;
+  const eda = parseFloat(document.getElementById('f-rvEDA')?.value);
+  const v = parseFloat(inp.value);
+  hint.textContent = '';
+  hint.classList.remove('show', 'dilated', 'neutral');
+  inp.classList.remove('soft-red');
+  if (inp.value.trim() === '' || isNaN(v)) return;
+  let clinicalOrder = false;
+  if (!isNaN(eda) && eda > 0 && !isNaN(v) && v >= eda) {
+    clinicalOrder = true;
+    hint.textContent = 'RV ESA should be less than RV EDA for fractional area change.';
+    hint.classList.add('show', 'neutral');
+  }
+  const unusual = evalUnusualPlausibility('f-rvESA');
+  applyUnusualWarn('f-rvESA', unusual);
+  inp.classList.toggle('soft-red', clinicalOrder || unusual);
+}
+
 function checkRVFAC() {
-  const inp = document.getElementById('f-rvFAC');
+  const inp = document.getElementById('fac-display-input');
   const hint = document.getElementById('rv-fac-hint');
   if (!inp || !hint) return;
   const v = parseFloat(inp.value);
@@ -5952,8 +7311,8 @@ function checkRVFAC() {
     hint.textContent = 'Below typical lower reference (≤30%).';
     hint.classList.add('show', 'dilated');
   }
-  const unusual = evalUnusualPlausibility('f-rvFAC');
-  applyUnusualWarn('f-rvFAC', unusual);
+  const unusual = evalUnusualPlausibility('fac-display-input');
+  applyUnusualWarn('fac-display-input', unusual);
   inp.classList.toggle('soft-red', clinicalRed || unusual);
 }
 
@@ -6002,6 +7361,8 @@ function runRvFieldClinicalChecksOnly() {
   checkRVOTProximal();
   checkRVWallThickness();
   checkRAArea();
+  checkRVEDA();
+  checkRVESA();
   checkRVFAC();
   checkRVTAPSE();
   checkRVSPrime();
@@ -6016,6 +7377,7 @@ let mainContentSoftValidationTimer = null;
 const MAIN_CONTENT_SOFT_VALIDATION_MS = 480;
 
 function runMainContentSoftValidation() {
+  recalcRVFAC();
   refreshRVFieldValidations();
   checkLVIDdHint();
   recalcLVOptionalMeasures();
@@ -6611,6 +7973,26 @@ function recalcFractionalShortening() {
   }
   if (!isNaN(fs) && fs >= 0 && fs <= 100) {
     if (!manual) inp.value = fs.toFixed(1);
+  } else if (!manual) {
+    inp.value = '';
+  }
+  inp.placeholder = (!manual && inp.value.trim() === '') ? '—' : '';
+  setAutoCalcSourceVisible(src, manual, inp.value.trim() !== '');
+}
+
+function recalcRVFAC() {
+  const inp = document.getElementById('fac-display-input');
+  const src = document.getElementById('fac-display-source');
+  if (!inp) return;
+  const eda = parseFloat(document.getElementById('f-rvEDA')?.value);
+  const esa = parseFloat(document.getElementById('f-rvESA')?.value);
+  const manual = isAutoCalcManual(inp);
+  let fac = NaN;
+  if (!isNaN(eda) && eda > 0 && !isNaN(esa) && esa < eda) {
+    fac = ((eda - esa) / eda) * 100;
+  }
+  if (!isNaN(fac) && fac >= 0 && fac <= 100) {
+    if (!manual) inp.value = fac.toFixed(1);
   } else if (!manual) {
     inp.value = '';
   }
@@ -7347,7 +8729,9 @@ function collectSessionDraftPayload() {
     cvsDrugDetailValues: cvsCopy,
     conditionals,
     settingsToggles,
-    demo: captureDemographicWidgetSnapshot()
+    demo: captureDemographicWidgetSnapshot(),
+    rwmaStates: RWMA.getStates(),
+    edecInterp: EDEC_INTERP_IDS.reduce((o, id) => { const v = document.getElementById(id)?.value; if (v) o[id] = v; return o; }, {})
   };
 }
 
@@ -7448,6 +8832,15 @@ function applySessionDraftPayload(d) {
     const autoTog = document.getElementById('toggle-session-draft-autosave');
     if (autoTog) autoTog.checked = true;
 
+    if (d.rwmaStates) RWMA.setStates(d.rwmaStates);
+
+    if (d.edecInterp) {
+      Object.entries(d.edecInterp).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el) el.value = val;
+      });
+    }
+
     updateCVSDrugDetailsUI();
     checkSupervisionField();
     checkRWMA();
@@ -7494,6 +8887,7 @@ function applySessionDraftPayload(d) {
         'di-display-input': 'di-display-source',
         'rri-display-input': 'rri-display-source',
         'fs-display-input': 'fs-display-source',
+        'fac-display-input': 'fac-display-source',
         'rwt-display-input': 'rwt-display-source',
         'lv-mass-display-input': 'lv-mass-display-source',
         'lvmi-display-input': 'lvmi-display-source',
@@ -7655,7 +9049,7 @@ function confirmClear() {
 // ─── VALIDATION ────────────────────────────────────────
 function validateForm() {
   document.querySelectorAll('.warn-highlight').forEach(e => e.classList.remove('warn-highlight'));
-  const toCheck = ['f-patientName', 'f-patientId', 'f-visualLvSize', 'f-ef', 'f-rvVisualSize', 'f-rvVisLongitudinal', 'f-rvVisRadial'];
+  const toCheck = ['f-patientName', 'f-patientId', 'f-visualLvSize', 'f-ef', 'f-rvVisualSize', 'f-rvVisLongitudinal', 'f-rvVisRadial', 'f-raVisualImpression'];
   if (isSummarySectionVisible()) toCheck.push('f-significance', 'f-impression');
   if (!document.getElementById('sec-pericardial').classList.contains('section-hidden')) toCheck.push('f-periEffusion');
   let bad = false;
@@ -7735,6 +9129,17 @@ function getFractionalShorteningCalc() {
   const fs = ((lvidD - lvidS) / lvidD) * 100;
   if (fs < 0 || fs > 100) return '';
   return fs.toFixed(1);
+}
+
+function getFACCalc() {
+  const inp = document.getElementById('fac-display-input');
+  if (inp?.value.trim()) return inp.value.trim();
+  const eda = parseFloat(document.getElementById('f-rvEDA')?.value);
+  const esa = parseFloat(document.getElementById('f-rvESA')?.value);
+  if (isNaN(eda) || eda <= 0 || isNaN(esa) || esa >= eda) return '';
+  const fac = ((eda - esa) / eda) * 100;
+  if (fac < 0 || fac > 100) return '';
+  return fac.toFixed(1);
 }
 
 function getRWTCalc() {
@@ -7995,6 +9400,7 @@ function runQuickExportFormat(format) {
   else if (format === 'clipboard-text') void doExportClipboardText();
   else if (format === 'plain-text-page') openPlainTextReportView();
   else if (format === 'print-pdf') doExportPrintPdf();
+  else if (format === 'edec') openEdecEditor();
 }
 
 /** Called from export modal action buttons. */
@@ -8004,6 +9410,7 @@ function triggerExportFromModal(format) {
   else if (format === 'clipboard-text') void doExportClipboardText();
   else if (format === 'plain-text-page') openPlainTextReportView();
   else if (format === 'print-pdf') doExportPrintPdf();
+  else if (format === 'edec') openEdecEditor();
 }
 
 const EXPORT_DISCLAIMER_TEXT = 'Disclaimer: This text is a draft export for clinical review only. It is not a final report and must not be entered into any patient record without formal verification, appropriate clinical review, and sign-off.';
@@ -8077,6 +9484,10 @@ function initExportSplitControl() {
   });
   document.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return;
+    if (document.getElementById('edecEditorPanel')?.classList.contains('open')) {
+      closeEdecEditor();
+      return;
+    }
     if (document.getElementById('refRangesPanel')?.classList.contains('open')) {
       closeReferenceRanges();
       return;
@@ -8202,7 +9613,7 @@ function buildExportRows() {
     const afterHdr = rows.length;
     bodyFn();
     const hasContent = rows.slice(afterHdr).some(r => {
-      if (r.t === 'row' || r.t === 'subhdr') return true;
+      if (r.t === 'row' || r.t === 'subhdr' || r.t === 'rwmaDiagram') return true;
       if (r.t === 'summaryConclusionsBlock') {
         const sig = (r.significance || '').trim();
         const imp = (r.impression || '').trim();
@@ -8221,7 +9632,7 @@ function buildExportRows() {
   const anonHdr = isStudyPseudoAnonymised();
   rows.push({ t:'meta', label: anonHdr ? 'Scan period (month & year)' : 'Date of Scan', value: scanDate });
   if (scanTime) rows.push({ t:'meta', label: anonHdr ? 'Time of day (AM / PM)' : 'Time of Scan', value: scanTime });
-  rows.push({ t:'meta', label:'Generated',     value:`${nd} ${nt.slice(0,2)}:${nt.slice(2,4)}:${nt.slice(4,6)}` });
+  rows.push({ t:'meta', label:'Report Generated', value:`${nd} ${nt.slice(0,2)}:${nt.slice(2,4)}:${nt.slice(4,6)}` });
   rows.push({ t:'meta', label:'Operator',      value: getVal('f-operatorName') || 'Not specified' });
   rows.push({ t:'meta', label:'Supervision',   value: getSupervisionLabel() });
   if (getVal('f-imageQuality')) rows.push({ t:'meta', label:'Image Quality', value: getVal('f-imageQuality') });
@@ -8259,7 +9670,7 @@ function buildExportRows() {
     rowU('Systolic BP', getVal('f-sbp'), 'mmHg');
     rowU('Diastolic BP', getVal('f-dbp'), 'mmHg');
     const map = getMAPCalc();
-    if (map) rowU(isAutoCalcManual(document.getElementById('map-display-input')) ? 'Mean Arterial Pressure — manually entered' : 'Mean Arterial Pressure — calculated', map, 'mmHg');
+    if (map) rowU(isAutoCalcManual(document.getElementById('map-display-input')) ? 'Mean Arterial Pressure — manually entered' : 'Mean Arterial Pressure', map, 'mmHg');
     row('Ventilation', getVal('f-ventilation'));
     rowU('CVP', getVal('f-cvp'), 'mmHg');
     row('CVS Drugs', selectedCVSDrugs.size ? [...selectedCVSDrugs].join(', ') : '');
@@ -8279,11 +9690,11 @@ function buildExportRows() {
     rowU('LVPWd', getVal('f-lvpwd'), 'mm');
     if (document.getElementById('toggle-show-rwt')?.checked) {
       const rwt = getRWTCalc();
-      if (rwt) row(isAutoCalcManual(document.getElementById('rwt-display-input')) ? 'Relative wall thickness — manually entered' : 'Relative wall thickness — calculated', rwt);
+      if (rwt) row(isAutoCalcManual(document.getElementById('rwt-display-input')) ? 'Relative wall thickness — manually entered' : 'Relative wall thickness', rwt);
     }
     if (document.getElementById('toggle-show-lv-mass')?.checked) {
       const lm = getLVMassCalc();
-      if (lm) rowU(isAutoCalcManual(document.getElementById('lv-mass-display-input')) ? 'LV mass — manually entered' : 'LV mass — calculated', lm, 'g');
+      if (lm) rowU(isAutoCalcManual(document.getElementById('lv-mass-display-input')) ? 'LV mass — manually entered' : 'LV mass', lm, 'g');
     }
     if (document.getElementById('toggle-show-lvmi')?.checked) {
       const lvmi = getLVMICalc();
@@ -8302,7 +9713,7 @@ function buildExportRows() {
       const fs = getFractionalShorteningCalc();
       if (fs) {
         rowU(
-          isAutoCalcManual(document.getElementById('fs-display-input')) ? 'LV fractional shortening — manually entered' : 'LV fractional shortening — calculated',
+          isAutoCalcManual(document.getElementById('fs-display-input')) ? 'LV fractional shortening — manually entered' : 'LV fractional shortening',
           fs,
           '%'
         );
@@ -8310,12 +9721,15 @@ function buildExportRows() {
     }
     row('Regional Wall Motion Abnormality', getVal('f-rwma'));
     if (getVal('f-rwma') === 'Present') row('RWMA Description', getVal('f-rwmaDesc'));
+    if (getVal('f-rwma') === 'Present' && RWMA.hasAbnormal()) {
+      rows.push({ t: 'rwmaDiagram', states: RWMA.getStates() });
+    }
     rowU('LVOT Diameter', getVal('f-lvotDiam'), 'cm');
     if (isMachinePWDEnabled()) rowU('LVOT VTI', getVal('f-lvotVTI'), 'cm');
     const sv = getSVCalc();
-    if (sv) rowU(isAutoCalcManual(document.getElementById('sv-display-input')) ? 'Stroke Volume — manually entered' : 'Stroke Volume — calculated', sv, 'mL');
+    if (sv) rowU(isAutoCalcManual(document.getElementById('sv-display-input')) ? 'Stroke Volume — manually entered' : 'Stroke Volume', sv, 'mL');
     const co = getCOCalc();
-    if (co) rowU(isAutoCalcManual(document.getElementById('co-display-input')) ? 'Cardiac Output — manually entered' : 'Cardiac Output — calculated', co, 'L/min');
+    if (co) rowU(isAutoCalcManual(document.getElementById('co-display-input')) ? 'Cardiac Output — manually entered' : 'Cardiac Output', co, 'L/min');
     if (document.getElementById('toggle-show-cardiac-index')?.checked) {
       const ci = getCICalc();
       if (ci) rowU(isAutoCalcManual(document.getElementById('ci-display-input')) ? 'Cardiac Index — manually entered' : 'Cardiac Index — calculated', ci, 'L/min/m²');
@@ -8353,7 +9767,7 @@ function buildExportRows() {
       row('B-Lines on Lung Ultrasound', getVal('f-bLinesLung'));
       row('Atrial septal deviation throughout the cardiac cycle', getVal('f-atrialSeptalDev'));
       row('Visual assessment (LA)', getVal('f-laVisual'));
-      rowU('LA diameter — end systole', getVal('f-laDiamSys'), 'mm');
+      rowU('LA diameter', getVal('f-laDiamSys'), 'mm');
       rowU('LA area', getVal('f-laArea'), 'cm²');
       if (isMachinePWDEnabled()) {
         rowU('E Wave Velocity', getVal('f-eWave'), 'cm/s');
@@ -8361,37 +9775,47 @@ function buildExportRows() {
       }
       if (document.getElementById('toggle-show-ea-field')?.checked && isMachinePWDEnabled()) {
         const ea = getEACalc();
-        if (ea) row(isAutoCalcManual(document.getElementById('ea-display-input')) ? 'E/A Ratio — manually entered' : 'E/A Ratio — calculated', ea);
+        if (ea) row(isAutoCalcManual(document.getElementById('ea-display-input')) ? 'E/A Ratio — manually entered' : 'E/A Ratio', ea);
       }
       if (isMachineTDIEnabled()) {
         rowU('e\' Septal', getVal('f-eSeptal'), 'cm/s');
         rowU('e\' Lateral', getVal('f-eLateral'), 'cm/s');
         const epAvg = getEprimeAvgCalc();
-        if (epAvg) rowU(isAutoCalcManual(document.getElementById('eprime-avg-input')) ? 'Average e\' — manually entered' : 'Average e\' — calculated', epAvg, 'cm/s');
+        if (epAvg) rowU(isAutoCalcManual(document.getElementById('eprime-avg-input')) ? 'Average e\' — manually entered' : 'Average e\'', epAvg, 'cm/s');
         const ee = getEeCalc();
-        if (ee) row(isAutoCalcManual(document.getElementById('ee-display-input')) ? 'Average E/e\' — manually entered' : 'Average E/e\' — calculated', ee);
+        if (ee) row(isAutoCalcManual(document.getElementById('ee-display-input')) ? 'Average E/e\' — manually entered' : 'Average E/e\'', ee);
       }
       if (isMachineCWDEnabled()) rowU('TR Vmax', getVal('f-trVmaxLAP'), 'm/s');
       const lapEl = document.getElementById('lap-interp-display');
       if (lapEl && !lapEl.classList.contains('empty')) {
         const lapLabel = lapEl.querySelector('.interp-label');
-        if (lapLabel) row('LAP Probability (interpreted)', lapLabel.textContent);
+        if (lapLabel) row('LAP Probability', lapLabel.textContent);
       }
     });
   }
 
   // 4. RV / Right Heart
   section('RIGHT HEART', () => {
+    rowU('RA Area', getVal('f-raArea'), 'cm²');
+    row('RA visual impression', getVal('f-raVisualImpression'));
     row('RV size visual estimation', getVal('f-rvVisualSize'));
     rowU('RV basal diameter', getVal('f-rvBasalDiam'), 'mm');
     rowU('RV mid diameter', getVal('f-rvMidDiam'), 'mm');
     rowU('RV longitudinal diameter', getVal('f-rvLongDiam'), 'mm');
     rowU('RVOT proximal', getVal('f-rvotProx'), 'mm');
     rowU('RV wall thickness', getVal('f-rvWallThick'), 'mm');
-    rowU('RA area', getVal('f-raArea'), 'cm²');
     row('Visual impression — longitudinal systolic function', getVal('f-rvVisLongitudinal'));
     row('Visual impression — radial systolic function', getVal('f-rvVisRadial'));
-    rowU('FAC', getVal('f-rvFAC'), '%');
+    rowU('RV end-diastolic area', getVal('f-rvEDA'), 'cm²');
+    rowU('RV end-systolic area', getVal('f-rvESA'), 'cm²');
+    const fac = getFACCalc();
+    if (fac) {
+      rowU(
+        isAutoCalcManual(document.getElementById('fac-display-input')) ? 'FAC — manually entered' : 'FAC',
+        fac,
+        '%'
+      );
+    }
     rowU('TAPSE', getVal('f-tapse'), 'mm');
     if (isMachineTDIEnabled()) rowU('RV S′', getVal('f-rvS'), 'cm/s');
     const phRisk = isMachineCWDEnabled() ? getTRVmaxPHRiskExportText() : '';
@@ -8399,7 +9823,7 @@ function buildExportRows() {
     if (document.getElementById('toggle-show-pasp-field')?.checked && isMachineCWDEnabled()) {
       const paspCtx = getPASPCVPCalc();
       if (paspCtx) {
-        if (paspCtx.mode === 'cvp') rowU('PASP — calculated (4×TR Vmax² + CVP)', paspCtx.mmHg, 'mmHg');
+        if (paspCtx.mode === 'cvp') rowU('PASP', paspCtx.mmHg, 'mmHg');
         else row('PASP — calculated (4×TR Vmax² + IVC-estimated RAP)', `${paspCtx.mmHg} mmHg (mean RAP ${paspCtx.rapMid} mmHg, table category ~${paspCtx.rapBand}; CVP not entered — estimate)`);
       }
     }
@@ -8409,7 +9833,7 @@ function buildExportRows() {
         row(
           isAutoCalcManual(document.getElementById('rv-lv-basal-ratio-display-input'))
             ? 'RV:LV basal diameter ratio — manually entered'
-            : 'RV:LV basal diameter ratio — calculated',
+            : 'RV:LV basal diameter ratio',
           rvlv
         );
       }
@@ -8420,7 +9844,7 @@ function buildExportRows() {
         rowU(
           isAutoCalcManual(document.getElementById('tapse-pasp-ratio-display-input'))
             ? 'TAPSE / PASP ratio — manually entered'
-            : 'TAPSE / PASP ratio — calculated',
+            : 'TAPSE / PASP ratio',
           tp,
           'mm/mmHg'
         );
@@ -8459,7 +9883,7 @@ function buildExportRows() {
             if (isMachinePWDEnabled() && getVal('f-lvotVTI')) rowU('  LVOT VTI', getVal('f-lvotVTI'), 'cm');
             if (isMachineCWDEnabled() && isMachinePWDEnabled()) {
               const di = getDICalc();
-              if (di) row(isAutoCalcManual(document.getElementById('di-display-input')) ? '  Dimensionless Index — manually entered' : '  Dimensionless Index — calculated', di);
+              if (di) row(isAutoCalcManual(document.getElementById('di-display-input')) ? '  Dimensionless Index — manually entered' : '  Dimensionless Index', di);
             }
             if (document.getElementById('toggle-show-ava-continuity')?.checked) {
               const csa = getLVOTCSA_cm2();
@@ -8469,7 +9893,7 @@ function buildExportRows() {
                 rowU(
                   isAutoCalcManual(document.getElementById('ava-continuity-display-input'))
                     ? '  Aortic valve area (continuity) — manually entered'
-                    : '  Aortic valve area (continuity) — calculated',
+                    : '  Aortic valve area (continuity)',
                   ava,
                   'cm²'
                 );
@@ -8550,7 +9974,7 @@ function buildExportRows() {
         const rriExport = getRRIExportValueString();
         if (getVal('f-rriPSV')) rowU('Renal PSV', getVal('f-rriPSV'), 'cm/s');
         if (getVal('f-rriEDV')) rowU('Renal EDV', getVal('f-rriEDV'), 'cm/s');
-        if (rriExport) row(isAutoCalcManual(document.getElementById('rri-display-input')) ? 'Renal Resistive Index — manually entered' : 'Renal Resistive Index — calculated', rriExport);
+        if (rriExport) row(isAutoCalcManual(document.getElementById('rri-display-input')) ? 'Renal Resistive Index — manually entered' : 'Renal Resistive Index', rriExport);
       }
     });
   }
@@ -8701,6 +10125,11 @@ function formatExportRowsAsPlainText(rows) {
         if (lines.length && lines[lines.length - 1] !== '') lines.push('');
         lines.push(chunks.join('\n\n'));
       }
+    } else if (r.t === 'rwmaDiagram') {
+      const st = r.states; const groups = [[],[],[],[]];
+      for (let i = 1; i <= 17; i++) groups[st[i]||0].push(i);
+      const mn = RWMA.MNAMES, nm = RWMA.NAMES;
+      [1,2,3].forEach(s => { if (groups[s].length) lines.push(`  ${mn[s]}: ${groups[s].map(n => `${n} (${nm[n]})`).join(', ')}`); });
     } else if (r.t === 'row') {
       const raw = r.label;
       const name = raw.trim();
@@ -8718,6 +10147,30 @@ function escapeHtml(s) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+function buildRwmaPrintSVG(st) {
+  const svg = RWMA.buildStaticSVG.call(null, 180);
+  const svgPatched = svg.replace('<svg ', '<svg style="display:block;" ');
+  const groups = [[],[],[],[]];
+  for (let i = 1; i <= 17; i++) groups[st[i] || 0].push(i);
+  const mnames = RWMA.MNAMES, names = RWMA.NAMES, fills = RWMA.FILLS;
+  let sumHtml = '';
+  [1,2,3].forEach(s => {
+    if (!groups[s].length) return;
+    sumHtml += `<div style="margin-bottom:3px;"><strong style="color:${fills[s]};">${escapeHtml(mnames[s])}</strong>: ${groups[s].map(n => `${n} (${escapeHtml(names[n])})`).join(', ')}</div>`;
+  });
+  const terr = {1:'LAD',2:'LAD',3:'RCA',4:'RCA',5:'RCA or CX',6:'LAD or CX',7:'LAD',8:'LAD',9:'RCA',10:'RCA',11:'RCA or CX',12:'LAD or CX',13:'LAD',14:'LAD',15:'RCA or LAD',16:'LAD or CX',17:'LAD'};
+  const arteries = new Set();
+  for (let i = 1; i <= 17; i++) {
+    if ((st[i]||0) > 0) terr[i].split(' or ').forEach(a => arteries.add(a.trim()));
+  }
+  const artArr = [...arteries].sort((a,b) => ['LAD','RCA','CX'].indexOf(a) - ['LAD','RCA','CX'].indexOf(b));
+  if (artArr.length) sumHtml += `<div style="margin-top:3px;"><strong>Likely vessel(s):</strong> ${escapeHtml(artArr.join(' or '))}</div>`;
+  let legend = '<div class="rwma-print-legend">';
+  ['Normal','Hypokinetic','Akinetic','Dyskinetic'].forEach((n,i) => { legend += `<span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${fills[i]};vertical-align:middle;margin-right:3px;"></span>${n}</span>`; });
+  legend += '</div>';
+  return `<div class="rwma-print-block"><div class="rwma-print-layout">${svgPatched}<div class="rwma-print-summary">${sumHtml}${legend}</div></div></div>`;
 }
 
 function renderExportRowsToPrintHTML(rows) {
@@ -8864,6 +10317,9 @@ function renderExportRowsToPrintHTML(rows) {
         });
         flushFieldPairs(false);
       }
+    } else if (r.t === 'rwmaDiagram') {
+      closeFieldGrid();
+      parts.push(buildRwmaPrintSVG(r.states));
     } else if (r.t === 'summaryConclusionsBlock') {
       closeMeta();
       const sig = (r.significance || '').trim();
@@ -8898,6 +10354,7 @@ function doExportPrintPdf() {
   const valid = validateForm();
   const mount = document.getElementById('printReportMount');
   if (!mount) return;
+  const previousDocumentTitle = document.title;
   const aggressive2page = !!document.getElementById('toggle-export-aggressive-2page')?.checked;
   mount.classList.toggle('print-aggressive-2page', aggressive2page);
   document.documentElement.classList.toggle('print-aggressive-2page-root', aggressive2page);
@@ -8921,6 +10378,9 @@ function doExportPrintPdf() {
   const saved = new Map();
 
   function enterPrintLayout() {
+    const pn = (document.getElementById('f-patientName')?.value || '').trim();
+    const pid = (document.getElementById('f-patientId')?.value || '').trim();
+    if (pn || pid) document.title = pn && pid ? `${pn} / ${pid}` : (pn || pid);
     if (mask) mask.classList.add('active');
     siblings.forEach(el => {
       saved.set(el, el.style.display);
@@ -8932,6 +10392,7 @@ function doExportPrintPdf() {
   }
 
   function exitPrintLayout() {
+    document.title = previousDocumentTitle;
     mount.style.cssText = '';
     mount.innerHTML = '';
     mount.classList.remove('print-aggressive-2page');
@@ -9042,6 +10503,11 @@ function doExport() {
         rStyle[sheetRi] = 'nonfusicBullet';
         sheetRi++;
       }
+    } else if (r.t === 'rwmaDiagram') {
+      const st = r.states; const groups = [[],[],[],[]];
+      for (let i = 1; i <= 17; i++) groups[st[i]||0].push(i);
+      const mn = RWMA.MNAMES, nm = RWMA.NAMES;
+      [1,2,3].forEach(s => { if (groups[s].length) { wsData.push([`  RWMA ${mn[s]}`, groups[s].map(n => `${n} (${nm[n]})`).join(', ')]); rStyle[sheetRi] = 'row'; sheetRi++; } });
     } else if (r.t === 'row') {
       wsData.push([r.label, r.value]);
       rStyle[sheetRi] = 'row';
