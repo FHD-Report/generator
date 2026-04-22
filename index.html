@@ -595,6 +595,13 @@ html[data-theme="dark"] .edec-meas-block-title { background: #2a4c6e; }
 .toggle-thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.2); transition: transform 0.2s; pointer-events: none; }
 .toggle-switch input:checked ~ .toggle-track { background: var(--primary); }
 .toggle-switch input:checked ~ .toggle-thumb { transform: translateX(20px); }
+.toggle-switch input:disabled ~ .toggle-track { background: var(--border); opacity: 0.55; cursor: not-allowed; }
+.toggle-switch input:disabled ~ .toggle-thumb { opacity: 0.7; box-shadow: none; }
+.toggle-row--disabled { opacity: 0.55; cursor: not-allowed; }
+.toggle-row--disabled .toggle-label { color: var(--text-muted); }
+.toggle-row--disabled .settings-toggle-hint { color: var(--text-muted); }
+.settings-measure-master-toggle input:disabled ~ .toggle-track { opacity: 0.55; cursor: not-allowed; }
+.settings-measure-master-toggle input:disabled ~ .toggle-thumb { opacity: 0.7; }
 
 /* ─── MAIN CONTENT ────────────────────────────────────── */
 #mainContent { margin-top: var(--header-h); padding: 16px 16px calc(var(--footer-h) + 40px); max-width: 720px; margin-left: auto; margin-right: auto; }
@@ -607,30 +614,39 @@ html[data-theme="dark"] .edec-meas-block-title { background: #2a4c6e; }
     padding-right: 24px;
     padding-top: 10px;
   }
-  body.compact-mode .form-section { margin-bottom: 6px; }
-  body.compact-mode .section-header { padding: 7px 12px; }
-  body.compact-mode .section-title { font-size: 13px; gap: 6px; }
-  body.compact-mode .section-icon { width: 22px; height: 22px; font-size: 11px; border-radius: 4px; }
-  body.compact-mode .chevron svg { width: 15px; height: 15px; }
+  body.compact-mode .form-section { margin-bottom: 4px; }
+  body.compact-mode .section-header { padding: 4px 10px; }
+  body.compact-mode .section-title { font-size: 12.5px; gap: 5px; }
+  body.compact-mode .section-icon { width: 18px; height: 18px; font-size: 10px; border-radius: 4px; }
+  body.compact-mode .chevron svg { width: 13px; height: 13px; }
   body.compact-mode .section-body {
     grid-template-columns: repeat(4, 1fr);
-    gap: 5px 14px;
-    padding: 8px 12px 10px;
+    grid-auto-flow: dense;
+    gap: 3px 12px;
+    padding: 4px 10px 6px;
   }
-  body.compact-mode .section-body .field-group { gap: 2px; }
-  body.compact-mode label.field-label { font-size: 11px; }
-  body.compact-mode label.field-label .unit { font-size: 10px; }
+  body.compact-mode .section-body .field-group { gap: 1px; }
+  body.compact-mode label.field-label { font-size: 10.5px; }
+  body.compact-mode label.field-label .unit { font-size: 9.5px; }
   body.compact-mode input[type="text"],
   body.compact-mode input[type="number"],
   body.compact-mode input[type="date"],
   body.compact-mode textarea,
-  body.compact-mode select { padding: 6px 8px; font-size: 13px; }
-  body.compact-mode textarea { min-height: 28px; }
-  body.compact-mode .calc-hint { font-size: 10px; padding: 1px 2px 0; }
-  body.compact-mode .rv-subheading { font-size: 11px; margin: 4px 0 2px; padding-top: 4px; }
+  body.compact-mode select { padding: 4px 7px; font-size: 12.5px; }
+  body.compact-mode textarea { min-height: 24px; }
+  body.compact-mode .calc-hint { font-size: 9.5px; padding: 1px 2px 0; }
+  body.compact-mode .rv-subheading { font-size: 11px; margin: 2px 0 1px; padding-top: 2px; }
   body.compact-mode .rv-subheading:first-child { margin-top: 0; padding-top: 0; }
-  body.compact-mode .field-row.two-col { gap: 5px 10px; }
-  body.compact-mode .field-row.three-col { gap: 5px 8px; }
+  body.compact-mode .field-row.two-col { gap: 3px 10px; }
+  body.compact-mode .field-row.three-col { gap: 3px 8px; }
+  body.compact-mode .section-body .field-row.two-col > .field-group > .vti-delta-resp-primary,
+  body.compact-mode .section-body .field-row.three-col > .field-group > .vti-delta-resp-primary {
+    gap: 1px;
+  }
+  /* Compact chip groups (rhythm, CVS drugs, PHT, tamponade reuse .rhythm-chip) */
+  body.compact-mode .rhythm-chips { gap: 4px; }
+  body.compact-mode .rhythm-chip { padding: 3px 9px; font-size: 12px; border-width: 1px; border-radius: 14px; }
+  body.compact-mode .rhythm-summary { font-size: 11px; padding-top: 2px; }
   /* Default: all children span half-width so they pair up */
   body.compact-mode .section-body > * { grid-column: span 2; }
   /* Standalone field-groups span 1 col for max compaction */
@@ -664,22 +680,25 @@ html[data-theme="dark"] .edec-meas-block-title { background: #2a4c6e; }
     width: 100%;
     max-width: min(100%, 520px);
   }
-  /* Scan info card: 4-col compact */
+  /* Scan info card: 6-col compact (fits all six fields on one row) */
+  body.compact-mode .scan-info-header { padding: 6px 12px; }
+  body.compact-mode .scan-info-header-title { font-size: 13px; }
   body.compact-mode .scan-info-body {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 5px 14px;
-    padding: 8px 12px;
+    grid-template-columns: repeat(6, 1fr);
+    grid-auto-flow: dense;
+    gap: 3px 10px;
+    padding: 4px 10px;
   }
-  body.compact-mode .scan-info-body .field-group { gap: 2px; }
-  body.compact-mode .scan-info-body label.field-label { font-size: 11px; }
+  body.compact-mode .scan-info-body .field-group { gap: 1px; }
+  body.compact-mode .scan-info-body label.field-label { font-size: 10.5px; }
   body.compact-mode .scan-info-body input[type="text"],
   body.compact-mode .scan-info-body input[type="date"],
   body.compact-mode .scan-info-body input[type="time"],
-  body.compact-mode .scan-info-body select { padding: 6px 8px; font-size: 13px; }
+  body.compact-mode .scan-info-body select { padding: 4px 7px; font-size: 12.5px; }
   /* Editable calc displays */
-  body.compact-mode .calc-display.calc-display-editable { padding: 5px 7px; min-height: 30px; }
-  body.compact-mode .la-validate-hint { font-size: 10px; }
-  body.compact-mode .inline-warn { font-size: 10px; }
+  body.compact-mode .calc-display.calc-display-editable { padding: 3px 6px; min-height: 26px; }
+  body.compact-mode .la-validate-hint { font-size: 9.5px; }
+  body.compact-mode .inline-warn { font-size: 9.5px; }
 }
 
 /* ─── SCAN INFO CARD ──────────────────────────────────── */
@@ -774,6 +793,22 @@ html[data-theme="dark"] .edec-meas-block-title { background: #2a4c6e; }
 .field-row.three-col > .field-group > .calc-display,
 .field-row.three-col > .field-group > .field-row {
   margin-top: auto;
+}
+/* VTI Δ intervention: respiration input lives inside .vti-delta-resp-primary so it does not get margin-top:auto; when the intervention panel is hidden, do not push this input down in a stretched row (compact grid often stretches row height). */
+.field-row.two-col > .field-group:has(#vti-intervention-panel:not(.visible)) > #f-vtiDeltaIntervention,
+.field-row.three-col > .field-group:has(#vti-intervention-panel:not(.visible)) > #f-vtiDeltaIntervention {
+  margin-top: 0;
+}
+/* Vein Doppler row: .vein-hint sits below the select; margin-top:auto on selects misaligns columns when only some hints are visible (compact and normal). */
+#mc-pwd-veins-wrap .field-row.three-col > .field-group > select {
+  margin-top: 0;
+}
+/* VTI Δ respiration: label+input live inside .vti-delta-resp-primary; mirror .field-group flex gap so label→input spacing matches the intervention column. */
+.field-row.two-col > .field-group > .vti-delta-resp-primary,
+.field-row.three-col > .field-group > .vti-delta-resp-primary {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 @media (max-width: 480px) { .field-row.two-col, .field-row.three-col, .field-row.eprime-row-three { grid-template-columns: 1fr; } }
 .eprime-avg-col { min-width: 0; }
@@ -1298,10 +1333,11 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
 }
 
 /* ─── EXPORT MODAL ───────────────────────────────────── */
-#exportModal.modal-overlay {
-  padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
-  align-items: center;
-  justify-content: center;
+#exportModal.modal-overlay,
+#exportImagesModal.modal-overlay {
+  padding: 0;
+  align-items: stretch;
+  justify-content: stretch;
 }
 .export-modal-header {
   flex-shrink: 0;
@@ -1309,143 +1345,625 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 10px 14px;
+  padding: 12px max(16px, env(safe-area-inset-right)) 12px max(16px, env(safe-area-inset-left));
+  padding-top: max(12px, env(safe-area-inset-top));
   background: var(--primary-xlight);
   border-bottom: 1px solid var(--border-light);
 }
 .export-modal-header h2 {
   margin: 0;
-  font-size: 1.08rem;
+  font-size: 1.18rem;
   font-weight: 700;
   color: var(--primary-dark);
   line-height: 1.2;
 }
 .export-modal-header .about-modal-close {
-  padding: 4px;
+  padding: 8px;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.6);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  min-width: 44px;
+  min-height: 44px;
+}
+.export-modal-header .about-modal-close:hover,
+.export-modal-header .about-modal-close:focus-visible {
+  background: #fff;
+  border-color: var(--primary);
+  color: var(--primary-dark);
 }
 .export-modal-header .about-modal-close svg {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
 }
 .export-modal-scroll {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 12px 14px 14px;
+  padding: 20px max(20px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
   -webkit-overflow-scrolling: touch;
 }
+.export-modal-content {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+}
 .export-modal-lead {
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--text-muted);
-  line-height: 1.42;
-  margin: 0 0 12px;
-  max-width: min(72ch, 100%);
+  line-height: 1.5;
+  margin: 0 0 16px;
+  max-width: none;
 }
-.export-options-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-}
-@media (min-width: 700px) {
-  .export-options-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    align-items: stretch;
-  }
-}
-@media (min-width: 1024px) {
-  .export-options-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-.export-option-card {
+/* Before exporting — global controls grouped above the format list */
+.export-pre-export-bar {
+  margin: 0 0 20px;
+  padding: 14px 16px;
   border: 1px solid var(--border-light);
   border-radius: var(--radius-sm);
-  padding: 12px 14px;
   background: var(--bg);
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
 }
-.export-option-card h3 {
-  margin: 0 0 6px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1.25;
-}
-.export-option-card p {
-  flex: 1;
-  margin: 0 0 10px;
-  font-size: 12.5px;
-  color: var(--text-mid);
-  line-height: 1.4;
-}
-.export-option-card .btn {
-  width: 100%;
-  justify-content: center;
-  min-height: 40px;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  font-size: 13px;
-  margin-top: auto;
-}
-/* Print/PDF: PII caution — mobile viewports only (hidden on larger screens) */
-.export-print-mobile-caution {
-  display: none;
-  margin: 0 0 8px;
-  padding: 0;
+.export-pre-export-label {
   font-size: 10.5px;
-  line-height: 1.4;
-  font-weight: 500;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--text-muted);
-  letter-spacing: 0.01em;
+  margin: 0 0 10px;
 }
-@media (max-width: 767px) {
-  .export-print-mobile-caution {
-    display: block;
-  }
+.export-pre-export-bar .export-modal-images-block,
+.export-pre-export-bar .export-modal-anonymise-block {
+  margin: 0;
+  padding: 10px 0;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
 }
-.export-option-card p.export-print-mobile-caution {
-  flex: 0 0 auto;
-  margin-bottom: 8px;
-}
-.export-modal-footer-actions {
-  margin-top: 14px;
-  padding-top: 12px;
+.export-pre-export-bar .export-modal-images-block + .export-modal-anonymise-block {
   border-top: 1px solid var(--border-light);
 }
-.export-modal-footer-actions .btn {
-  width: 100%;
-  max-width: 260px;
-  margin: 0 auto;
-  justify-content: center;
-  min-height: 40px;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  font-size: 13px;
+
+/* Formats section */
+.export-formats-section-title {
+  margin: 0 0 10px;
+  padding: 0 0 8px;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
-.export-modal-anonymise-block {
+.export-formats-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.export-format-row {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  transition: border-color 0.15s, background-color 0.15s;
+}
+.export-format-row:hover {
+  border-color: var(--primary-light, #93c5fd);
+  background: var(--primary-xlight, #eff6ff);
+}
+.export-format-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--primary-xlight, #eff6ff);
+  color: var(--primary-dark, #1d4ed8);
+  flex-shrink: 0;
+}
+.export-format-icon svg {
+  width: 20px;
+  height: 20px;
+}
+.export-format-text {
+  min-width: 0;
+}
+.export-format-text h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.export-format-text p {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+.export-format-action {
+  min-height: 38px;
+  padding: 7px 16px;
+  font-size: 13px;
+  white-space: nowrap;
+  justify-content: center;
+}
+@media (max-width: 640px) {
+  .export-format-row {
+    grid-template-columns: 40px 1fr;
+    grid-template-areas:
+      "icon text"
+      "action action";
+    row-gap: 10px;
+  }
+  .export-format-icon { grid-area: icon; }
+  .export-format-text { grid-area: text; }
+  .export-format-action {
+    grid-area: action;
+    width: 100%;
+  }
+}
+
+/* Destructive-styled Pseudo-anonymise slot inside the pre-export bar */
+.export-modal-anonymise-block--destructive {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.export-modal-anonymise-text {
+  flex: 1 1 260px;
+  min-width: 0;
+  line-height: 1.35;
+}
+.export-modal-anonymise-text strong {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.export-modal-anonymise-text span {
+  display: block;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+.anonymise-images-notice {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 2px solid var(--red);
+  background: #fef2f2;
+  color: var(--red);
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.4;
+  text-align: left;
+}
+.anonymise-images-notice strong {
+  font-weight: 800;
+}
+.anonymise-images-notice[hidden] { display: none !important; }
+.btn.btn-danger-outline {
+  background: #fff;
+  color: var(--red);
+  border: 1px solid var(--red);
+}
+.btn.btn-danger-outline:hover {
+  background: var(--red);
+  color: #fff;
+}
+.export-modal-anonymise-btn {
+  min-height: 38px;
+  padding: 7px 14px;
+  font-size: 12.5px;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .export-modal-anonymise-btn { width: 100%; }
+}
+
+.export-attached-img-badge {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  color: var(--primary);
+  border-radius: 4px;
+  flex-shrink: 0;
+  cursor: help;
+}
+.export-attached-img-badge.is-on { display: inline-flex; }
+.export-attached-img-badge svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+}
+.export-format-text h3 .export-attached-img-badge {
+  background: var(--primary-xlight);
+  color: var(--primary-dark);
+  width: 20px;
+  height: 20px;
+}
+.export-format-text h3 .export-attached-img-badge svg { width: 13px; height: 13px; }
+.footer-export-menu-item .export-attached-img-badge {
+  margin-left: 4px;
+  color: var(--primary);
+}
+
+.export-modal-images-block {
   margin-top: 12px;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-light);
   background: var(--bg);
 }
-.export-modal-anonymise-desc {
-  margin: 0 0 8px;
-  font-size: 12px;
-  color: var(--text-mid);
+.export-modal-images-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.export-modal-images-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  flex: 1 1 260px;
+  line-height: 1.35;
+}
+.export-modal-images-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.export-modal-images-toggle-text strong {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.export-modal-images-toggle-text span {
+  display: block;
+  font-size: 11.5px;
+  color: var(--text-muted);
   line-height: 1.4;
 }
-.export-modal-anonymise-block .btn {
+.export-modal-images-select-btn {
+  min-height: 36px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  flex: 0 0 auto;
+}
+.export-modal-images-select-btn[hidden] { display: none !important; }
+.export-modal-images-status {
+  margin-top: 6px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+.export-modal-images-status[hidden] { display: none !important; }
+
+/* Images picker sub-modal */
+.modal-box.modal-box--images {
+  max-width: 100vw;
+  width: 100vw;
+  max-height: 100vh;
+  height: 100vh;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-align: left;
+  border-radius: 0;
+  box-shadow: none;
+}
+.export-images-modal-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px max(16px, env(safe-area-inset-right)) 12px max(16px, env(safe-area-inset-left));
+  padding-top: max(12px, env(safe-area-inset-top));
+  background: var(--primary-xlight);
+  border-bottom: 1px solid var(--border-light);
+}
+.export-images-modal-header h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+.export-images-modal-header .about-modal-close {
+  padding: 8px;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.6);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  min-width: 44px;
+  min-height: 44px;
+}
+.export-images-modal-header .about-modal-close:hover,
+.export-images-modal-header .about-modal-close:focus-visible {
+  background: #fff;
+  border-color: var(--primary);
+  color: var(--primary-dark);
+}
+.export-images-modal-header .about-modal-close svg {
+  width: 22px;
+  height: 22px;
+}
+.export-images-modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+  -webkit-overflow-scrolling: touch;
+}
+.export-images-modal-content {
   width: 100%;
-  justify-content: center;
-  min-height: 40px;
-  padding-top: 8px;
-  padding-bottom: 8px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.export-images-modal-lead {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  color: var(--text-mid);
+  line-height: 1.45;
+}
+.export-images-per-page-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+}
+.export-images-per-page-label {
   font-size: 13px;
-  box-sizing: border-box;
+  font-weight: 600;
+  color: var(--text);
+  flex: 0 0 auto;
+}
+.export-images-per-page-select {
+  font: inherit;
+  font-size: 13px;
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  flex: 0 0 auto;
+}
+.export-images-per-page-hint {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  line-height: 1.35;
+  flex: 1 1 200px;
+  min-width: 0;
+}
+.export-images-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 18px 14px;
+  border: 2px dashed var(--primary-light);
+  border-radius: var(--radius-sm);
+  background: var(--primary-xlight);
+  color: var(--primary-dark);
+  text-align: center;
+  transition: background 0.15s, border-color 0.15s;
+  cursor: pointer;
+}
+.export-images-dropzone.dragover {
+  background: #e0edf9;
+  border-color: var(--primary);
+}
+.export-images-dropzone-main {
+  font-weight: 600;
+  font-size: 13.5px;
+}
+.export-images-dropzone-sub {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+.export-images-dropzone input[type="file"] {
+  position: absolute;
+  width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+.export-images-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.export-images-empty {
+  margin: 12px 0 0;
+  padding: 12px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+  border: 1px dashed var(--border-light);
+  border-radius: var(--radius-sm);
+}
+.export-images-empty[hidden] { display: none !important; }
+.export-images-row {
+  display: grid;
+  grid-template-columns: auto 54px 1fr auto;
+  grid-template-areas:
+    "handle thumb name   actions"
+    "handle thumb anno   anno";
+  gap: 6px 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  align-items: center;
+  transition: box-shadow 0.12s, border-color 0.12s, opacity 0.12s;
+}
+.export-images-row.dragging { opacity: 0.45; }
+.export-images-row.drop-target { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(21,101,168,0.18); }
+.export-images-row-handle {
+  grid-area: handle;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: grab;
+  user-select: none;
+  color: var(--text-muted);
+  padding: 4px 2px;
+}
+.export-images-row-handle:active { cursor: grabbing; }
+.export-images-row-handle-dots {
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: 1px;
+}
+.export-images-row-handle-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 1px 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+  min-width: 20px;
+  line-height: 1;
+}
+.export-images-row-handle-btn:hover:not([disabled]) {
+  background: var(--primary-xlight);
+  border-color: var(--primary-light);
+  color: var(--primary-dark);
+}
+.export-images-row-handle-btn[disabled] { opacity: 0.3; cursor: not-allowed; }
+.export-images-row-thumb {
+  grid-area: thumb;
+  width: 54px;
+  height: 54px;
+  border-radius: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border-light);
+  object-fit: cover;
+  display: block;
+}
+.export-images-row-name {
+  grid-area: name;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  word-break: break-all;
+  line-height: 1.3;
+  min-width: 0;
+}
+.export-images-row-name-meta {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+.export-images-row-actions {
+  grid-area: actions;
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.export-images-row-del {
+  background: none;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 12px;
+  line-height: 1;
+}
+.export-images-row-del:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+.export-images-row-anno {
+  grid-area: anno;
+  width: 100%;
+  min-height: 40px;
+  max-height: 120px;
+  resize: vertical;
+  padding: 6px 8px;
+  font-family: var(--font);
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--text);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  background: var(--bg);
+}
+.export-images-row-anno::placeholder { color: var(--text-muted); font-style: italic; }
+.export-images-row-anno:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(21,101,168,0.15);
+  background: var(--surface);
+}
+.export-images-modal-footer {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border-light);
+  background: var(--bg);
+}
+.export-images-modal-footer .btn {
+  min-height: 38px;
+  padding: 7px 16px;
+  font-size: 13px;
+}
+@media (max-width: 640px) {
+  .export-images-row {
+    grid-template-columns: auto 54px 1fr;
+    grid-template-areas:
+      "handle thumb name"
+      "handle anno   anno"
+      "actions actions actions";
+  }
+  .export-images-row-thumb { width: 54px; height: 54px; }
+  .export-images-row-actions { justify-content: flex-end; }
 }
 
 /* ─── MODAL ───────────────────────────────────────────── */
@@ -1455,14 +1973,17 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
 .modal-overlay.open .modal-box { transform: scale(1) translateY(0); }
 /* Export dialog: wider than default modal; wins over .modal-box max-width/padding */
 .modal-box.modal-box--export {
-  max-width: min(860px, calc(100vw - 20px));
-  width: 100%;
-  max-height: min(94vh, 900px);
+  max-width: 100vw;
+  width: 100vw;
+  max-height: 100vh;
+  height: 100vh;
   padding: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   text-align: left;
+  border-radius: 0;
+  box-shadow: none;
 }
 .modal-icon { width: 52px; height: 52px; border-radius: 50%; background: #fef2f2; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
 .modal-icon svg { width: 26px; height: 26px; color: var(--red); }
@@ -1504,7 +2025,12 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
 .settings-machine-cap-block .toggle-thumb { width: 16px; height: 16px; top: 3px; left: 3px; }
 .settings-machine-cap-block .toggle-switch input:checked ~ .toggle-thumb { transform: translateX(18px); }
 .settings-nonfusic-measurements-block { margin-top: 7px; }
-.settings-nonfusic-global-toggle-row { margin: 6px 0 0; padding: 8px 10px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); background: rgba(21, 101, 168, 0.04); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.settings-nonfusic-indexed-toggle-row { margin: 6px 0 0; padding: 8px 10px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); background: rgba(21, 101, 168, 0.04); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.settings-nonfusic-indexed-toggle-row .settings-indexed-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.settings-nonfusic-indexed-toggle-row .settings-measure-title { font-weight: 600; }
+.settings-nonfusic-indexed-toggle-row .settings-indexed-hint { font-size: 10.5px; color: var(--text-muted); line-height: 1.3; }
+.settings-nonfusic-global-toggle-row { margin: 8px 0 0; padding: 10px 12px; border: 1.5px solid rgba(21, 101, 168, 0.55); border-radius: var(--radius-sm); background: rgba(21, 101, 168, 0.11); display: flex; align-items: center; justify-content: space-between; gap: 10px; box-shadow: 0 1px 2px rgba(21, 101, 168, 0.08); }
+.settings-nonfusic-global-toggle-row .settings-measure-title { font-weight: 700; font-size: 12px; letter-spacing: 0.02em; color: #0d3d6b; text-transform: uppercase; }
 .settings-haemodynamics-details {
   margin: 6px 0 0;
   padding: 0;
@@ -1883,6 +2409,28 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
     color: #111;
     line-height: 1.28;
   }
+  .print-header-row,
+  .edec-print-header-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 2px 0;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .print-header-row .print-doc-title,
+  .edec-print-header-row .edec-print-title {
+    margin: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .print-header-logo {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    flex: 0 0 auto;
+    display: block;
+  }
   .print-doc-title {
     font-size: 13pt;
     font-weight: 700;
@@ -2067,6 +2615,98 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
     line-height: 1.35;
     break-inside: avoid;
   }
+  .print-image-attachments {
+    margin-top: 10px;
+    page-break-before: always;
+    break-before: page;
+  }
+  .print-image-attachments-title {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #0d3d6b;
+    margin: 0 0 6px 0;
+    padding-bottom: 3px;
+    border-bottom: 1.5px solid #1565a8;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  .print-image-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: flex-start;
+    align-content: flex-start;
+  }
+  .print-image-figure {
+    margin: 0;
+    padding: 0;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    text-align: center;
+    box-sizing: border-box;
+    flex: 0 0 auto;
+  }
+  .print-image-figure img {
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    border: 1px solid #bbb;
+    display: block;
+    margin: 0 auto;
+  }
+  .print-image-figure figcaption {
+    margin-top: 3px;
+    font-size: 8pt;
+    line-height: 1.3;
+    color: #222;
+    text-align: center;
+    break-before: avoid;
+    page-break-before: avoid;
+  }
+  /* Orientation-aware layout (default / "auto"): portrait (e.g. VScan 1080x2165) shares rows in columns; landscape spans the page; squares pair up. */
+  .print-image-figure--portrait {
+    flex-basis: calc((100% - 16px) / 3);
+    max-width: calc((100% - 16px) / 3);
+  }
+  .print-image-figure--portrait img { max-height: 62vh; }
+  .print-image-figure--square {
+    flex-basis: calc((100% - 8px) / 2);
+    max-width: calc((100% - 8px) / 2);
+  }
+  .print-image-figure--square img { max-height: 48vh; }
+  .print-image-figure--landscape {
+    flex-basis: 100%;
+    max-width: 100%;
+  }
+  .print-image-figure--landscape img { max-height: 62vh; }
+  /* User-selected fixed count overrides orientation defaults (1-4 per A4 page). */
+  .print-image-grid--per-page-1 .print-image-figure {
+    flex-basis: 100%;
+    max-width: 100%;
+    page-break-after: always;
+    break-after: page;
+  }
+  .print-image-grid--per-page-1 .print-image-figure:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+  .print-image-grid--per-page-1 .print-image-figure img { max-height: 90vh; }
+  .print-image-grid--per-page-2 .print-image-figure {
+    flex-basis: calc((100% - 8px) / 2);
+    max-width: calc((100% - 8px) / 2);
+  }
+  .print-image-grid--per-page-2 .print-image-figure img { max-height: 88vh; }
+  .print-image-grid--per-page-3 .print-image-figure {
+    flex-basis: calc((100% - 16px) / 3);
+    max-width: calc((100% - 16px) / 3);
+  }
+  .print-image-grid--per-page-3 .print-image-figure img { max-height: 62vh; }
+  .print-image-grid--per-page-4 .print-image-figure {
+    flex-basis: calc((100% - 8px) / 2);
+    max-width: calc((100% - 8px) / 2);
+  }
+  .print-image-grid--per-page-4 .print-image-figure img { max-height: 44vh; }
   /* Optional: pack print/PDF toward ~2 A4 pages (margins set via #fusic-print-aggressive-page in JS) */
   #printReportMount.print-aggressive-2page .print-report-inner {
     line-height: 1.14;
@@ -2076,6 +2716,10 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
     margin: 0 0 0 0;
     padding-bottom: 2px;
     border-bottom-width: 1px;
+  }
+  #printReportMount.print-aggressive-2page .print-header-logo {
+    width: 46px;
+    height: 46px;
   }
   #printReportMount.print-aggressive-2page .print-blank {
     height: 0;
@@ -2310,27 +2954,6 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
     line-height: 1.3;
     font-style: italic;
   }
-  .edec-print-nonfusic {
-    margin: 4px 0 6px;
-    padding: 5px 7px;
-    border: 1px solid #ccc;
-    background: #fff;
-    font-size: 7.25pt;
-    line-height: 1.35;
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-  .edec-print-nonfusic-intro {
-    margin: 0 0 4px;
-    font-weight: 600;
-    color: #111;
-  }
-  .edec-print-nonfusic-list {
-    margin: 0;
-    padding: 0 0 0 1.1em;
-    color: #222;
-  }
-  .edec-print-nonfusic-list li { margin-bottom: 2px; }
 }
 </style>
 </head>
@@ -2423,7 +3046,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
                   <label class="toggle-switch"><input type="checkbox" id="toggle-show-rwt"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
                 </div>
                 <div class="toggle-row">
-                  <div><div class="toggle-label">LV mass</div><div class="settings-toggle-hint">0.8 × [1.04 × (LVIDd + IVSd + LVPWd)³ − LVIDd³] + 0.6 (g); linear measures in mm converted to cm</div></div>
+                  <div><div class="toggle-label">LV mass</div><div class="settings-toggle-hint">0.8 × 1.04 × [(LVIDd + IVSd + LVPWd)³ − LVIDd³] + 0.6 (g); linear measures in mm converted to cm</div></div>
                   <label class="toggle-switch"><input type="checkbox" id="toggle-show-lv-mass"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
                 </div>
                 <div class="toggle-row">
@@ -2545,6 +3168,13 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
               </div>
             </div>
           </details>
+          <div class="settings-nonfusic-indexed-toggle-row">
+            <span class="settings-indexed-text">
+              <span class="settings-measure-title">Indexed measurements</span>
+              <span class="settings-indexed-hint">Turn on indexed versions of any currently-enabled measurements (e.g. LV mass index only if LV mass is on; SVR index only if SVR is on). Turning this off clears all indexed measurements.</span>
+            </span>
+            <label class="toggle-switch settings-measure-master-toggle"><input type="checkbox" id="toggle-nonfusic-indexed-measures"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+          </div>
           <div class="settings-nonfusic-global-toggle-row">
             <span class="settings-measure-title">Toggle all</span>
             <label class="toggle-switch settings-measure-master-toggle"><input type="checkbox" id="toggle-nonfusic-measures-all"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
@@ -2552,7 +3182,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         </div>
         <div class="settings-normal-study-block">
           <div class="rv-subheading">Normal study helper</div>
-          <p class="settings-machine-cap-desc">Prefill categorical fields as for a structurally and functionally normal study (FUSIC HD questions, rhythm, ventilation, lung profile, RWMA, effusion, valves including appearance, aorta flaps / colour flow, LV and RV impressions, LAP screen, clinical significance). Measurements and free-text narratives are not overwritten.</p>
+          <p class="settings-machine-cap-desc">Auto-fill certain fields to aid report writing for studies with completely normal findings.</p>
           <button type="button" class="btn btn-secondary settings-anonymise-btn" id="openNormalStudyAutofillModal">Auto-fill normal study fields…</button>
         </div>
       </div>
@@ -2589,14 +3219,14 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         <div class="toggle-row">
           <div>
             <div class="toggle-label">Omit empty fields from export</div>
-            <div class="settings-toggle-hint">When on, section headings (e.g. Aorta) are omitted if every field in that section is blank — less bloat in text and Excel. Turn off to always print the full template of headings.</div>
+            <div class="settings-toggle-hint">When on, section headings (e.g. Aorta) are omitted if every field in that section is blank.</div>
           </div>
           <label class="toggle-switch"><input type="checkbox" id="toggle-omit-empty-export" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
         </div>
         <div class="toggle-row">
           <div>
             <div class="toggle-label">Summary near top of export</div>
-            <div class="settings-toggle-hint">When on, <strong>FUSIC HD questions</strong> (if shown), <strong>Summary &amp; conclusions</strong>, then the <strong>non-FUSIC HD disclaimer</strong> (if any) appear in exported text, Excel, and print <strong>after Patient demographics</strong> and <strong>before Left ventricle</strong>. Turn off to keep the same block at the end of the report.</div>
+            <div class="settings-toggle-hint">When on, the summary/conclusion section appears at the top of the report, rather than at the end.</div>
           </div>
           <label class="toggle-switch"><input type="checkbox" id="toggle-export-summary-near-top" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
         </div>
@@ -2610,9 +3240,16 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         <div class="toggle-row">
           <div>
             <div class="toggle-label">Aggressively fit onto 2 pages (print / PDF)</div>
-            <div class="settings-toggle-hint">For <strong>Save as PDF</strong> only: tighter page margins, smaller type (down to a still-usable minimum), less padding, and sections may split across pages so the layout can squeeze onto two A4 sides. <strong>Caution:</strong> readability may suffer; turn off if anything looks too cramped.</div>
+            <div class="settings-toggle-hint">Tightly condenses PDF report to fit onto as few pages as possible (ideally 2 sides of A4).</div>
           </div>
           <label class="toggle-switch"><input type="checkbox" id="toggle-export-aggressive-2page"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">FUSIC HD logo on PDF exports</div>
+            <div class="settings-toggle-hint">Include the FUSIC HD Logo on PDF reports.</div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="toggle-export-pdf-logo" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
         </div>
         <button type="button" class="btn btn-secondary settings-anonymise-btn" id="openAnonymiseModal">Pseudo-anonymise study…</button>
       </div>
@@ -2880,7 +3517,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
             <span class="calc-editable-suffix">g</span>
           </div>
         </div>
-        <div class="calc-hint">0.8 × [1.04 × (LVIDd + IVSd + LVPWd)³ − LVIDd³] + 0.6 — linear mm → cm</div>
+        <div class="calc-hint">0.8 × 1.04 × [(LVIDd + IVSd + LVPWd)³ − LVIDd³] + 0.6 — linear mm → cm</div>
       </div>
       <div id="lvmi-field-wrap" class="field-group section-hidden">
         <label class="field-label" for="lvmi-display-input">LV mass index <span class="unit">(g/m²)</span><span class="field-label-source-tag" id="lvmi-display-source" hidden></span></label>
@@ -3409,8 +4046,8 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <div id="pasp-field-group-wrap" class="section-hidden">
         <div class="field-group">
           <label class="field-label">PASP <span class="unit">(mmHg, TR Vmax + CVP or IVC-derived RAP)</span></label>
-          <div class="calc-display" id="pasp-cvp-display"><span class="calc-empty">Enter TR Vmax, then CVP (Section 1) or IVC + collapsibility (Veins)</span></div>
-          <div class="calc-hint">PASP ≈ 4×TR Vmax² + RAP (mmHg). RAP = CVP when entered; if CVP blank, mean RAP is inferred from IVC diameter + collapse (published table).</div>
+          <div class="calc-display" id="pasp-cvp-display"><span class="calc-empty">Enter TR Vmax, then CVP (Section 1) or IVC diameter (cm) + collapsibility (Veins)</span></div>
+          <div class="calc-hint">PASP ≈ 4×TR Vmax² + RAP (mmHg). RAP = CVP when entered; if CVP blank, mean RAP is inferred from IVC diameter (cm) + collapse (published table).</div>
         </div>
       </div>
       <div id="tapse-pasp-ratio-field-wrap" class="field-group section-hidden">
@@ -3612,8 +4249,8 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
     <div class="section-body">
       <div class="field-row two-col">
         <div class="field-group">
-          <label class="field-label" for="f-ivcDiam">IVC Diameter <span class="unit">(mm)</span></label>
-          <input type="number" id="f-ivcDiam" placeholder="e.g. 18" min="0" step="0.1" oninput="recalcVeXUS(); syncPHTBasicAutoSelections(); recalcPASPCVP()" onchange="recalcVeXUS(); syncPHTBasicAutoSelections(); recalcPASPCVP()">
+          <label class="field-label" for="f-ivcDiam">IVC Diameter <span class="unit">(cm)</span></label>
+          <input type="number" id="f-ivcDiam" placeholder="e.g. 1.8" min="0" step="0.01" oninput="recalcVeXUS(); syncPHTBasicAutoSelections(); recalcPASPCVP()" onchange="recalcVeXUS(); syncPHTBasicAutoSelections(); recalcPASPCVP()">
         </div>
         <div class="field-group">
           <label class="field-label" for="f-ivcCollapse">IVC Collapsibility</label>
@@ -3845,8 +4482,8 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <button type="button" class="footer-export-menu-item" role="menuitem" data-export-format="xlsx">Excel workbook (.xlsx)</button>
       <button type="button" class="footer-export-menu-item" role="menuitem" data-export-format="clipboard-text">Plain text — copy to clipboard</button>
       <button type="button" class="footer-export-menu-item" role="menuitem" data-export-format="plain-text-page">Plain text — full page (select & copy)</button>
-      <button type="button" class="footer-export-menu-item" role="menuitem" data-export-format="print-pdf">Print / Save as PDF (A4)</button>
-      <button type="button" class="footer-export-menu-item" role="menuitem" data-export-format="edec">BSE/EDEC Style Report</button>
+      <button type="button" class="footer-export-menu-item" role="menuitem" data-export-format="print-pdf">Print / Save as PDF (A4)<span class="export-attached-img-badge" title="Study has Images Attached" aria-label="Study has Images Attached"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span></button>
+      <button type="button" class="footer-export-menu-item" role="menuitem" data-export-format="edec">BSE/EDEC Style Report<span class="export-attached-img-badge" title="Study has Images Attached" aria-label="Study has Images Attached"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span></button>
     </div>
   </div>
 </div>
@@ -3873,42 +4510,137 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       </button>
     </div>
     <div class="export-modal-scroll">
+     <div class="export-modal-content">
       <p class="export-modal-lead">Every option uses the same structured report: section visibility, machine-capability settings, and field values are respected. Incomplete fields are allowed; any important gaps are highlighted on the form and summarised in a brief toast when you export.</p>
-      <div class="export-options-grid">
-        <div class="export-option-card">
-          <h3>Excel workbook (.xlsx)</h3>
-          <p>Download a spreadsheet formatted for columns and rows. Useful for filing, further editing in Excel or similar, attaching to notes, or sharing as a file.</p>
-          <button type="button" class="btn btn-secondary" onclick="triggerExportFromModal('xlsx')">Download Excel file</button>
+
+      <section class="export-pre-export-bar" aria-label="Before exporting">
+        <div class="export-pre-export-label">Before exporting</div>
+        <div class="export-modal-images-block">
+          <div class="export-modal-images-head">
+            <label class="export-modal-images-toggle" for="export-include-images">
+              <input type="checkbox" id="export-include-images">
+              <span class="export-modal-images-toggle-text">
+                <strong>Include images in report (PDF only)</strong>
+                <span>Applies to the Print/Save as PDF and BSE/EDEC outputs. Other formats ignore this setting.</span>
+              </span>
+            </label>
+            <button type="button" class="btn btn-secondary export-modal-images-select-btn" id="exportSelectImagesBtn" hidden>Select images…</button>
+          </div>
+          <div class="export-modal-images-status" id="exportImagesStatus" hidden></div>
         </div>
-        <div class="export-option-card">
-          <h3>Plain text — clipboard</h3>
-          <p>Copy the full text report in one step — same wording as the full-page view, including the draft disclaimer. Best when your browser allows clipboard access.</p>
-          <button type="button" class="btn btn-secondary" onclick="triggerExportFromModal('clipboard-text')">Copy to clipboard</button>
+        <div class="export-modal-anonymise-block export-modal-anonymise-block--destructive">
+          <div class="export-modal-anonymise-text">
+            <strong>Pseudo-anonymise study</strong>
+            <span>Permanently replaces name, ID, age band, and coarse scan date/time. Cannot be undone.</span>
+          </div>
+          <button type="button" class="btn btn-danger-outline export-modal-anonymise-btn" id="exportOpenAnonymiseModal">Pseudo-anonymise…</button>
         </div>
-        <div class="export-option-card">
-          <h3>Plain text — full page</h3>
-          <p>Open the report as one large, readable page you can scroll, select manually, or use &ldquo;Select all&rdquo; and copy (e.g. if clipboard automation is blocked). Nothing is stored beyond this screen.</p>
-          <button type="button" class="btn btn-secondary" onclick="triggerExportFromModal('plain-text-page')">Open text page</button>
-        </div>
-        <div class="export-option-card">
-          <h3>Print / Save as PDF</h3>
-          <p>Opens your browser&rsquo;s print dialog with a compact A4 layout. Choose <strong>Save as PDF</strong> and A4 for a two-sided sheet where possible.</p>
-          <p class="export-print-mobile-caution" role="note">Caution: saving or printing can place patient-identifiable information on a personal device — follow your organisation&rsquo;s information governance and only use approved workflows.</p>
-          <button type="button" class="btn btn-secondary" onclick="triggerExportFromModal('print-pdf')">Print or save as PDF</button>
-        </div>
-        <div class="export-option-card">
-          <h3>BSE/EDEC Style Report</h3>
-          <p>Opens a full-screen editor for free-text clinical interpretation, with a compact measurements table. Generates a PDF in the BSE/EDEC reporting style. We recommend completion on a desktop computer.</p>
-          <button type="button" class="btn btn-secondary" onclick="triggerExportFromModal('edec')">Open BSE/EDEC editor</button>
-        </div>
+      </section>
+
+      <h3 class="export-formats-section-title">Choose an export format</h3>
+      <ul class="export-formats-list" role="list">
+        <li class="export-format-row">
+          <span class="export-format-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>
+          </span>
+          <div class="export-format-text">
+            <h3>Excel workbook (.xlsx)</h3>
+            <p>Structured spreadsheet for filing or further editing.</p>
+          </div>
+          <button type="button" class="btn btn-secondary export-format-action" onclick="triggerExportFromModal('xlsx')">Download</button>
+        </li>
+        <li class="export-format-row">
+          <span class="export-format-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </span>
+          <div class="export-format-text">
+            <h3>Plain text — copy to clipboard</h3>
+            <p>Full-text report copied in one click.</p>
+          </div>
+          <button type="button" class="btn btn-secondary export-format-action" onclick="triggerExportFromModal('clipboard-text')">Copy</button>
+        </li>
+        <li class="export-format-row">
+          <span class="export-format-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+          </span>
+          <div class="export-format-text">
+            <h3>Plain text — full page</h3>
+            <p>Opens the text report to select and copy manually.</p>
+          </div>
+          <button type="button" class="btn btn-secondary export-format-action" onclick="triggerExportFromModal('plain-text-page')">Open</button>
+        </li>
+        <li class="export-format-row">
+          <span class="export-format-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          </span>
+          <div class="export-format-text">
+            <h3>Print / Save as PDF<span class="export-attached-img-badge" title="Study has Images Attached" aria-label="Study has Images Attached"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span></h3>
+            <p>Browser print dialog with a compact A4 layout.</p>
+          </div>
+          <button type="button" class="btn btn-secondary export-format-action" onclick="triggerExportFromModal('print-pdf')">Print</button>
+        </li>
+        <li class="export-format-row">
+          <span class="export-format-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M10.5 15.5l1.5 1.5 3-3"/></svg>
+          </span>
+          <div class="export-format-text">
+            <h3>BSE/EDEC Style Report<span class="export-attached-img-badge" title="Study has Images Attached" aria-label="Study has Images Attached"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span></h3>
+            <p>Free-text editor, produces a PDF in BSE/EDEC style.</p>
+          </div>
+          <button type="button" class="btn btn-secondary export-format-action" onclick="triggerExportFromModal('edec')">Open editor</button>
+        </li>
+      </ul>
+     </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="exportImagesModal" onclick="if(event.target===this)closeExportImagesModal()">
+  <div class="modal-box modal-box--images" role="dialog" aria-labelledby="exportImagesModalTitle" aria-modal="true" onclick="event.stopPropagation()">
+    <div class="export-images-modal-header">
+      <h2 id="exportImagesModalTitle">Attach images to PDF</h2>
+      <button type="button" class="about-modal-close" onclick="closeExportImagesModal()" aria-label="Close attached images">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="export-images-modal-body">
+     <div class="export-images-modal-content">
+      <p class="export-images-modal-lead">Add PNG, JPEG, or GIF images. Each image is placed at the end of the PDF in the order shown below. Drag the rows (or use the ▲▼ buttons) to reorder. Images are held in memory for this session only.</p>
+      <div class="export-images-per-page-row">
+        <label class="export-images-per-page-label" for="exportImagesPerPage">Images per page</label>
+        <select class="export-images-per-page-select" id="exportImagesPerPage" aria-describedby="exportImagesPerPageHint">
+          <option value="auto">Auto (by orientation)</option>
+          <option value="1">1 per page</option>
+          <option value="2">2 per page</option>
+          <option value="3">3 per page</option>
+          <option value="4">4 per page</option>
+        </select>
+        <span class="export-images-per-page-hint" id="exportImagesPerPageHint">Auto packs images by shape; a fixed number overrides this.</span>
       </div>
-      <div class="export-modal-anonymise-block">
-        <p class="export-modal-anonymise-desc">Pseudo-anonymise replaces name, ID, age band, and coarse scan date/time in line with the Settings flow. If you confirm, this export window will close so you can review the rest of the report for anything still identifiable before you export.</p>
-        <button type="button" class="btn btn-secondary" id="exportOpenAnonymiseModal">Pseudo-anonymise study…</button>
-      </div>
-      <div class="export-modal-footer-actions">
-        <button type="button" class="btn btn-secondary" onclick="closeExportModal()">Cancel</button>
-      </div>
+      <label class="export-images-dropzone" id="exportImagesDropzone" for="exportImagesFileInput">
+        <span class="export-images-dropzone-main">Click to choose images</span>
+        <span class="export-images-dropzone-sub">or drag and drop here — PNG, JPEG, GIF (max 8 MB each)</span>
+        <input type="file" id="exportImagesFileInput" accept="image/png,image/jpeg,image/gif" multiple>
+      </label>
+      <p class="export-images-empty" id="exportImagesEmpty">No images attached yet.</p>
+      <ul class="export-images-list" id="exportImagesList" aria-label="Attached images (drag to reorder)"></ul>
+     </div>
+    </div>
+    <div class="export-images-modal-footer">
+      <button type="button" class="btn btn-primary" onclick="closeExportImagesModal()">Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="exportImagesPiiWarnModal" onclick="if(event.target===this)closeExportImagesPiiWarn()">
+  <div class="modal-box modal-box--anonymise" role="dialog" aria-labelledby="exportImagesPiiTitle" aria-modal="true" onclick="event.stopPropagation()">
+    <div class="modal-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+    <div class="modal-title" id="exportImagesPiiTitle">Check images for identifiable information</div>
+    <div class="modal-desc">Before attaching, <strong>review every image</strong> for patient-identifiable information — patient name or ID burned into screenshots, wristbands, bedside monitor details, room or bed labels, DICOM overlays, or anything else in the background.</div>
+    <div class="modal-desc">Attached images are <strong>embedded into the resulting PDF</strong>. If you are producing the report on your <strong>personal device</strong>, that PDF (and any copy you share) will contain the raw image data. You remain responsible for following your organisation's information governance.</div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary" onclick="closeExportImagesPiiWarn()">Cancel</button>
+      <button type="button" class="btn btn-primary" id="exportImagesPiiContinueBtn">I understand — continue</button>
     </div>
   </div>
 </div>
@@ -3933,6 +4665,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
     <div class="modal-title">Pseudo-anonymise study?</div>
     <div class="modal-desc">This will <strong>permanently replace</strong> patient name and patient ID with the <strong>same</strong> pseudo-code (e.g. FUSICHD-Alpha-71204 in both fields), plus age (decade band such as 30–39 or 80+), scan date (month and year only), and time (AM or PM only). <strong>This cannot be undone</strong> — the app does not keep your original values.</div>
     <div class="modal-desc">Before you continue, check that <strong>Clinical Indication</strong>, <strong>Overall Impression</strong>, and <strong>Recommended Actions</strong> do <strong>not</strong> contain identifiable patient information. Other fields (for example operator name) may still be identifying — you are responsible for what you export or share.</div>
+    <p class="anonymise-images-notice" id="anonymiseImagesNotice" hidden><strong>This does not pseudo-anonymise uploaded images — review each attached image separately before exporting.</strong></p>
     <div class="modal-actions">
       <button type="button" class="btn btn-secondary" onclick="closeAnonymiseModal()">Cancel</button>
       <button type="button" class="btn btn-danger" onclick="applyPseudoAnonymisation()">Anonymise</button>
@@ -4401,7 +5134,7 @@ const REFERENCE_RANGES_DATA = [
     title: '12. IVC AND VENOUS CONGESTION',
     rows: [
       {
-        parameter: 'IVC diameter',
+        parameter: 'IVC diameter (cm)',
         lines: [{ k: 'Congestion unlikely', v: '< 2 cm' }, { k: 'Suspicion raised', v: '> 2 cm — continue venous scan' }]
       },
       {
@@ -4449,10 +5182,10 @@ const REFERENCE_RANGES_DATA = [
     globalNote: 'Abnormality patterns: Hepatic vein mild = S < D; severe = S reversal. Portal vein mild = PI 0.3–0.5; severe = PI > 0.5. Renal vein mild = interrupted S and D phase; severe = interrupted D phase only.',
     notePlacement: 'after',
     gradeLines: [
-      'Grade 0: IVC < 20 mm',
-      'Grade 1: IVC > 20 mm plus no or mild abnormalities in any pattern',
-      'Grade 2: IVC > 20 mm plus severe abnormality in 1 pattern',
-      'Grade 3: IVC > 20 mm plus severe abnormalities in > 1 pattern'
+      'Grade 0: IVC < 2.0 cm',
+      'Grade 1: IVC ≥ 2.0 cm plus no or mild abnormalities in any pattern',
+      'Grade 2: IVC ≥ 2.0 cm plus severe abnormality in 1 pattern',
+      'Grade 3: IVC ≥ 2.0 cm plus severe abnormalities in > 1 pattern'
     ]
   }
 ];
@@ -4563,18 +5296,20 @@ function closeEdecEditor() {
   document.body.style.overflow = edecPrevOverflow;
 }
 
-/* Measurement definitions for the compact table */
+/* Measurement definitions for the compact table.
+   Optional 4th tuple slot = options object; currently `toggleId` gates the row
+   on a non-FUSIC HD measurement toggle (row hidden everywhere if toggle OFF). */
 const EDEC_MEAS_GROUPS = [
   { title: 'LV Size', rows: [
     ['LVIDd', 'f-lvidd', 'mm'], ['LVIDs', 'f-lvids', 'mm'],
     ['IVSd', 'f-ivsd', 'mm'], ['LVPWd', 'f-lvpwd', 'mm'],
-    ['LVIDd Indexed', 'lvidd-index-display-input', 'mm/m²'],
-    ['LV Mass', 'lv-mass-display-input', 'g'],
-    ['LVMi', 'lvmi-display-input', 'g/m²'],
-    ['RWT', 'rwt-display-input', ''],
+    ['LVIDd Indexed', 'lvidd-index-display-input', 'mm/m²', { toggleId: 'toggle-show-lvidd-indexed' }],
+    ['LV Mass', 'lv-mass-display-input', 'g', { toggleId: 'toggle-show-lv-mass' }],
+    ['LVMi', 'lvmi-display-input', 'g/m²', { toggleId: 'toggle-show-lvmi' }],
+    ['RWT', 'rwt-display-input', '', { toggleId: 'toggle-show-rwt' }],
   ]},
   { title: 'LV Systolic Function', rows: [
-    ['FS', 'fs-display-input', '%'],
+    ['FS', 'fs-display-input', '%', { toggleId: 'toggle-show-lv-fractional-shortening' }],
     ['EF (Simpson\'s)', 'f-efSimpsonBiplane', '%'],
     ['EF (Visual)', 'f-ef', ''],
     ['MAPSE', 'f-mapse', 'mm'],
@@ -4584,20 +5319,20 @@ const EDEC_MEAS_GROUPS = [
     ['LVOT Diam', 'f-lvotDiam', 'cm'],
     ['LVOT VTI', 'f-lvotVTI', 'cm'],
     ['SV (VTI)', 'sv-display-input', 'mL'],
-    ['SVi', 'svi-display-input', 'mL/m²'],
+    ['SVi', 'svi-display-input', 'mL/m²', { toggleId: 'toggle-show-svi' }],
     ['CO', 'co-display-input', 'L/min'],
-    ['CI', 'ci-display-input', 'L/min/m²'],
-    ['SVR', 'svr-display-input', ''],
-    ['SVRi', 'svri-display-input', ''],
+    ['CI', 'ci-display-input', 'L/min/m²', { toggleId: 'toggle-show-cardiac-index' }],
+    ['SVR', 'svr-display-input', '', { toggleId: 'toggle-show-svr' }],
+    ['SVRi', 'svri-display-input', '', { toggleId: 'toggle-show-svri' }],
     ['VTI Δ resp', 'f-vtiDeltaResp', '%'],
-    ['IVC Diam', 'f-ivcDiam', 'mm'],
+    ['IVC Diam', 'f-ivcDiam', 'cm'],
     ['IVC Collapse', 'f-ivcCollapse', ''],
     ['CVP', 'f-cvp', 'mmHg'],
   ]},
   { title: 'LV Diastolic Function', rows: [
     ['E Vel', 'f-eWave', 'cm/s'],
     ['A Vel', 'f-aWave', 'cm/s'],
-    ['E/A', 'ea-display-input', ''],
+    ['E/A', 'ea-display-input', '', { toggleId: 'toggle-show-ea-field' }],
     ['e\' Septal', 'f-eSeptal', 'cm/s'],
     ['e\' Lateral', 'f-eLateral', 'cm/s'],
     ['Avg e\'', 'eprime-avg-input', 'cm/s'],
@@ -4620,7 +5355,7 @@ const EDEC_MEAS_GROUPS = [
   { title: 'Aortic Valve', rows: [
     ['AV VTI', 'f-avVTI', 'cm'],
     ['DI', 'di-display-input', ''],
-    ['AVA (cont.)', 'ava-continuity-display-input', 'cm²'],
+    ['AVA (cont.)', 'ava-continuity-display-input', 'cm²', { toggleId: 'toggle-show-ava-continuity' }],
   ]},
   { title: 'Tricuspid Valve', rows: [
     ['TR Vmax', 'f-trVmax', 'm/s'],
@@ -4644,15 +5379,39 @@ const EDEC_MEAS_GROUPS = [
 function edecGetVal(id) {
   const el = document.getElementById(id);
   if (!el) return '';
+  if (el.tagName === 'SELECT') return (el.value || '').trim();
   return (el.value || el.textContent || '').trim();
+}
+
+/* Filter EDEC measurement groups for display/export.
+   - Always drops rows whose `toggleId` (non-FUSIC HD measurement toggle) is OFF.
+   - If `omitEmpty` is true, additionally drops rows whose current value is blank.
+   - Drops groups whose filtered row list is empty. */
+function filterEdecMeasGroups(omitEmpty) {
+  const out = [];
+  for (const g of EDEC_MEAS_GROUPS) {
+    const rows = [];
+    for (const r of g.rows) {
+      const opts = r[3];
+      if (opts && opts.toggleId && !document.getElementById(opts.toggleId)?.checked) continue;
+      if (omitEmpty) {
+        const v = edecGetVal(r[1]);
+        if (!v) continue;
+      }
+      rows.push(r);
+    }
+    if (rows.length) out.push({ title: g.title, rows });
+  }
+  return out;
 }
 
 function buildEdecMeasurementsTable() {
   const mount = document.getElementById('edecMeasMount');
   if (!mount) return;
   const esc = escapeHtml;
+  const groups = filterEdecMeasGroups(false);
   let html = '<div class="edec-meas-outer">';
-  for (const g of EDEC_MEAS_GROUPS) {
+  for (const g of groups) {
     let rows = '';
     for (const [label, id, unit] of g.rows) {
       const v = edecGetVal(id);
@@ -4676,7 +5435,17 @@ function buildEdecPrintHTML() {
 
   const parts = ['<div class="edec-print-inner">'];
 
-  parts.push('<h1 class="edec-print-title">Echocardiography Report</h1>');
+  if (isExportPdfLogoEnabled()) {
+    const logoSrc = __fhdLogoDataUrl || './FHD.jpg';
+    parts.push(
+      `<div class="edec-print-header-row">` +
+        `<img class="print-header-logo" src="${logoSrc}" alt="" aria-hidden="true">` +
+        `<h1 class="edec-print-title">Echocardiography Report</h1>` +
+      `</div>`
+    );
+  } else {
+    parts.push('<h1 class="edec-print-title">Echocardiography Report</h1>');
+  }
 
   /* Demographics table */
   const demoRows = [
@@ -4752,9 +5521,12 @@ function buildEdecPrintHTML() {
       const items = getNonFusicHdEnabledMeasureLabelsForExport();
       if (items.length && typeof NONFUSIC_HD_DISCLAIMER_EXPORT_INTRO === 'string') {
         nonFusicHtml =
-          '<div class="edec-print-nonfusic">' +
-          `<p class="edec-print-nonfusic-intro">${esc(NONFUSIC_HD_DISCLAIMER_EXPORT_INTRO)}</p>` +
-          `<ul class="edec-print-nonfusic-list">${items.map(it => `<li>${esc(it)}</li>`).join('')}</ul></div>`;
+          '<section class="print-section print-section--nonfusic-disclaimer" aria-label="Non-FUSIC HD measurement disclaimer">' +
+          '<h2 class="print-section-title">Non-FUSIC HD measurement disclaimer</h2>' +
+          `<p class="print-nonfusic-disclaimer-intro">${esc(NONFUSIC_HD_DISCLAIMER_EXPORT_INTRO)}</p>` +
+          '<ul class="print-nonfusic-disclaimer-list">' +
+          items.map(it => `<li><span class="print-nonfusic-li-bullet">•</span> ${esc(it)}</li>`).join('') +
+          '</ul></section>';
       }
     }
   }
@@ -4770,46 +5542,48 @@ function buildEdecPrintHTML() {
   }
 
   /* Measurements table */
-  parts.push('<h3 class="edec-print-meas-heading">Measurements</h3>');
-  parts.push('<table class="edec-print-meas-table"><tbody>');
+  const omitEmptyExport = !!document.getElementById('toggle-omit-empty-export')?.checked;
+  const printGroups = filterEdecMeasGroups(omitEmptyExport);
 
-  const groupsPerRow = 3;
-  for (let gi = 0; gi < EDEC_MEAS_GROUPS.length; gi += groupsPerRow) {
-    const chunk = EDEC_MEAS_GROUPS.slice(gi, gi + groupsPerRow);
-    const maxRows = Math.max(...chunk.map(g => g.rows.length));
+  if (printGroups.length) {
+    parts.push('<h3 class="edec-print-meas-heading">Measurements</h3>');
+    parts.push('<table class="edec-print-meas-table"><tbody>');
 
-    /* Header row */
-    parts.push('<tr class="edec-meas-hdr-row">');
-    for (const g of chunk) {
-      parts.push(`<th colspan="2">${esc(g.title)}</th>`);
-    }
-    for (let pad = chunk.length; pad < groupsPerRow; pad++) parts.push('<th colspan="2"></th>');
-    parts.push('</tr>');
+    const groupsPerRow = 3;
+    for (let gi = 0; gi < printGroups.length; gi += groupsPerRow) {
+      const chunk = printGroups.slice(gi, gi + groupsPerRow);
+      const maxRows = Math.max(...chunk.map(g => g.rows.length));
 
-    /* Data rows */
-    for (let ri = 0; ri < maxRows; ri++) {
-      parts.push('<tr>');
+      /* Header row */
+      parts.push('<tr class="edec-meas-hdr-row">');
       for (const g of chunk) {
-        if (ri < g.rows.length) {
-          const [label, id, unit] = g.rows[ri];
-          const v = edecGetVal(id);
-          const display = v ? (unit ? `${v} ${unit}` : v) : '';
-          parts.push(`<td class="edec-meas-k">${esc(label)}</td><td class="edec-meas-v">${esc(display)}</td>`);
-        } else {
-          parts.push('<td class="edec-meas-k"></td><td class="edec-meas-v"></td>');
-        }
+        parts.push(`<th colspan="2">${esc(g.title)}</th>`);
       }
-      for (let pad = chunk.length; pad < groupsPerRow; pad++) parts.push('<td></td><td></td>');
+      for (let pad = chunk.length; pad < groupsPerRow; pad++) parts.push('<th colspan="2"></th>');
       parts.push('</tr>');
+
+      /* Data rows */
+      for (let ri = 0; ri < maxRows; ri++) {
+        parts.push('<tr>');
+        for (const g of chunk) {
+          if (ri < g.rows.length) {
+            const [label, id, unit] = g.rows[ri];
+            const v = edecGetVal(id);
+            const display = v ? (unit ? `${v} ${unit}` : v) : '';
+            parts.push(`<td class="edec-meas-k">${esc(label)}</td><td class="edec-meas-v">${esc(display)}</td>`);
+          } else {
+            parts.push('<td class="edec-meas-k"></td><td class="edec-meas-v"></td>');
+          }
+        }
+        for (let pad = chunk.length; pad < groupsPerRow; pad++) parts.push('<td></td><td></td>');
+        parts.push('</tr>');
+      }
     }
+    parts.push('</tbody></table>');
   }
-  parts.push('</tbody></table>');
 
   /* Reported by */
   parts.push('<div class="edec-print-reported-by"><strong>Reported by:</strong> ' + esc(gv('f-operatorName') || '') + '</div>');
-
-  /* Disclaimer */
-  parts.push(`<p class="edec-print-disclaimer">${esc(EXPORT_DISCLAIMER_TEXT)}</p>`);
 
   parts.push('</div>');
   return parts.join('');
@@ -4823,6 +5597,7 @@ function doEdecExportPdf() {
   const previousDocumentTitle = document.title;
 
   mount.innerHTML = buildEdecPrintHTML();
+  appendAttachedImagesToPrintMount();
 
   const pn = (document.getElementById('f-patientName')?.value || '').trim();
   const pid = (document.getElementById('f-patientId')?.value || '').trim();
@@ -5134,7 +5909,8 @@ const SESSION_DRAFT_TOGGLE_IDS = [
   'toggle-omit-empty-export',
   'toggle-export-summary-near-top',
   'toggle-export-nonfusic-disclaimer',
-  'toggle-export-aggressive-2page'
+  'toggle-export-aggressive-2page',
+  'toggle-export-pdf-logo'
 ];
 const HAEMODYNAMICS_CHILD_TOGGLE_IDS = [
   'toggle-show-cardiac-index',
@@ -5168,12 +5944,53 @@ const NONFUSIC_MEASURES_ALL_CHILD_TOGGLE_IDS = [
   ...RH_MEASURES_CHILD_TOGGLE_IDS,
   ...VALVE_MEASURES_CHILD_TOGGLE_IDS
 ];
+/* Indexed non-FUSIC HD measurements.
+   `requiresId` = the toggle that gates the base measurement. If null, the base
+   measurement is a FUSIC HD core field (always displayed), so the indexed
+   version can always be turned on by the master "Indexed measurements" switch. */
+const NONFUSIC_INDEXED_MEASURES = [
+  { id: 'toggle-show-lvidd-indexed',   requiresId: null },                 // LVIDd (core)
+  { id: 'toggle-show-lvmi',            requiresId: 'toggle-show-lv-mass' },
+  { id: 'toggle-show-cardiac-index',   requiresId: null },                 // CO (core)
+  { id: 'toggle-show-svi',             requiresId: null },                 // SV (core)
+  { id: 'toggle-show-svri',            requiresId: 'toggle-show-svr' }
+];
+
+/* Machine-capability gates for non-FUSIC HD measurement toggles.
+   Each listed toggle requires its caps to be ON; toggles not listed have no
+   machine-capability prerequisite. */
+const NONFUSIC_MEASURE_CAP_REQS = {
+  'toggle-show-cardiac-index':    ['pwd'],
+  'toggle-show-svi':              ['pwd'],
+  'toggle-show-svr':              ['pwd'],
+  'toggle-show-svri':             ['pwd'],
+  'toggle-show-ea-field':         ['pwd'],
+  'toggle-show-pasp-field':       ['cwd'],
+  'toggle-show-tapse-pasp-ratio': ['cwd'],
+  'toggle-show-ava-continuity':   ['cwd', 'pwd']
+};
+function isNonfusicToggleAvailable(id) {
+  const reqs = NONFUSIC_MEASURE_CAP_REQS[id] || [];
+  return reqs.every(c => c === 'pwd' ? isMachinePWDEnabled() : isMachineCWDEnabled());
+}
+function nonfusicCapTitleFor(id) {
+  const reqs = NONFUSIC_MEASURE_CAP_REQS[id] || [];
+  if (!reqs.length) return '';
+  if (reqs.length === 1) return reqs[0] === 'pwd'
+    ? 'Requires pulsed-wave Doppler — enable PWD in Machine capabilities.'
+    : 'Requires continuous-wave Doppler — enable CWD in Machine capabilities.';
+  return 'Requires CWD and PWD — enable both in Machine capabilities.';
+}
+function availableNonfusicIds(ids) {
+  return ids.filter(isNonfusicToggleAvailable);
+}
 let _syncingHaemodynamicsMaster = false;
 let _syncingLAPMaster = false;
 let _syncingLVMaster = false;
 let _syncingValveMaster = false;
 let _syncingRHMaster = false;
 let _syncingNonfusicMeasuresGlobalMaster = false;
+let _syncingNonfusicIndexedMaster = false;
 let sessionRestoreInProgress = false;
 let sessionDraftSaveTimer = null;
 
@@ -5288,6 +6105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById(id)?.addEventListener('change', onValveMeasuresChildToggleChange);
   });
   document.getElementById('toggle-nonfusic-measures-all')?.addEventListener('change', onNonfusicMeasuresGlobalMasterChange);
+  document.getElementById('toggle-nonfusic-indexed-measures')?.addEventListener('change', onNonfusicIndexedMasterChange);
   document.getElementById('toggle-machine-cwd')?.addEventListener('change', refreshMachineCapabilityFields);
   document.getElementById('toggle-machine-pwd')?.addEventListener('change', refreshMachineCapabilityFields);
   document.getElementById('toggle-machine-tdi')?.addEventListener('change', refreshMachineCapabilityFields);
@@ -5313,6 +6131,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('clearBtn').addEventListener('click', () => document.getElementById('clearModal').classList.add('open'));
   document.getElementById('populateTestDataBtn')?.addEventListener('click', populateDebugTestData);
   initExportSplitControl();
+  initExportImagesAttachments();
   document.getElementById('openAnonymiseModal')?.addEventListener('click', openPseudoAnonymiseDialog);
   document.getElementById('openNormalStudyAutofillModal')?.addEventListener('click', openNormalStudyAutofillModal);
 
@@ -5605,8 +6424,8 @@ function applyPHTBasicChipDOM() {
 function syncPHTBasicAutoSelections() {
   const KEY_IVC = 'IVC >2cm';
   const KEY_RV = 'RV dilation';
-  const ivcMm = parseFloat(document.getElementById('f-ivcDiam')?.value);
-  if (!isNaN(ivcMm) && ivcMm > 20) selectedPHTBasic.add(KEY_IVC);
+  const ivcCm = parseFloat(document.getElementById('f-ivcDiam')?.value);
+  if (!isNaN(ivcCm) && ivcCm > 2.0) selectedPHTBasic.add(KEY_IVC);
   else selectedPHTBasic.delete(KEY_IVC);
 
   const vis = document.getElementById('f-rvVisualSize')?.value || '';
@@ -5985,6 +6804,8 @@ function refreshAnonymiseEntrypointButtons() {
 
 function openPseudoAnonymiseDialog() {
   if (isStudyPseudoAnonymised()) return;
+  const notice = document.getElementById('anonymiseImagesNotice');
+  if (notice) notice.hidden = !(typeof isExportImagesEnabled === 'function' && isExportImagesEnabled());
   document.getElementById('anonymiseModal')?.classList.add('open');
 }
 
@@ -6297,7 +7118,7 @@ function populateDebugTestData() {
   ['f-aortaArchDiam', 'f-aortaDescDiam', 'f-aortaAbdDiam'].forEach(id => setV(id, ''));
   ['f-aortaArchFlap', 'f-aortaArchFlow', 'f-aortaDescFlap', 'f-aortaDescFlow', 'f-aortaAbdFlap', 'f-aortaAbdFlow'].forEach(id => setV(id, ''));
 
-  setV('f-ivcDiam', '12');
+  setV('f-ivcDiam', '1.2');
   setV('f-ivcCollapse', '>50% collapse');
   setV('f-hepaticVein', 'S>D');
   setV('f-portalVein', '<0.3');
@@ -6406,6 +7227,60 @@ function isMachineTDIEnabled() {
   return !tdiEl || !!tdiEl.checked;
 }
 
+/** Disable + clear any non-FUSIC HD measurement toggle whose required machine
+ *  capability (PWD/CWD) is off. Also disables the matching section-master
+ *  toggle when none of its children are available. Returns nothing; mutates DOM
+ *  state so callers can follow up with the section's `refresh*` and master
+ *  sync helpers. */
+function applyNonfusicMeasureCapabilityGates() {
+  for (const id of Object.keys(NONFUSIC_MEASURE_CAP_REQS)) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    const row = el.closest('.toggle-row');
+    if (isNonfusicToggleAvailable(id)) {
+      el.disabled = false;
+      el.removeAttribute('title');
+      row?.classList.remove('toggle-row--disabled');
+    } else {
+      if (el.checked) el.checked = false;
+      el.disabled = true;
+      el.title = nonfusicCapTitleFor(id);
+      row?.classList.add('toggle-row--disabled');
+    }
+  }
+  /* Section masters: disable when no children are available in that section. */
+  const sections = [
+    { masterId: 'toggle-lv-measures-all',     ids: LV_MEASURES_CHILD_TOGGLE_IDS },
+    { masterId: 'toggle-haemodynamics-all',   ids: HAEMODYNAMICS_CHILD_TOGGLE_IDS },
+    { masterId: 'toggle-lap-measures-all',    ids: LAP_MEASURES_CHILD_TOGGLE_IDS },
+    { masterId: 'toggle-rh-measures-all',     ids: RH_MEASURES_CHILD_TOGGLE_IDS },
+    { masterId: 'toggle-valve-measures-all',  ids: VALVE_MEASURES_CHILD_TOGGLE_IDS }
+  ];
+  for (const { masterId, ids } of sections) {
+    const master = document.getElementById(masterId);
+    if (!master) continue;
+    const anyAvailable = availableNonfusicIds(ids).length > 0;
+    master.disabled = !anyAvailable;
+    if (!anyAvailable) master.title = 'All measurements in this section need machine capabilities that are currently off.';
+    else master.removeAttribute('title');
+  }
+  /* Global and Indexed masters: disable only if no non-FUSIC HD toggle is available. */
+  const anyAvailableGlobal = availableNonfusicIds(NONFUSIC_MEASURES_ALL_CHILD_TOGGLE_IDS).length > 0;
+  const globalMaster = document.getElementById('toggle-nonfusic-measures-all');
+  if (globalMaster) {
+    globalMaster.disabled = !anyAvailableGlobal;
+    if (!anyAvailableGlobal) globalMaster.title = 'No non-FUSIC HD measurements can be enabled with the current Machine capabilities.';
+    else globalMaster.removeAttribute('title');
+  }
+  const anyAvailableIndexed = NONFUSIC_INDEXED_MEASURES.some(m => isNonfusicToggleAvailable(m.id));
+  const indexedMaster = document.getElementById('toggle-nonfusic-indexed-measures');
+  if (indexedMaster) {
+    indexedMaster.disabled = !anyAvailableIndexed;
+    if (!anyAvailableIndexed) indexedMaster.title = 'No indexed measurements can be enabled with the current Machine capabilities.';
+    else indexedMaster.removeAttribute('title');
+  }
+}
+
 /** Short codes (CWD, PWD, TDI) for modalities turned off in Settings — same order as capability toggles. */
 function getDisabledMachineModalityShortCodes() {
   const out = [];
@@ -6443,16 +7318,18 @@ function setMachineCapWrapHidden(id, hidden) {
 function syncNonfusicMeasuresGlobalMasterToggle() {
   const master = document.getElementById('toggle-nonfusic-measures-all');
   if (!master || _syncingNonfusicMeasuresGlobalMaster) return;
-  master.checked = NONFUSIC_MEASURES_ALL_CHILD_TOGGLE_IDS.every(id => !!document.getElementById(id)?.checked);
+  const available = availableNonfusicIds(NONFUSIC_MEASURES_ALL_CHILD_TOGGLE_IDS);
+  master.checked = available.length > 0 && available.every(id => !!document.getElementById(id)?.checked);
 }
 
 function onNonfusicMeasuresGlobalMasterChange(ev) {
   if (_syncingNonfusicMeasuresGlobalMaster) return;
   _syncingNonfusicMeasuresGlobalMaster = true;
   const on = ev.target.checked;
-  NONFUSIC_MEASURES_ALL_CHILD_TOGGLE_IDS.forEach(id => {
+  const targets = on ? availableNonfusicIds(NONFUSIC_MEASURES_ALL_CHILD_TOGGLE_IDS) : NONFUSIC_MEASURES_ALL_CHILD_TOGGLE_IDS;
+  targets.forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.checked = on;
+    if (el && !el.disabled) el.checked = on;
   });
   _syncingNonfusicMeasuresGlobalMaster = false;
   syncLVMasterToggle();
@@ -6460,6 +7337,7 @@ function onNonfusicMeasuresGlobalMasterChange(ev) {
   syncLAPMasterToggle();
   syncRHMasterToggle();
   syncValveMasterToggle();
+  syncNonfusicIndexedMasterToggle();
   refreshLVMeasuresOptionalVisibility();
   refreshHaemodynamicsOptionalVisibility();
   refreshEAFieldVisibility();
@@ -6467,23 +7345,68 @@ function onNonfusicMeasuresGlobalMasterChange(ev) {
   refreshValveOptionalVisibility();
 }
 
+/** An indexed measure is "eligible" when (a) its required machine capability
+ *  is satisfied, and (b) its base prerequisite is satisfied (requiresId === null
+ *  for FUSIC HD core fields, or the referenced toggle is on). */
+function isNonfusicIndexedEligible(m) {
+  if (!isNonfusicToggleAvailable(m.id)) return false;
+  if (!m.requiresId) return true;
+  return !!document.getElementById(m.requiresId)?.checked;
+}
+
+/** Master toggle reflects state: checked iff at least one indexed measure is
+ *  eligible AND every eligible indexed measure is currently on. */
+function syncNonfusicIndexedMasterToggle() {
+  const master = document.getElementById('toggle-nonfusic-indexed-measures');
+  if (!master || _syncingNonfusicIndexedMaster) return;
+  const eligible = NONFUSIC_INDEXED_MEASURES.filter(isNonfusicIndexedEligible);
+  master.checked = eligible.length > 0 && eligible.every(m => !!document.getElementById(m.id)?.checked);
+}
+
+function onNonfusicIndexedMasterChange(ev) {
+  if (_syncingNonfusicIndexedMaster) return;
+  _syncingNonfusicIndexedMaster = true;
+  const on = ev.target.checked;
+  NONFUSIC_INDEXED_MEASURES.forEach(m => {
+    const el = document.getElementById(m.id);
+    if (!el) return;
+    if (on) {
+      /* Only switch on indexed toggles whose base prerequisite is satisfied.
+         Leave ineligible ones untouched so they don't appear in the report
+         without their base measurement. */
+      if (isNonfusicIndexedEligible(m)) el.checked = true;
+    } else {
+      el.checked = false;
+    }
+  });
+  _syncingNonfusicIndexedMaster = false;
+  syncLVMasterToggle();
+  syncHaemodynamicsMasterToggle();
+  syncNonfusicMeasuresGlobalMasterToggle();
+  refreshLVMeasuresOptionalVisibility();
+  refreshHaemodynamicsOptionalVisibility();
+}
+
 function syncRHMasterToggle() {
   const master = document.getElementById('toggle-rh-measures-all');
   if (!master) return;
-  master.checked = RH_MEASURES_CHILD_TOGGLE_IDS.every(id => !!document.getElementById(id)?.checked);
+  const available = availableNonfusicIds(RH_MEASURES_CHILD_TOGGLE_IDS);
+  master.checked = available.length > 0 && available.every(id => !!document.getElementById(id)?.checked);
 }
 
 function onRHMasterChange(ev) {
   if (_syncingRHMaster) return;
   _syncingRHMaster = true;
   const on = ev.target.checked;
-  RH_MEASURES_CHILD_TOGGLE_IDS.forEach(id => {
+  const targets = on ? availableNonfusicIds(RH_MEASURES_CHILD_TOGGLE_IDS) : RH_MEASURES_CHILD_TOGGLE_IDS;
+  targets.forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.checked = on;
+    if (el && !el.disabled) el.checked = on;
   });
   _syncingRHMaster = false;
   refreshRightHeartOptionalVisibility();
   syncNonfusicMeasuresGlobalMasterToggle();
+  syncNonfusicIndexedMasterToggle();
 }
 
 function onRHMeasuresChildToggleChange() {
@@ -6491,6 +7414,7 @@ function onRHMeasuresChildToggleChange() {
   syncRHMasterToggle();
   refreshRightHeartOptionalVisibility();
   syncNonfusicMeasuresGlobalMasterToggle();
+  syncNonfusicIndexedMasterToggle();
 }
 
 function refreshRightHeartOptionalVisibility() {
@@ -6512,20 +7436,23 @@ function refreshPASPGatedVisibility() {
 function syncLAPMasterToggle() {
   const master = document.getElementById('toggle-lap-measures-all');
   if (!master) return;
-  master.checked = LAP_MEASURES_CHILD_TOGGLE_IDS.every(id => !!document.getElementById(id)?.checked);
+  const available = availableNonfusicIds(LAP_MEASURES_CHILD_TOGGLE_IDS);
+  master.checked = available.length > 0 && available.every(id => !!document.getElementById(id)?.checked);
 }
 
 function onLAPMasterChange(ev) {
   if (_syncingLAPMaster) return;
   _syncingLAPMaster = true;
   const on = ev.target.checked;
-  LAP_MEASURES_CHILD_TOGGLE_IDS.forEach(id => {
+  const targets = on ? availableNonfusicIds(LAP_MEASURES_CHILD_TOGGLE_IDS) : LAP_MEASURES_CHILD_TOGGLE_IDS;
+  targets.forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.checked = on;
+    if (el && !el.disabled) el.checked = on;
   });
   _syncingLAPMaster = false;
   refreshEAFieldVisibility();
   syncNonfusicMeasuresGlobalMasterToggle();
+  syncNonfusicIndexedMasterToggle();
 }
 
 function onLAPMeasuresChildToggleChange() {
@@ -6533,6 +7460,7 @@ function onLAPMeasuresChildToggleChange() {
   syncLAPMasterToggle();
   refreshEAFieldVisibility();
   syncNonfusicMeasuresGlobalMasterToggle();
+  syncNonfusicIndexedMasterToggle();
 }
 
 function refreshEAFieldVisibility() {
@@ -6546,20 +7474,23 @@ function refreshEAFieldVisibility() {
 function syncLVMasterToggle() {
   const master = document.getElementById('toggle-lv-measures-all');
   if (!master) return;
-  master.checked = LV_MEASURES_CHILD_TOGGLE_IDS.every(id => !!document.getElementById(id)?.checked);
+  const available = availableNonfusicIds(LV_MEASURES_CHILD_TOGGLE_IDS);
+  master.checked = available.length > 0 && available.every(id => !!document.getElementById(id)?.checked);
 }
 
 function onLVMasterChange(ev) {
   if (_syncingLVMaster) return;
   _syncingLVMaster = true;
   const on = ev.target.checked;
-  LV_MEASURES_CHILD_TOGGLE_IDS.forEach(id => {
+  const targets = on ? availableNonfusicIds(LV_MEASURES_CHILD_TOGGLE_IDS) : LV_MEASURES_CHILD_TOGGLE_IDS;
+  targets.forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.checked = on;
+    if (el && !el.disabled) el.checked = on;
   });
   _syncingLVMaster = false;
   refreshLVMeasuresOptionalVisibility();
   syncNonfusicMeasuresGlobalMasterToggle();
+  syncNonfusicIndexedMasterToggle();
 }
 
 function onLVMeasuresChildToggleChange() {
@@ -6567,6 +7498,7 @@ function onLVMeasuresChildToggleChange() {
   syncLVMasterToggle();
   refreshLVMeasuresOptionalVisibility();
   syncNonfusicMeasuresGlobalMasterToggle();
+  syncNonfusicIndexedMasterToggle();
 }
 
 function refreshLVMeasuresOptionalVisibility() {
@@ -6594,20 +7526,23 @@ function refreshLVFractionalShorteningVisibility() {
 function syncValveMasterToggle() {
   const master = document.getElementById('toggle-valve-measures-all');
   if (!master) return;
-  master.checked = VALVE_MEASURES_CHILD_TOGGLE_IDS.every(id => !!document.getElementById(id)?.checked);
+  const available = availableNonfusicIds(VALVE_MEASURES_CHILD_TOGGLE_IDS);
+  master.checked = available.length > 0 && available.every(id => !!document.getElementById(id)?.checked);
 }
 
 function onValveMasterChange(ev) {
   if (_syncingValveMaster) return;
   _syncingValveMaster = true;
   const on = ev.target.checked;
-  VALVE_MEASURES_CHILD_TOGGLE_IDS.forEach(id => {
+  const targets = on ? availableNonfusicIds(VALVE_MEASURES_CHILD_TOGGLE_IDS) : VALVE_MEASURES_CHILD_TOGGLE_IDS;
+  targets.forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.checked = on;
+    if (el && !el.disabled) el.checked = on;
   });
   _syncingValveMaster = false;
   refreshValveOptionalVisibility();
   syncNonfusicMeasuresGlobalMasterToggle();
+  syncNonfusicIndexedMasterToggle();
 }
 
 function onValveMeasuresChildToggleChange() {
@@ -6615,6 +7550,7 @@ function onValveMeasuresChildToggleChange() {
   syncValveMasterToggle();
   refreshValveOptionalVisibility();
   syncNonfusicMeasuresGlobalMasterToggle();
+  syncNonfusicIndexedMasterToggle();
 }
 
 function refreshValveOptionalVisibility() {
@@ -6644,20 +7580,23 @@ function clearCardiacIndexValidationUI() {
 function syncHaemodynamicsMasterToggle() {
   const master = document.getElementById('toggle-haemodynamics-all');
   if (!master) return;
-  master.checked = HAEMODYNAMICS_CHILD_TOGGLE_IDS.every(id => !!document.getElementById(id)?.checked);
+  const available = availableNonfusicIds(HAEMODYNAMICS_CHILD_TOGGLE_IDS);
+  master.checked = available.length > 0 && available.every(id => !!document.getElementById(id)?.checked);
 }
 
 function onHaemodynamicsMasterChange(ev) {
   if (_syncingHaemodynamicsMaster) return;
   _syncingHaemodynamicsMaster = true;
   const on = ev.target.checked;
-  HAEMODYNAMICS_CHILD_TOGGLE_IDS.forEach(id => {
+  const targets = on ? availableNonfusicIds(HAEMODYNAMICS_CHILD_TOGGLE_IDS) : HAEMODYNAMICS_CHILD_TOGGLE_IDS;
+  targets.forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.checked = on;
+    if (el && !el.disabled) el.checked = on;
   });
   _syncingHaemodynamicsMaster = false;
   refreshHaemodynamicsOptionalVisibility();
   syncNonfusicMeasuresGlobalMasterToggle();
+  syncNonfusicIndexedMasterToggle();
 }
 
 function onHaemodynamicsChildToggleChange() {
@@ -6665,6 +7604,7 @@ function onHaemodynamicsChildToggleChange() {
   syncHaemodynamicsMasterToggle();
   refreshHaemodynamicsOptionalVisibility();
   syncNonfusicMeasuresGlobalMasterToggle();
+  syncNonfusicIndexedMasterToggle();
 }
 
 function refreshHaemodynamicsOptionalVisibility() {
@@ -6724,11 +7664,19 @@ function refreshMachineCapabilityFields() {
   setMachineCapWrapHidden('mc-di-wrap', !cwd || !pwd);
   setMachineCapWrapHidden('mc-cwd-trvmax-valve-wrap', !cwd);
   setMachineCapWrapHidden('mc-pwd-veins-wrap', !pwd);
+  applyNonfusicMeasureCapabilityGates();
   refreshRightHeartOptionalVisibility();
   refreshEAFieldVisibility();
   refreshLVMeasuresOptionalVisibility();
   refreshHaemodynamicsOptionalVisibility();
   refreshValveOptionalVisibility();
+  syncLVMasterToggle();
+  syncHaemodynamicsMasterToggle();
+  syncLAPMasterToggle();
+  syncRHMasterToggle();
+  syncValveMasterToggle();
+  syncNonfusicMeasuresGlobalMasterToggle();
+  syncNonfusicIndexedMasterToggle();
   buildLVOTOChips();
   buildTamponadeChips();
   buildPHTAdvancedChips();
@@ -7049,7 +7997,7 @@ const UNUSUAL_PLAUSIBILITY_RULES = {
   'f-avVTI': v => !isNaN(v) && (v < 4 || v > 60),
   'f-aortaRootDiam': v => !isNaN(v) && (v < 15 || v > 90),
   'f-aortaAscDiam': v => !isNaN(v) && (v < 15 || v > 90),
-  'f-ivcDiam': v => !isNaN(v) && (v < 3 || v > 45),
+  'f-ivcDiam': v => !isNaN(v) && (v < 0.3 || v > 4.5),
   'f-vtiDeltaResp': v => !isNaN(v) && v > 100,
   'f-vtiDeltaIntervention': v => !isNaN(v) && v > 100,
   'f-laArea': v => !isNaN(v) && (v < 5 || v > 60),
@@ -7893,7 +8841,7 @@ function getSVRICalc() {
   return '';
 }
 
-/** Devereux LV mass (g) from LVIDd, IVSd, LVPWd in mm; NaN if insufficient. */
+/** Devereux LV mass (g) from LVIDd, IVSd, LVPWd in mm; NaN if insufficient. ASE-corrected: 0.8 × 1.04 × (sum³ − LVIDd³) + 0.6 with dimensions in cm. */
 function getLVMassFromDimensionsGrams() {
   const lvidDmm = parseFloat(document.getElementById('f-lvidd')?.value);
   const ivsdMm = parseFloat(document.getElementById('f-ivsd')?.value);
@@ -7903,7 +8851,7 @@ function getLVMassFromDimensionsGrams() {
   const ivs = ivsdMm / 10;
   const pw = lvpwdMm / 10;
   const sum = d + ivs + pw;
-  return 0.8 * (1.04 * (sum * sum * sum) - d * d * d) + 0.6;
+  return 0.8 * 1.04 * (sum * sum * sum - d * d * d) + 0.6;
 }
 
 function getLVMassGramsForLVMI() {
@@ -8122,22 +9070,22 @@ function initTRVmaxMirror() {
   recalcPASPCVP();
 }
 
-/** IVC table: diameter mm (2.1 cm = 21, 2.5 cm = 25); mean RAP midpoints for PASP. */
+/** IVC table: diameter in cm (same breakpoints as former mm table: 2.1 cm, 2.5 cm); mean RAP midpoints for PASP. */
 function getIVCEstimatedRAP() {
-  const dMm = parseFloat(document.getElementById('f-ivcDiam')?.value);
+  const dCm = parseFloat(document.getElementById('f-ivcDiam')?.value);
   const coll = (document.getElementById('f-ivcCollapse')?.value || '').trim();
   if (!coll || coll === 'Not assessed') return null;
-  if (isNaN(dMm) || dMm <= 0) return null;
+  if (isNaN(dCm) || dCm <= 0) return null;
 
   const good = coll === '>50% collapse';
   const poor = coll === '<50% collapse' || coll === 'Fixed dilated';
 
-  if (good && dMm < 21) return { mid: 2.5, band: '0–5' };
-  if (good && dMm <= 21) return { mid: 7.5, band: '5–10' };
+  if (good && dCm < 2.1) return { mid: 2.5, band: '0–5' };
+  if (good && dCm <= 2.1) return { mid: 7.5, band: '5–10' };
 
-  if (poor && dMm > 25) return { mid: 17.5, band: '>15' };
-  if (poor && dMm > 21) return { mid: 12.5, band: '10–15' };
-  if (poor && dMm <= 21) return { mid: 7.5, band: '5–10' };
+  if (poor && dCm > 2.5) return { mid: 17.5, band: '>15' };
+  if (poor && dCm > 2.1) return { mid: 12.5, band: '10–15' };
+  if (poor && dCm <= 2.1) return { mid: 7.5, band: '5–10' };
 
   return null;
 }
@@ -8168,7 +9116,7 @@ function recalcPASPCVP() {
   }
   const ctx = computePASPContext();
   if (!ctx) {
-    el.innerHTML = '<span class="calc-empty">Enter CVP (Section 1) or IVC diameter + collapsibility (Veins)</span>';
+    el.innerHTML = '<span class="calc-empty">Enter CVP (Section 1) or IVC diameter (cm) + collapsibility (Veins)</span>';
     recalcRightHeartDerivedRatios();
     return;
   }
@@ -8176,7 +9124,7 @@ function recalcPASPCVP() {
   if (ctx.mode === 'cvp') {
     el.innerHTML = `PASP: <span class="calc-val">${val} mmHg</span><div class="pasp-estimate-note">RAP = <strong>measured CVP</strong> (Section 1, mmHg).</div>`;
   } else {
-    el.innerHTML = `PASP: <span class="calc-val">${val} mmHg</span><div class="pasp-estimate-note"><strong>Estimation:</strong> CVP not entered. Mean RAP for this tool is taken as <strong>${ctx.rapMid} mmHg</strong> (IVC table category ~${ctx.rapBand} mmHg: diameter vs collapsibility). This is <strong>not</strong> a measured CVP — use with caution.</div>`;
+    el.innerHTML = `PASP: <span class="calc-val">${val} mmHg</span><div class="pasp-estimate-note"><strong>Estimation:</strong> CVP not entered. Mean RAP for this tool is taken as <strong>${ctx.rapMid} mmHg</strong> (IVC table category ~${ctx.rapBand} mmHg: IVC diameter in cm vs collapsibility). This is <strong>not</strong> a measured CVP — use with caution.</div>`;
   }
   recalcRightHeartDerivedRatios();
 }
@@ -8555,19 +9503,19 @@ function updateVeinHint(selectId, hintId) {
 }
 
 function recalcVeXUS() {
-  const ivcMM = parseFloat(document.getElementById('f-ivcDiam')?.value);
+  const ivcCm = parseFloat(document.getElementById('f-ivcDiam')?.value);
   const el = document.getElementById('vexus-display');
   if (!el) return;
 
-  if (isNaN(ivcMM) || ivcMM <= 0) {
+  if (isNaN(ivcCm) || ivcCm <= 0) {
     el.className = 'lv-interp empty';
     el.textContent = 'Enter IVC diameter and vein assessments above';
     return;
   }
 
-  if (ivcMM < 20) {
+  if (ivcCm < 2.0) {
     el.className = 'lv-interp normal';
-    el.innerHTML = '<span class="interp-icon">✓</span><span class="interp-label">VeXUS Grade 0</span><span class="interp-ref">IVC &lt;20 mm</span>';
+    el.innerHTML = '<span class="interp-icon">✓</span><span class="interp-label">VeXUS Grade 0</span><span class="interp-ref">IVC &lt;2.0 cm</span>';
     return;
   }
 
@@ -8583,13 +9531,13 @@ function recalcVeXUS() {
   let grade, cls, icon, desc;
   if (severeCount > 1) {
     grade = 3; cls = 'severe'; icon = '⛔';
-    desc = 'IVC ≥20 mm + severe abnormalities in >1 vessel';
+    desc = 'IVC ≥2.0 cm + severe abnormalities in >1 vessel';
   } else if (severeCount === 1) {
     grade = 2; cls = 'orange'; icon = '⚠';
-    desc = 'IVC ≥20 mm + severe abnormalities in 1 vessel';
+    desc = 'IVC ≥2.0 cm + severe abnormalities in 1 vessel';
   } else {
     grade = 1; cls = 'dilated'; icon = '⚠';
-    desc = 'IVC ≥20 mm + no or mild abnormalities';
+    desc = 'IVC ≥2.0 cm + no or mild abnormalities';
   }
 
   el.className = `lv-interp ${cls}`;
@@ -8839,6 +9787,7 @@ function applySettingsTogglesFromDraft(st) {
   syncRHMasterToggle();
   syncLAPMasterToggle();
   syncNonfusicMeasuresGlobalMasterToggle();
+  syncNonfusicIndexedMasterToggle();
 }
 
 function applySessionDraftPayload(d) {
@@ -9054,6 +10003,7 @@ function confirmClear() {
   updateLeftLungPESubVisibility();
   updateRightLungPESubVisibility();
   clearAllAutoCalcManualFlags();
+  clearAttachedExportImages();
   document.getElementById('ee-single-eprime-warn')?.classList.remove('show');
   document.getElementById('trvmax-rv-warn')?.classList.remove('show');
   const phRiskEl = document.getElementById('trvmax-ph-risk-display');
@@ -9061,7 +10011,7 @@ function confirmClear() {
   const lapIntEl = document.getElementById('lap-interp-display');
   if (lapIntEl) { lapIntEl.className = 'lv-interp empty'; lapIntEl.innerHTML = '<span class="calc-empty">Enter relevant fields above when available</span>'; }
   const paspCvpEl = document.getElementById('pasp-cvp-display');
-  if (paspCvpEl) paspCvpEl.innerHTML = '<span class="calc-empty">Enter TR Vmax, then CVP (Section 1) or IVC + collapsibility (Veins)</span>';
+  if (paspCvpEl) paspCvpEl.innerHTML = '<span class="calc-empty">Enter TR Vmax, then CVP (Section 1) or IVC diameter (cm) + collapsibility (Veins)</span>';
   const aw = document.getElementById('age-warn'); if (aw) aw.classList.remove('show');
   const ageEl = document.getElementById('f-age'); if (ageEl) ageEl.classList.remove('soft-red');
   const scanDateEl = document.getElementById('f-scanDate');
@@ -9343,7 +10293,7 @@ function getIVCExportCombined() {
   const dRaw = getVal('f-ivcDiam').trim();
   const coll = getVal('f-ivcCollapse').trim();
   const dNum = parseFloat(dRaw);
-  const dCore = dRaw !== '' && !isNaN(dNum) ? `${dNum}mm` : (dRaw ? `${dRaw}mm` : '');
+  const dCore = dRaw !== '' && !isNaN(dNum) ? `${dNum} cm` : (dRaw ? dRaw : '');
   if (!dCore && !coll) return '';
   if (!dCore) return `collapsibility: ${coll}`;
   if (!coll || coll === 'Not assessed') return `diameter: ${dCore}`;
@@ -9420,6 +10370,7 @@ function getNow() {
 function openExportModal() {
   closeExportDropdown();
   refreshAnonymiseEntrypointButtons();
+  updateExportImagesUIVisibility();
   document.getElementById('exportModal')?.classList.add('open');
 }
 
@@ -9521,6 +10472,431 @@ async function plainTextReportCopyFromView() {
   }
 }
 
+// ─── EXPORT: PDF HEADER LOGO (cached for offline) ─────
+let __fhdLogoDataUrl = '';
+async function preloadFhdLogo() {
+  try {
+    const r = await fetch('./FHD.jpg', { cache: 'force-cache' });
+    if (!r.ok) return;
+    const blob = await r.blob();
+    __fhdLogoDataUrl = await new Promise((res, rej) => {
+      const fr = new FileReader();
+      fr.onload = () => res(fr.result);
+      fr.onerror = () => rej(fr.error);
+      fr.readAsDataURL(blob);
+    });
+  } catch (_) {}
+}
+document.addEventListener('DOMContentLoaded', preloadFhdLogo);
+
+function isExportPdfLogoEnabled() {
+  const el = document.getElementById('toggle-export-pdf-logo');
+  if (!el) return true;
+  return !!el.checked;
+}
+
+// ─── EXPORT: ATTACHED IMAGES (PDF ONLY) ────────────────
+const EXPORT_IMAGE_MAX_BYTES = 8 * 1024 * 1024;
+const EXPORT_IMAGE_ACCEPTED_MIME = new Set(['image/png', 'image/jpeg', 'image/jpg', 'image/gif']);
+const EXPORT_IMAGES_PII_ACK_STORAGE_KEY = 'fusic_hd_export_images_pii_ack';
+
+function readExportImagesPiiAcknowledgedFromStorage() {
+  try {
+    return localStorage.getItem(EXPORT_IMAGES_PII_ACK_STORAGE_KEY) === '1';
+  } catch (_) {
+    return false;
+  }
+}
+
+function persistExportImagesPiiAcknowledged() {
+  try {
+    localStorage.setItem(EXPORT_IMAGES_PII_ACK_STORAGE_KEY, '1');
+  } catch (_) {}
+}
+
+let attachedExportImages = [];
+let exportImagesPiiAcknowledged = readExportImagesPiiAcknowledgedFromStorage();
+let _exportImagesPiiPendingAction = null;
+let _exportImagesDragId = null;
+let exportImagesPerPage = 'auto';
+
+function formatFileSize(bytes) {
+  if (!Number.isFinite(bytes) || bytes <= 0) return '';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function isExportImagesEnabled() {
+  return !!document.getElementById('export-include-images')?.checked;
+}
+
+function updateExportImagesUIVisibility() {
+  const enabled = isExportImagesEnabled();
+  const btn = document.getElementById('exportSelectImagesBtn');
+  if (btn) btn.hidden = !enabled;
+  const anonImgNotice = document.getElementById('anonymiseImagesNotice');
+  if (anonImgNotice) anonImgNotice.hidden = !enabled;
+  updateExportImagesStatusLine();
+}
+
+function refreshExportImagesAttachedBadges() {
+  const on = isExportImagesEnabled() && attachedExportImages.length > 0;
+  document.querySelectorAll('.export-attached-img-badge').forEach(el => {
+    el.classList.toggle('is-on', on);
+  });
+}
+
+function updateExportImagesStatusLine() {
+  const status = document.getElementById('exportImagesStatus');
+  const enabled = isExportImagesEnabled();
+  const n = attachedExportImages.length;
+  if (status) {
+    if (!enabled) {
+      status.hidden = true;
+      status.textContent = '';
+    } else if (n === 0) {
+      status.hidden = false;
+      status.textContent = 'No images attached yet — open the picker to add some.';
+    } else {
+      status.hidden = false;
+      status.textContent = `${n} image${n === 1 ? '' : 's'} attached.`;
+    }
+  }
+  refreshExportImagesAttachedBadges();
+}
+
+function openExportImagesFlow() {
+  if (!exportImagesPiiAcknowledged) {
+    _exportImagesPiiPendingAction = openExportImagesModal;
+    openExportImagesPiiWarn();
+    return;
+  }
+  openExportImagesModal();
+}
+
+function openExportImagesPiiWarn() {
+  const m = document.getElementById('exportImagesPiiWarnModal');
+  if (!m) return;
+  m.classList.add('open');
+  m.setAttribute('aria-hidden', 'false');
+}
+
+function closeExportImagesPiiWarn() {
+  const m = document.getElementById('exportImagesPiiWarnModal');
+  if (!m) return;
+  m.classList.remove('open');
+  m.setAttribute('aria-hidden', 'true');
+  _exportImagesPiiPendingAction = null;
+}
+
+function acknowledgeExportImagesPii() {
+  exportImagesPiiAcknowledged = true;
+  persistExportImagesPiiAcknowledged();
+  const next = _exportImagesPiiPendingAction;
+  const m = document.getElementById('exportImagesPiiWarnModal');
+  if (m) {
+    m.classList.remove('open');
+    m.setAttribute('aria-hidden', 'true');
+  }
+  _exportImagesPiiPendingAction = null;
+  if (typeof next === 'function') next();
+}
+
+function openExportImagesModal() {
+  const m = document.getElementById('exportImagesModal');
+  if (!m) return;
+  renderExportImagesList();
+  m.classList.add('open');
+  m.setAttribute('aria-hidden', 'false');
+}
+
+function closeExportImagesModal() {
+  const m = document.getElementById('exportImagesModal');
+  if (!m) return;
+  m.classList.remove('open');
+  m.setAttribute('aria-hidden', 'true');
+  updateExportImagesStatusLine();
+}
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(fr.result);
+    fr.onerror = () => reject(fr.error || new Error('Read failed'));
+    fr.readAsDataURL(file);
+  });
+}
+
+function probeImageDimensions(dataUrl) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve({ w: img.naturalWidth || 0, h: img.naturalHeight || 0 });
+    img.onerror = () => resolve({ w: 0, h: 0 });
+    img.src = dataUrl;
+  });
+}
+
+function classifyImageOrientation(w, h) {
+  if (!w || !h) return 'landscape';
+  const r = h / w;
+  if (r >= 1.25) return 'portrait';
+  if (r <= 0.85) return 'landscape';
+  return 'square';
+}
+
+async function addExportImageFiles(fileList) {
+  const files = Array.from(fileList || []);
+  if (!files.length) return;
+  let rejectedType = 0;
+  let rejectedSize = 0;
+  let added = 0;
+  for (const f of files) {
+    const mime = (f.type || '').toLowerCase();
+    if (!EXPORT_IMAGE_ACCEPTED_MIME.has(mime)) { rejectedType++; continue; }
+    if (f.size > EXPORT_IMAGE_MAX_BYTES) { rejectedSize++; continue; }
+    try {
+      const dataUrl = await readFileAsDataURL(f);
+      const dims = await probeImageDimensions(dataUrl);
+      attachedExportImages.push({
+        id: `img-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        name: f.name || 'image',
+        size: f.size,
+        mime,
+        dataUrl,
+        annotation: '',
+        width: dims.w,
+        height: dims.h,
+        orientation: classifyImageOrientation(dims.w, dims.h)
+      });
+      added++;
+    } catch (_) {
+      rejectedType++;
+    }
+  }
+  renderExportImagesList();
+  updateExportImagesStatusLine();
+  if (rejectedType || rejectedSize) {
+    const msgs = [];
+    if (rejectedType) msgs.push(`${rejectedType} skipped (only PNG, JPEG, GIF)`);
+    if (rejectedSize) msgs.push(`${rejectedSize} skipped (over 8 MB)`);
+    showToast(msgs.join(' — '), 'warn');
+  } else if (added) {
+    showToast(`${added} image${added === 1 ? '' : 's'} attached`, 'success');
+  }
+}
+
+function removeExportImage(id) {
+  attachedExportImages = attachedExportImages.filter(it => it.id !== id);
+  renderExportImagesList();
+  updateExportImagesStatusLine();
+}
+
+function moveExportImage(id, delta) {
+  const idx = attachedExportImages.findIndex(it => it.id === id);
+  if (idx < 0) return;
+  const target = idx + delta;
+  if (target < 0 || target >= attachedExportImages.length) return;
+  const [item] = attachedExportImages.splice(idx, 1);
+  attachedExportImages.splice(target, 0, item);
+  renderExportImagesList();
+}
+
+function renderExportImagesList() {
+  const list = document.getElementById('exportImagesList');
+  const empty = document.getElementById('exportImagesEmpty');
+  if (!list) return;
+  list.innerHTML = '';
+  if (empty) empty.hidden = attachedExportImages.length > 0;
+  const esc = (typeof escapeHtml === 'function') ? escapeHtml : s => String(s);
+  attachedExportImages.forEach((it, i) => {
+    const li = document.createElement('li');
+    li.className = 'export-images-row';
+    li.dataset.id = it.id;
+    li.draggable = true;
+    li.innerHTML = `
+      <div class="export-images-row-handle" aria-label="Reorder">
+        <button type="button" class="export-images-row-handle-btn" data-act="up" aria-label="Move up"${i === 0 ? ' disabled' : ''}>▲</button>
+        <span class="export-images-row-handle-dots" aria-hidden="true">⋮⋮</span>
+        <button type="button" class="export-images-row-handle-btn" data-act="down" aria-label="Move down"${i === attachedExportImages.length - 1 ? ' disabled' : ''}>▼</button>
+      </div>
+      <img class="export-images-row-thumb" src="${esc(it.dataUrl)}" alt="">
+      <div class="export-images-row-name">
+        ${esc(it.name)}
+        <span class="export-images-row-name-meta">${esc(formatFileSize(it.size) || '')}${it.size ? ' · ' : ''}Position ${i + 1} of ${attachedExportImages.length}</span>
+      </div>
+      <div class="export-images-row-actions">
+        <button type="button" class="export-images-row-del" data-act="del" aria-label="Remove image">Remove</button>
+      </div>
+      <textarea class="export-images-row-anno" data-act="anno" placeholder="Annotation (optional)" rows="1" aria-label="Annotation for ${esc(it.name)}">${esc(it.annotation || '')}</textarea>
+    `;
+    list.appendChild(li);
+  });
+}
+
+function onExportImagesListClick(e) {
+  const btn = e.target.closest('button[data-act]');
+  if (!btn) return;
+  const row = btn.closest('.export-images-row');
+  if (!row) return;
+  const id = row.dataset.id;
+  const act = btn.dataset.act;
+  if (act === 'del') removeExportImage(id);
+  else if (act === 'up') moveExportImage(id, -1);
+  else if (act === 'down') moveExportImage(id, 1);
+}
+
+function onExportImagesListInput(e) {
+  const ta = e.target.closest('textarea[data-act="anno"]');
+  if (!ta) return;
+  const row = ta.closest('.export-images-row');
+  if (!row) return;
+  const it = attachedExportImages.find(x => x.id === row.dataset.id);
+  if (it) it.annotation = ta.value;
+}
+
+function onExportImagesRowDragStart(e) {
+  const row = e.target.closest('.export-images-row');
+  if (!row) return;
+  if (e.target.closest('textarea, button')) { e.preventDefault(); return; }
+  _exportImagesDragId = row.dataset.id;
+  row.classList.add('dragging');
+  if (e.dataTransfer) {
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', row.dataset.id); } catch (_) {}
+  }
+}
+
+function onExportImagesRowDragOver(e) {
+  const row = e.target.closest('.export-images-row');
+  if (!row || !_exportImagesDragId || row.dataset.id === _exportImagesDragId) return;
+  e.preventDefault();
+  document.querySelectorAll('.export-images-row.drop-target').forEach(el => {
+    if (el !== row) el.classList.remove('drop-target');
+  });
+  row.classList.add('drop-target');
+}
+
+function onExportImagesRowDrop(e) {
+  const row = e.target.closest('.export-images-row');
+  if (!row || !_exportImagesDragId) return;
+  e.preventDefault();
+  const fromId = _exportImagesDragId;
+  const toId = row.dataset.id;
+  if (fromId && toId && fromId !== toId) {
+    const from = attachedExportImages.findIndex(x => x.id === fromId);
+    const to = attachedExportImages.findIndex(x => x.id === toId);
+    if (from >= 0 && to >= 0) {
+      const [item] = attachedExportImages.splice(from, 1);
+      attachedExportImages.splice(to, 0, item);
+      renderExportImagesList();
+    }
+  }
+}
+
+function onExportImagesRowDragEnd() {
+  _exportImagesDragId = null;
+  document.querySelectorAll('.export-images-row').forEach(el => {
+    el.classList.remove('dragging');
+    el.classList.remove('drop-target');
+  });
+}
+
+function initExportImagesAttachments() {
+  const toggle = document.getElementById('export-include-images');
+  toggle?.addEventListener('change', () => {
+    updateExportImagesUIVisibility();
+  });
+  document.getElementById('exportSelectImagesBtn')?.addEventListener('click', openExportImagesFlow);
+  document.getElementById('exportImagesPiiContinueBtn')?.addEventListener('click', acknowledgeExportImagesPii);
+
+  const perPageSel = document.getElementById('exportImagesPerPage');
+  if (perPageSel) {
+    perPageSel.value = exportImagesPerPage;
+    perPageSel.addEventListener('change', () => {
+      const v = perPageSel.value;
+      exportImagesPerPage = (v === '1' || v === '2' || v === '3' || v === '4') ? v : 'auto';
+    });
+  }
+
+  const fileInput = document.getElementById('exportImagesFileInput');
+  fileInput?.addEventListener('change', e => {
+    void addExportImageFiles(e.target.files);
+    e.target.value = '';
+  });
+
+  const drop = document.getElementById('exportImagesDropzone');
+  if (drop) {
+    ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => {
+      e.preventDefault();
+      drop.classList.add('dragover');
+    }));
+    ['dragleave', 'dragend', 'drop'].forEach(ev => drop.addEventListener(ev, e => {
+      if (ev === 'dragleave' && e.target !== drop) return;
+      drop.classList.remove('dragover');
+    }));
+    drop.addEventListener('drop', e => {
+      e.preventDefault();
+      if (e.dataTransfer?.files?.length) void addExportImageFiles(e.dataTransfer.files);
+    });
+  }
+
+  const list = document.getElementById('exportImagesList');
+  if (list) {
+    list.addEventListener('click', onExportImagesListClick);
+    list.addEventListener('input', onExportImagesListInput);
+    list.addEventListener('dragstart', onExportImagesRowDragStart);
+    list.addEventListener('dragover', onExportImagesRowDragOver);
+    list.addEventListener('drop', onExportImagesRowDrop);
+    list.addEventListener('dragend', onExportImagesRowDragEnd);
+  }
+
+  updateExportImagesUIVisibility();
+}
+
+function clearAttachedExportImages() {
+  attachedExportImages = [];
+  exportImagesPerPage = 'auto';
+  const toggle = document.getElementById('export-include-images');
+  if (toggle) toggle.checked = false;
+  const perPageSel = document.getElementById('exportImagesPerPage');
+  if (perPageSel) perPageSel.value = 'auto';
+  updateExportImagesUIVisibility();
+  renderExportImagesList();
+}
+
+function buildAttachedImagesHTML() {
+  if (!isExportImagesEnabled() || !attachedExportImages.length) return '';
+  const esc = escapeHtml;
+  const n = Number(exportImagesPerPage);
+  const perPageClass = (n >= 1 && n <= 4) ? ` print-image-grid--per-page-${n}` : '';
+  const parts = ['<section class="print-image-attachments" aria-label="Attached images">'];
+  parts.push('<h2 class="print-image-attachments-title">Attached images</h2>');
+  parts.push(`<div class="print-image-grid${perPageClass}">`);
+  for (const it of attachedExportImages) {
+    const orient = it.orientation || classifyImageOrientation(it.width, it.height);
+    parts.push(`<figure class="print-image-figure print-image-figure--${esc(orient)}">`);
+    parts.push(`<img src="${esc(it.dataUrl)}" alt="${esc(it.annotation || '')}">`);
+    const cap = (it.annotation || '').trim();
+    if (cap) {
+      parts.push(`<figcaption>${esc(cap)}</figcaption>`);
+    }
+    parts.push('</figure>');
+  }
+  parts.push('</div>');
+  parts.push('</section>');
+  return parts.join('');
+}
+
+function appendAttachedImagesToPrintMount() {
+  const mount = document.getElementById('printReportMount');
+  if (!mount) return;
+  const html = buildAttachedImagesHTML();
+  if (!html) return;
+  const inner = mount.querySelector('.print-report-inner, .edec-print-inner') || mount;
+  inner.insertAdjacentHTML('beforeend', html);
+}
+
 function initExportSplitControl() {
   document.getElementById('exportBtn')?.addEventListener('click', openExportModal);
   document.getElementById('exportOpenAnonymiseModal')?.addEventListener('click', openPseudoAnonymiseDialog);
@@ -9561,6 +10937,14 @@ function initExportSplitControl() {
     }
     if (document.getElementById('anonymiseModal')?.classList.contains('open')) {
       closeAnonymiseModal();
+      return;
+    }
+    if (document.getElementById('exportImagesPiiWarnModal')?.classList.contains('open')) {
+      closeExportImagesPiiWarn();
+      return;
+    }
+    if (document.getElementById('exportImagesModal')?.classList.contains('open')) {
+      closeExportImagesModal();
       return;
     }
     if (document.getElementById('exportModal')?.classList.contains('open')) closeExportModal();
@@ -10013,15 +11397,15 @@ function buildExportRows() {
         const renVal = getVal('f-renalVein');
         const renHint = {'Continuous':'Normal','Biphasic':'Mildly abnormal','Monophasic':'Severely abnormal'}[renVal] || '';
         row('Renal Interlobar Vein', renVal ? `${renVal} (${renHint})` : '');
-        const ivcMM = parseFloat(getVal('f-ivcDiam'));
-        if (!isNaN(ivcMM) && ivcMM > 0) {
+        const ivcCm = parseFloat(getVal('f-ivcDiam'));
+        if (!isNaN(ivcCm) && ivcCm > 0) {
           let vGrade, vDesc;
-          if (ivcMM < 20) { vGrade = 0; vDesc = 'IVC <20 mm'; }
+          if (ivcCm < 2.0) { vGrade = 0; vDesc = 'IVC <2.0 cm'; }
           else {
             const sc = (hepVal==='S reversal / D only'?1:0) + (porVal==='>0.5'?1:0) + (renVal==='Monophasic'?1:0);
-            if (sc > 1) { vGrade = 3; vDesc = 'IVC ≥20 mm + severe abnormalities in >1 vessel'; }
-            else if (sc === 1) { vGrade = 2; vDesc = 'IVC ≥20 mm + severe abnormalities in 1 vessel'; }
-            else { vGrade = 1; vDesc = 'IVC ≥20 mm + no or mild abnormalities'; }
+            if (sc > 1) { vGrade = 3; vDesc = 'IVC ≥2.0 cm + severe abnormalities in >1 vessel'; }
+            else if (sc === 1) { vGrade = 2; vDesc = 'IVC ≥2.0 cm + severe abnormalities in 1 vessel'; }
+            else { vGrade = 1; vDesc = 'IVC ≥2.0 cm + no or mild abnormalities'; }
           }
           row('VeXUS Grade', `${vGrade} — ${vDesc}`);
         }
@@ -10312,7 +11696,17 @@ function renderExportRowsToPrintHTML(rows) {
     if (r.t === 'title') {
       closeMeta();
       closeSection();
-      parts.push(`<h1 class="print-doc-title">${esc(r.value)}</h1>`);
+      if (isExportPdfLogoEnabled()) {
+        const logoSrc = __fhdLogoDataUrl || './FHD.jpg';
+        parts.push(
+          `<div class="print-header-row">` +
+            `<img class="print-header-logo" src="${logoSrc}" alt="" aria-hidden="true">` +
+            `<h1 class="print-doc-title">${esc(r.value)}</h1>` +
+          `</div>`
+        );
+      } else {
+        parts.push(`<h1 class="print-doc-title">${esc(r.value)}</h1>`);
+      }
     } else if (r.t === 'blank') {
       parts.push('<div class="print-blank"></div>');
     } else if (r.t === 'meta') {
@@ -10396,7 +11790,6 @@ function renderExportRowsToPrintHTML(rows) {
   }
   closeMeta();
   closeSection();
-  parts.push(`<p class="print-disclaimer">${esc(EXPORT_DISCLAIMER_TEXT)}</p>`);
   parts.push('</div>');
   return parts.join('');
 }
@@ -10426,6 +11819,7 @@ function doExportPrintPdf() {
 
   const rows = getExportRowsOrdered();
   mount.innerHTML = renderExportRowsToPrintHTML(rows);
+  appendAttachedImagesToPrintMount();
 
   const mask = document.getElementById('fusicPrintMask');
   const siblings = [...document.body.children].filter(el => el !== mount && el !== mask);
