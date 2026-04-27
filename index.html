@@ -93,6 +93,8 @@ html[data-theme="dark"] .btn-primary { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35)
 html[data-theme="dark"] .modal-icon { background: #3f1f24; }
 html[data-theme="dark"] .inline-warn { color: #fcd34d; }
 html[data-theme="dark"] .la-validate-hint.error { color: #fca5a5; }
+html[data-theme="dark"] .calc-hint.abnormal-ref { color: #fbbf24; }
+html[data-theme="dark"] .field-label.abnormal-label { color: #fbbf24; }
 html[data-theme="dark"] .settings-machine-cap-block,
 html[data-theme="dark"] .settings-normal-study-block,
 html[data-theme="dark"] .settings-haemodynamics-details { background: rgba(77, 158, 255, 0.08); }
@@ -1015,7 +1017,10 @@ input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-i
 }
 .rri-ratio-input:focus { outline: none; box-shadow: 0 1px 0 rgba(0,0,0,0.28); border-radius: 1px; }
 .calc-hint { font-size: 11.5px; color: var(--text-muted); font-style: italic; padding: 3px 2px 0; line-height: 1.4; }
+.calc-hint.abnormal-ref { color: #b45309; font-weight: 700; }
+.field-label.abnormal-label { color: #b45309; font-weight: 700; }
 .calc-hint-spacer { visibility: hidden; }
+body.guidance-off .guidance-text { display: none !important; }
 .pasp-estimate-note {
   font-size: 11px; color: var(--text-mid); line-height: 1.4; margin-top: 8px; padding: 8px 10px;
   background: var(--primary-xlight); border: 1px dashed var(--primary-light); border-radius: var(--radius-sm);
@@ -3257,6 +3262,13 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
     <div class="settings-group">
       <div class="settings-group-title">Debug</div>
       <div class="settings-group-body">
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Guidance mode</div>
+            <div class="settings-toggle-hint">Show in-form guidance/reference text and unusual-value checks.</div>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="toggle-guidance-mode" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+        </div>
         <button type="button" class="btn btn-secondary settings-anonymise-btn" id="populateTestDataBtn" title="Load septic shock / fluid-responsive demo data">Populate test data…</button>
       </div>
     </div>
@@ -3421,7 +3433,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
               <span class="calc-editable-suffix">mmHg</span>
             </div>
           </div>
-          <div class="calc-hint">MAP = (SBP + 2×DBP) / 3</div>
+          <div class="calc-hint guidance-text">MAP = (SBP + 2×DBP) / 3</div>
         </div>
       </div>
 
@@ -3489,12 +3501,12 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         <div class="field-group">
           <label class="field-label" for="f-ivsd">IVSd <span class="unit">(mm)</span></label>
           <input type="number" id="f-ivsd" placeholder="e.g. 9" min="3" max="30" step="0.1" oninput="scheduleMainContentSoftValidation()">
-          <div class="calc-hint">Normal &lt;12 mm</div>
+          <div class="calc-hint guidance-text" id="ivsd-ref">Normal &lt;12 mm</div>
         </div>
         <div class="field-group">
           <label class="field-label" for="f-lvpwd">LVPWd <span class="unit">(mm)</span></label>
           <input type="number" id="f-lvpwd" placeholder="e.g. 9" min="3" max="30" step="0.1" oninput="scheduleMainContentSoftValidation()">
-          <div class="calc-hint">Normal &lt;12 mm</div>
+          <div class="calc-hint guidance-text" id="lvpwd-ref">Normal &lt;12 mm</div>
         </div>
       </div>
 
@@ -3574,13 +3586,13 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         <div class="field-group">
           <label class="field-label" for="f-mapse">MAPSE <span class="unit">(mm)</span></label>
           <input type="number" id="f-mapse" placeholder="e.g. 14" min="0" max="40" step="0.1">
-          <div class="calc-hint">Normal &gt;12 mm</div>
+          <div class="calc-hint guidance-text" id="mapse-ref">Normal &gt;12 mm</div>
         </div>
         <div id="mc-tdi-lv-sprime-wrap" class="mc-doppler-wrap">
           <div class="field-group">
             <label class="field-label" for="f-lvSPrime">LV S&rsquo; <span class="unit">(cm/s)</span></label>
             <input type="number" id="f-lvSPrime" placeholder="e.g. 9" min="0" max="30" step="0.1">
-            <div class="calc-hint">Normal &gt;7 cm/s</div>
+            <div class="calc-hint guidance-text" id="lv-sprime-ref">Normal &gt;7 cm/s</div>
           </div>
         </div>
       </div>
@@ -3643,7 +3655,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
               <span class="calc-editable-suffix">mL</span>
             </div>
           </div>
-          <div class="calc-hint">⟵ Requires LVOT Diameter &amp; LVOT VTI</div>
+          <div class="calc-hint guidance-text">⟵ Requires LVOT Diameter &amp; LVOT VTI</div>
         </div>
         <div class="field-group">
           <label class="field-label" for="co-display-input">Cardiac Output <span class="unit">(L/min)</span><span class="field-label-source-tag" id="co-display-source" hidden></span></label>
@@ -3654,7 +3666,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
               <span class="calc-editable-suffix">L/min</span>
             </div>
           </div>
-          <div class="calc-hint">⟵ Also requires Heart Rate (Section 1)</div>
+          <div class="calc-hint guidance-text">⟵ Also requires Heart Rate (Section 1)</div>
         </div>
       </div>
       </div>
@@ -3797,11 +3809,13 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         </div>
         <div class="field-group">
           <label class="field-label" for="f-laDiamSys">LA diameter (end systole) <span class="unit">(mm)</span></label>
+          <p class="calc-hint guidance-text" id="la-diam-ref">Normal: &lt;45 mm (female), &lt;50 mm (male)</p>
           <input type="number" id="f-laDiamSys" placeholder="e.g. 42" min="0" max="120" step="0.1" oninput="recalcLAPInterp()" onchange="recalcLAPInterp()">
           <div id="la-diam-hint" class="la-validate-hint" aria-live="polite"></div>
         </div>
         <div class="field-group">
           <label class="field-label" for="f-laArea">LA area <span class="unit">(cm²)</span></label>
+          <p class="calc-hint guidance-text" id="la-area-ref">Normal &lt;22 cm²</p>
           <input type="number" id="f-laArea" placeholder="e.g. 18" min="0" max="80" step="0.1" oninput="recalcLAPInterp()" onchange="recalcLAPInterp()">
           <div id="la-area-hint" class="la-validate-hint" aria-live="polite"></div>
         </div>
@@ -3912,7 +3926,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         </div>
         <div class="field-group">
           <label class="field-label" for="f-raArea">RA Area <span class="unit">(cm²)</span></label>
-          <p class="calc-hint">Normal &lt;18 cm²</p>
+          <p class="calc-hint guidance-text" id="rv-ra-area-ref">Normal &lt;18 cm²</p>
           <input type="number" id="f-raArea" placeholder="e.g. 16" min="0" max="80" step="0.1">
           <div id="rv-ra-area-hint" class="la-validate-hint" aria-live="polite"></div>
         </div>
@@ -3928,13 +3942,13 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         </div>
         <div class="field-group">
           <label class="field-label" for="f-rvBasalDiam">RV basal diameter <span class="unit">(mm)</span></label>
-          <p class="calc-hint">Normal &lt;45 mm</p>
+          <p class="calc-hint guidance-text" id="rv-basal-diam-ref">Normal &lt;45 mm</p>
           <input type="number" id="f-rvBasalDiam" placeholder="e.g. 38" min="0" max="120" step="0.1" oninput="syncPHTBasicAutoSelections(); scheduleMainContentSoftValidation()" onchange="syncPHTBasicAutoSelections()">
           <div id="rv-basal-hint" class="la-validate-hint" aria-live="polite"></div>
         </div>
         <div class="field-group">
           <label class="field-label" for="f-rvMidDiam">RV mid diameter <span class="unit">(mm)</span></label>
-          <p class="calc-hint">Normal &lt;40 mm</p>
+          <p class="calc-hint guidance-text" id="rv-mid-diam-ref">Normal &lt;40 mm</p>
           <input type="number" id="f-rvMidDiam" placeholder="e.g. 35" min="0" max="120" step="0.1" oninput="syncPHTBasicAutoSelections()" onchange="syncPHTBasicAutoSelections()">
           <div id="rv-mid-hint" class="la-validate-hint" aria-live="polite"></div>
         </div>
@@ -3942,20 +3956,20 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <div class="field-row two-col">
         <div class="field-group">
           <label class="field-label" for="f-rvLongDiam">RV longitudinal diameter <span class="unit">(mm)</span></label>
-          <p class="calc-hint">Normal &lt;85 mm</p>
+          <p class="calc-hint guidance-text" id="rv-long-diam-ref">Normal &lt;85 mm</p>
           <input type="number" id="f-rvLongDiam" placeholder="e.g. 72" min="0" max="150" step="0.1" oninput="syncPHTBasicAutoSelections()" onchange="syncPHTBasicAutoSelections()">
           <div id="rv-long-hint" class="la-validate-hint" aria-live="polite"></div>
         </div>
         <div class="field-group">
           <label class="field-label" for="f-rvotProx">RVOT proximal <span class="unit">(mm)</span></label>
-          <p class="calc-hint">Normal &lt;45 mm · measure in PLAX or PSAX</p>
+          <p class="calc-hint guidance-text" id="rv-prox-diam-ref">Normal &lt;45 mm · measure in PLAX or PSAX</p>
           <input type="number" id="f-rvotProx" placeholder="e.g. 40" min="0" max="120" step="0.1" oninput="syncPHTBasicAutoSelections()" onchange="syncPHTBasicAutoSelections()">
           <div id="rv-rvot-hint" class="la-validate-hint" aria-live="polite"></div>
         </div>
       </div>
       <div class="field-group">
         <label class="field-label" for="f-rvWallThick">RV wall thickness <span class="unit">(mm)</span></label>
-        <p class="calc-hint">Normal ≤5 mm</p>
+        <p class="calc-hint guidance-text" id="rv-wall-thickness-ref">Normal ≤5 mm</p>
         <input type="number" id="f-rvWallThick" placeholder="e.g. 4" min="0" max="25" step="0.1">
         <div id="rv-wall-hint" class="la-validate-hint" aria-live="polite"></div>
       </div>
@@ -4004,7 +4018,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         </div>
         <div class="field-group">
           <label class="field-label" for="fac-display-input">FAC <span class="unit">(%)</span><span class="field-label-source-tag" id="fac-display-source" hidden></span></label>
-          <p class="calc-hint">(EDA − ESA) ÷ EDA × 100 — Normal &gt;30%</p>
+          <p class="calc-hint guidance-text" id="rv-fac-ref">(EDA − ESA) ÷ EDA × 100 — Normal &gt;30%</p>
           <div class="calc-display calc-display-editable" id="fac-display">
             <div class="calc-editable-value-line">
               <input type="text" class="calc-editable-value auto-calc-input" id="fac-display-input" inputmode="decimal" autocomplete="off" aria-label="RV fractional area change percent">
@@ -4016,14 +4030,14 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <div class="field-row two-col">
         <div class="field-group">
           <label class="field-label" for="f-tapse">TAPSE <span class="unit">(mm)</span></label>
-          <p class="calc-hint">Normal &gt;17 mm</p>
+          <p class="calc-hint guidance-text" id="rv-tapse-ref">Normal &gt;17 mm</p>
           <input type="number" id="f-tapse" placeholder="e.g. 20" min="0" max="80" step="0.1" oninput="scheduleMainContentSoftValidation()">
           <div id="rv-tapse-hint" class="la-validate-hint" aria-live="polite"></div>
         </div>
         <div id="mc-tdi-rv-sprime-wrap" class="mc-doppler-wrap">
           <div class="field-group">
             <label class="field-label" for="f-rvS">RV S′ <span class="unit">(cm/s)</span></label>
-            <p class="calc-hint">Normal &gt;9 cm/s</p>
+            <p class="calc-hint guidance-text" id="rv-sprime-ref">Normal &gt;9 cm/s</p>
             <input type="number" id="f-rvS" placeholder="e.g. 11" min="0" max="40" step="0.1">
             <div id="rv-sprime-hint" class="la-validate-hint" aria-live="polite"></div>
           </div>
@@ -4066,7 +4080,27 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         <div id="phtBasicSummary" class="rhythm-summary">None selected</div>
       </div>
       <div class="field-group" id="rv-pht-advanced-features-wrap">
-        <label class="field-label">Advanced Features of PHT <span class="unit">(tap to select — multiple allowed)</span></label>
+        <label class="field-label">Advanced Features of PHT <span class="unit">(enter values; RVOT notching remains tap-to-select)</span></label>
+        <div class="field-row three-col">
+          <div class="field-group">
+            <label class="field-label" for="f-phtRvotAccTime">RVOT Acc. Time <span class="unit">(ms)</span></label>
+            <p class="calc-hint guidance-text" id="pht-rvot-acc-time-ref">Abnormal if &lt;105 ms</p>
+            <input type="number" id="f-phtRvotAccTime" placeholder="e.g. 118" min="0" max="500" step="0.1" oninput="syncPHTAdvancedAutoSelections(); scheduleMainContentSoftValidation()" onchange="syncPHTAdvancedAutoSelections(); scheduleMainContentSoftValidation()">
+            <div id="pht-rvot-acc-time-hint" class="la-validate-hint" aria-live="polite"></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="f-phtEarlyDiastolicPrVel">Early diastolic PR velocity <span class="unit">(m/s)</span></label>
+            <p class="calc-hint guidance-text" id="pht-early-pr-vel-ref">Abnormal if &gt;2.2 m/s</p>
+            <input type="number" id="f-phtEarlyDiastolicPrVel" placeholder="e.g. 2.4" min="0" max="8" step="0.01" oninput="syncPHTAdvancedAutoSelections(); scheduleMainContentSoftValidation()" onchange="syncPHTAdvancedAutoSelections(); scheduleMainContentSoftValidation()">
+            <div id="pht-early-pr-vel-hint" class="la-validate-hint" aria-live="polite"></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="f-phtPaDiameter">PA diameter <span class="unit">(mm)</span></label>
+            <p class="calc-hint guidance-text" id="pht-pa-diameter-ref">Abnormal if &gt;25 mm</p>
+            <input type="number" id="f-phtPaDiameter" placeholder="e.g. 23" min="0" max="80" step="0.1" oninput="syncPHTAdvancedAutoSelections(); scheduleMainContentSoftValidation()" onchange="syncPHTAdvancedAutoSelections(); scheduleMainContentSoftValidation()">
+            <div id="pht-pa-diameter-hint" class="la-validate-hint" aria-live="polite"></div>
+          </div>
+        </div>
         <div id="phtAdvChips" class="rhythm-chips"></div>
         <div id="phtAdvSummary" class="rhythm-summary">None selected</div>
       </div>
@@ -4315,10 +4349,10 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
             <div class="auto-editable-top">
               <span class="interp-icon" id="rri-icon" style="display:none"></span>
               <input type="text" class="rri-ratio-input auto-calc-input" id="rri-display-input" inputmode="decimal" autocomplete="off" aria-label="Renal resistive index">
-              <span class="interp-ref" id="rri-ref"></span>
+              <span class="interp-ref guidance-text" id="rri-ref"></span>
             </div>
           </div>
-          <div class="calc-hint">RRI = (PSV − EDV) / PSV &nbsp;·&nbsp; Normal ≤0.70</div>
+          <div class="calc-hint guidance-text">RRI = (PSV − EDV) / PSV &nbsp;·&nbsp; Normal ≤0.70</div>
         </div>
       </div>
     </div>
@@ -5351,6 +5385,9 @@ const EDEC_MEAS_GROUPS = [
     ['FAC', 'fac-display-input', '%'],
     ['TAPSE', 'f-tapse', 'mm'],
     ['RV S\'', 'f-rvS', 'cm/s'],
+    ['RVOT Acc. Time', 'f-phtRvotAccTime', 'ms'],
+    ['Early diastolic PR velocity', 'f-phtEarlyDiastolicPrVel', 'm/s'],
+    ['PA diameter', 'f-phtPaDiameter', 'mm'],
   ]},
   { title: 'Aortic Valve', rows: [
     ['AV VTI', 'f-avVTI', 'cm'],
@@ -5845,21 +5882,14 @@ const PHT_BASIC_FEATURES = [
 let selectedPHTBasic = new Set();
 
 const PHT_ADVANCED_FEATURES = [
-  'RVOT acc time <105ms',
-  'Systolic notching of RVOT Doppler',
-  'Early diastolic PR velocity >2.2 m/s',
-  'PA diameter >25mm'
+  'Systolic notching of RVOT Doppler'
 ];
 let selectedPHTAdvanced = new Set();
 
 /** Machine-capability: options hidden when PWD/CWD toggles are off in Settings. */
 const LVOTO_FEATURE_REQUIRES_PWD = 'High LVOT velocity + turbulence';
 const TAMPONADE_OPTION_REQUIRES_PWD = 'Abnormal MV/TV inflow variation';
-const PHT_ADVANCED_REQUIRES_PWD = new Set([
-  'RVOT acc time <105ms',
-  'Systolic notching of RVOT Doppler'
-]);
-const PHT_ADVANCED_REQUIRES_CWD = 'Early diastolic PR velocity >2.2 m/s';
+const PHT_ADVANCED_REQUIRES_PWD = new Set(['Systolic notching of RVOT Doppler']);
 
 const LUNG_PE_CHIP = 'Pleural Effusion';
 const LUNG_NORMAL_CHIP = 'Normal';
@@ -5910,7 +5940,8 @@ const SESSION_DRAFT_TOGGLE_IDS = [
   'toggle-export-summary-near-top',
   'toggle-export-nonfusic-disclaimer',
   'toggle-export-aggressive-2page',
-  'toggle-export-pdf-logo'
+  'toggle-export-pdf-logo',
+  'toggle-guidance-mode'
 ];
 const HAEMODYNAMICS_CHILD_TOGGLE_IDS = [
   'toggle-show-cardiac-index',
@@ -6084,6 +6115,7 @@ document.addEventListener('DOMContentLoaded', () => {
   toggleSummarySectionVisibility(!!document.getElementById('toggle-show-summary-section')?.checked);
   document.getElementById('toggle-fusic-hd-questions')?.addEventListener('change', e => toggleFusicHdQuestionsSection(e.target.checked));
   document.getElementById('toggle-show-summary-section')?.addEventListener('change', e => toggleSummarySectionVisibility(!!e.target.checked));
+  document.getElementById('toggle-guidance-mode')?.addEventListener('change', applyGuidanceModeUI);
   document.getElementById('toggle-rh-measures-all')?.addEventListener('change', onRHMasterChange);
   RH_MEASURES_CHILD_TOGGLE_IDS.forEach(id => {
     document.getElementById(id)?.addEventListener('change', onRHMeasuresChildToggleChange);
@@ -6114,6 +6146,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   refreshFusicHdQuestionHighlights();
   refreshMachineCapabilityFields();
+  applyGuidanceModeUI();
   refreshAnonymiseEntrypointButtons();
 
   document.getElementById('scanInfoCollapseAllBtn')?.addEventListener('click', toggleAllCollapsibleSections);
@@ -6465,12 +6498,27 @@ function buildPHTBasicChips() {
 
 function getVisiblePHTAdvancedFeatures() {
   const pwd = isMachinePWDEnabled();
-  const cwd = isMachineCWDEnabled();
   return PHT_ADVANCED_FEATURES.filter(f => {
     if (!pwd && PHT_ADVANCED_REQUIRES_PWD.has(f)) return false;
-    if (!cwd && f === PHT_ADVANCED_REQUIRES_CWD) return false;
     return true;
   });
+}
+
+function syncPHTAdvancedAutoSelections() {
+  const rvotAcc = parseFloat(document.getElementById('f-phtRvotAccTime')?.value);
+  const earlyPr = parseFloat(document.getElementById('f-phtEarlyDiastolicPrVel')?.value);
+  const paDiam = parseFloat(document.getElementById('f-phtPaDiameter')?.value);
+
+  if (!isNaN(rvotAcc) && rvotAcc < 105) selectedPHTAdvanced.add('RVOT acc time <105ms');
+  else selectedPHTAdvanced.delete('RVOT acc time <105ms');
+
+  if (!isNaN(earlyPr) && earlyPr > 2.2) selectedPHTAdvanced.add('Early diastolic PR velocity >2.2 m/s');
+  else selectedPHTAdvanced.delete('Early diastolic PR velocity >2.2 m/s');
+
+  if (!isNaN(paDiam) && paDiam > 25) selectedPHTAdvanced.add('PA diameter >25mm');
+  else selectedPHTAdvanced.delete('PA diameter >25mm');
+
+  updatePHTAdvancedSummary();
 }
 
 function buildPHTAdvancedChips() {
@@ -6491,7 +6539,7 @@ function buildPHTAdvancedChips() {
     });
     c.appendChild(chip);
   });
-  updatePHTAdvancedSummary();
+  syncPHTAdvancedAutoSelections();
 }
 
 function updatePHTAdvancedSummary() {
@@ -6502,6 +6550,60 @@ function updatePHTAdvancedSummary() {
   } else {
     el.textContent = [...selectedPHTAdvanced].join(' · '); el.className = 'rhythm-summary has-values';
   }
+}
+
+function checkPHTAdvancedMeasurements() {
+  const guidanceOn = isGuidanceModeEnabled();
+  const checks = [
+    {
+      inputId: 'f-phtRvotAccTime',
+      hintId: 'pht-rvot-acc-time-hint',
+      refHintId: 'pht-rvot-acc-time-ref',
+      useAboveReferenceStyling: true,
+      isAbnormal: v => v < 105,
+      abnormalText: 'Abnormal - below threshold (<105 ms).'
+    },
+    {
+      inputId: 'f-phtEarlyDiastolicPrVel',
+      hintId: 'pht-early-pr-vel-hint',
+      refHintId: 'pht-early-pr-vel-ref',
+      useAboveReferenceStyling: true,
+      isAbnormal: v => v > 2.2,
+      abnormalText: 'Abnormal - above threshold (>2.2 m/s).'
+    },
+    {
+      inputId: 'f-phtPaDiameter',
+      hintId: 'pht-pa-diameter-hint',
+      refHintId: 'pht-pa-diameter-ref',
+      useAboveReferenceStyling: true,
+      isAbnormal: v => v > 25,
+      abnormalText: 'Abnormal - above threshold (>25 mm).'
+    }
+  ];
+  checks.forEach(({ inputId, hintId, refHintId, useAboveReferenceStyling, isAbnormal, abnormalText }) => {
+    const inp = document.getElementById(inputId);
+    const hint = document.getElementById(hintId);
+    const refHint = refHintId ? document.getElementById(refHintId) : null;
+    if (!inp || !hint) return;
+    const v = parseFloat(inp.value);
+    hint.textContent = '';
+    hint.classList.remove('show', 'dilated', 'neutral', 'error');
+    if (refHint) refHint.classList.remove('abnormal-ref');
+    toggleFieldAbnormalLabel(inputId, false);
+    inp.classList.remove('soft-red');
+    if (inp.value.trim() === '' || isNaN(v)) return;
+    if (isAbnormal(v)) {
+      if (!guidanceOn) {
+        toggleFieldAbnormalLabel(inputId, true);
+      } else if (useAboveReferenceStyling && refHint) {
+        refHint.classList.add('abnormal-ref');
+      } else {
+        hint.textContent = abnormalText;
+        hint.classList.add('show', 'dilated');
+      }
+      inp.classList.add('soft-red');
+    }
+  });
 }
 
 function lungFindingSetHasPE(set) {
@@ -6752,6 +6854,19 @@ function recalcAVAContinuity() {
 // ─── SETTINGS ──────────────────────────────────────────
 function openSettings() { document.getElementById('settingsPanel').classList.add('open'); document.getElementById('overlay').classList.add('open'); document.body.style.overflow = 'hidden'; }
 function closeSettings() { document.getElementById('settingsPanel').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); document.body.style.overflow = ''; }
+function isGuidanceModeEnabled() { return !!document.getElementById('toggle-guidance-mode')?.checked; }
+function clearAbnormalFieldLabels() {
+  document.querySelectorAll('.field-label.abnormal-label').forEach(el => el.classList.remove('abnormal-label'));
+}
+function applyGuidanceModeUI() {
+  const off = !isGuidanceModeEnabled();
+  document.body.classList.toggle('guidance-off', off);
+  clearAbnormalFieldLabels();
+  if (off) {
+    hideAllUnusualPlausibilityWarnings();
+  }
+  runMainContentSoftValidation();
+}
 
 function openAbout() { document.getElementById('aboutModal').classList.add('open'); }
 function closeAbout() { document.getElementById('aboutModal').classList.remove('open'); }
@@ -7682,6 +7797,7 @@ function refreshMachineCapabilityFields() {
   buildPHTAdvancedChips();
   recalcHaemodynamics();
   recalcLVOptionalMeasures();
+  document.body.classList.toggle('guidance-off', !isGuidanceModeEnabled());
   refreshScanInfoMachineLimits();
   updateScanInfoCollapseAllButton();
 }
@@ -8023,6 +8139,7 @@ const UNUSUAL_MERGE_WITH_CLINICAL = new Set([
 const UNUSUAL_STANDALONE_SOFTRED = new Set(Object.keys(UNUSUAL_PLAUSIBILITY_RULES));
 
 function evalUnusualPlausibility(fieldId) {
+  if (!isGuidanceModeEnabled()) return false;
   const fn = UNUSUAL_PLAUSIBILITY_RULES[fieldId];
   if (!fn) return false;
   const el = document.getElementById(fieldId);
@@ -8054,6 +8171,14 @@ function applyUnusualWarn(fieldId, bad) {
 }
 
 function refreshTrVmaxUnusualPlausibility() {
+  if (!isGuidanceModeEnabled()) {
+    ['f-trVmax', 'f-trVmaxLAP', 'f-trVmaxPH'].forEach(id => {
+      applyUnusualWarn(id, false);
+      const inp = document.getElementById(id);
+      if (inp) inp.classList.remove('soft-red');
+    });
+    return;
+  }
   const raw =
     document.getElementById('f-trVmax')?.value?.trim() ||
     document.getElementById('f-trVmaxLAP')?.value?.trim() ||
@@ -8069,6 +8194,14 @@ function refreshTrVmaxUnusualPlausibility() {
 }
 
 function refreshLvotVtiUnusualPlausibility() {
+  if (!isGuidanceModeEnabled()) {
+    ['f-lvotVTI', 'f-lvotVTI-valve'].forEach(id => {
+      applyUnusualWarn(id, false);
+      const inp = document.getElementById(id);
+      if (inp) inp.classList.remove('soft-red');
+    });
+    return;
+  }
   const raw = document.getElementById('f-lvotVTI')?.value?.trim() || '';
   const v = parseFloat(raw);
   const bad = raw !== '' && !isNaN(v) && (v < 4 || v > 60);
@@ -8080,6 +8213,17 @@ function refreshLvotVtiUnusualPlausibility() {
 }
 
 function refreshAllUnusualPlausibilityChecks() {
+  if (!isGuidanceModeEnabled()) {
+    hideAllUnusualPlausibilityWarnings();
+    UNUSUAL_STANDALONE_SOFTRED.forEach(fieldId => {
+      applyUnusualWarn(fieldId, false);
+      const inp = document.getElementById(fieldId);
+      if (inp) inp.classList.remove('soft-red');
+    });
+    refreshTrVmaxUnusualPlausibility();
+    refreshLvotVtiUnusualPlausibility();
+    return;
+  }
   UNUSUAL_STANDALONE_SOFTRED.forEach(fieldId => {
     const bad = evalUnusualPlausibility(fieldId);
     applyUnusualWarn(fieldId, bad);
@@ -8096,30 +8240,47 @@ function hideAllUnusualPlausibilityWarnings() {
   document.getElementById('hr-warn')?.classList.remove('show');
 }
 
+function getFieldLabelByInputId(inputId) {
+  return document.querySelector(`label.field-label[for="${inputId}"]`);
+}
+
+function toggleFieldAbnormalLabel(inputId, isAbnormal) {
+  const label = getFieldLabelByInputId(inputId);
+  if (label) label.classList.toggle('abnormal-label', !!isAbnormal);
+}
+
 function checkLADiameter() {
   const inp = document.getElementById('f-laDiamSys');
   const hint = document.getElementById('la-diam-hint');
+  const refHint = document.getElementById('la-diam-ref');
+  const guidanceOn = isGuidanceModeEnabled();
   if (!inp || !hint) return;
   const v = parseFloat(inp.value);
   const sex = document.getElementById('f-sex')?.value || '';
   hint.textContent = '';
   hint.classList.remove('show', 'dilated', 'neutral');
+  if (refHint) refHint.classList.remove('abnormal-ref');
+  toggleFieldAbnormalLabel('f-laDiamSys', false);
   inp.classList.remove('soft-red');
   if (inp.value.trim() === '' || isNaN(v)) return;
-  if (v > 50) {
-    hint.textContent = 'Dilated — exceeds typical upper reference (>50 mm) regardless of sex.';
-    hint.classList.add('show', 'dilated');
+  const clinicalRed = v >= 50 || (sex === 'female' && v >= 45);
+  if (!guidanceOn) {
+    toggleFieldAbnormalLabel('f-laDiamSys', clinicalRed);
+    inp.classList.toggle('soft-red', clinicalRed);
+    return;
+  }
+  if (v >= 50) {
+    if (refHint) refHint.classList.add('abnormal-ref');
     inp.classList.add('soft-red');
     return;
   }
   if (!sex) {
-    hint.textContent = 'Select sex (Section 1) for female-specific dilatation (≥45 mm); male cut-off is >50 mm.';
+    hint.textContent = 'Select sex (Section 1) to apply female threshold at 45 mm.';
     hint.classList.add('show', 'neutral');
     return;
   }
   if (sex === 'female' && v >= 45) {
-    hint.textContent = 'Dilated — at or above typical female reference (≥45 mm).';
-    hint.classList.add('show', 'dilated');
+    if (refHint) refHint.classList.add('abnormal-ref');
     inp.classList.add('soft-red');
   }
 }
@@ -8127,35 +8288,83 @@ function checkLADiameter() {
 function checkLAArea() {
   const inp = document.getElementById('f-laArea');
   const hint = document.getElementById('la-area-hint');
+  const refHint = document.getElementById('la-area-ref');
+  const guidanceOn = isGuidanceModeEnabled();
   if (!inp || !hint) return;
   const v = parseFloat(inp.value);
   hint.textContent = '';
   hint.classList.remove('show', 'dilated');
+  if (refHint) refHint.classList.remove('abnormal-ref');
+  toggleFieldAbnormalLabel('f-laArea', false);
   inp.classList.remove('soft-red');
   if (inp.value.trim() === '' || isNaN(v)) return;
   const clinicalRed = v > 22;
   if (clinicalRed) {
-    hint.textContent = 'Dilated — above typical reference (>22 cm²).';
-    hint.classList.add('show', 'dilated');
+    if (!guidanceOn) toggleFieldAbnormalLabel('f-laArea', true);
+    else if (refHint) refHint.classList.add('abnormal-ref');
   }
   const unusual = evalUnusualPlausibility('f-laArea');
   applyUnusualWarn('f-laArea', unusual);
   inp.classList.toggle('soft-red', clinicalRed || unusual);
 }
 
+function checkIVSd() {
+  const inp = document.getElementById('f-ivsd');
+  const refHint = document.getElementById('ivsd-ref');
+  const guidanceOn = isGuidanceModeEnabled();
+  if (!inp) return;
+  const v = parseFloat(inp.value);
+  if (refHint) refHint.classList.remove('abnormal-ref');
+  toggleFieldAbnormalLabel('f-ivsd', false);
+  inp.classList.remove('soft-red');
+  if (inp.value.trim() === '' || isNaN(v)) return;
+  const clinicalRed = v >= 12;
+  if (clinicalRed) {
+    if (!guidanceOn) toggleFieldAbnormalLabel('f-ivsd', true);
+    else if (refHint) refHint.classList.add('abnormal-ref');
+  }
+  const unusual = evalUnusualPlausibility('f-ivsd');
+  applyUnusualWarn('f-ivsd', unusual);
+  inp.classList.toggle('soft-red', clinicalRed || unusual);
+}
+
+function checkLVPWd() {
+  const inp = document.getElementById('f-lvpwd');
+  const refHint = document.getElementById('lvpwd-ref');
+  const guidanceOn = isGuidanceModeEnabled();
+  if (!inp) return;
+  const v = parseFloat(inp.value);
+  if (refHint) refHint.classList.remove('abnormal-ref');
+  toggleFieldAbnormalLabel('f-lvpwd', false);
+  inp.classList.remove('soft-red');
+  if (inp.value.trim() === '' || isNaN(v)) return;
+  const clinicalRed = v >= 12;
+  if (clinicalRed) {
+    if (!guidanceOn) toggleFieldAbnormalLabel('f-lvpwd', true);
+    else if (refHint) refHint.classList.add('abnormal-ref');
+  }
+  const unusual = evalUnusualPlausibility('f-lvpwd');
+  applyUnusualWarn('f-lvpwd', unusual);
+  inp.classList.toggle('soft-red', clinicalRed || unusual);
+}
+
 function checkRVBasalDiameter() {
   const inp = document.getElementById('f-rvBasalDiam');
   const hint = document.getElementById('rv-basal-hint');
+  const refHint = document.getElementById('rv-basal-diam-ref');
+  const guidanceOn = isGuidanceModeEnabled();
   if (!inp || !hint) return;
   const v = parseFloat(inp.value);
   hint.textContent = '';
   hint.classList.remove('show', 'dilated', 'neutral');
+  if (refHint) refHint.classList.remove('abnormal-ref');
+  toggleFieldAbnormalLabel('f-rvBasalDiam', false);
   inp.classList.remove('soft-red');
   if (inp.value.trim() === '' || isNaN(v)) return;
   const clinicalRed = v >= 45;
   if (clinicalRed) {
-    hint.textContent = 'Enlarged — at or above typical reference (≥45 mm).';
-    hint.classList.add('show', 'dilated');
+    if (!guidanceOn) toggleFieldAbnormalLabel('f-rvBasalDiam', true);
+    else if (refHint) refHint.classList.add('abnormal-ref');
   }
   const unusual = evalUnusualPlausibility('f-rvBasalDiam');
   applyUnusualWarn('f-rvBasalDiam', unusual);
@@ -8165,16 +8374,20 @@ function checkRVBasalDiameter() {
 function checkRVMidDiameter() {
   const inp = document.getElementById('f-rvMidDiam');
   const hint = document.getElementById('rv-mid-hint');
+  const refHint = document.getElementById('rv-mid-diam-ref');
+  const guidanceOn = isGuidanceModeEnabled();
   if (!inp || !hint) return;
   const v = parseFloat(inp.value);
   hint.textContent = '';
   hint.classList.remove('show', 'dilated', 'neutral');
+  if (refHint) refHint.classList.remove('abnormal-ref');
+  toggleFieldAbnormalLabel('f-rvMidDiam', false);
   inp.classList.remove('soft-red');
   if (inp.value.trim() === '' || isNaN(v)) return;
   const clinicalRed = v >= 40;
   if (clinicalRed) {
-    hint.textContent = 'Enlarged — at or above typical reference (≥40 mm).';
-    hint.classList.add('show', 'dilated');
+    if (!guidanceOn) toggleFieldAbnormalLabel('f-rvMidDiam', true);
+    else if (refHint) refHint.classList.add('abnormal-ref');
   }
   const unusual = evalUnusualPlausibility('f-rvMidDiam');
   applyUnusualWarn('f-rvMidDiam', unusual);
@@ -8184,16 +8397,20 @@ function checkRVMidDiameter() {
 function checkRVLongDiameter() {
   const inp = document.getElementById('f-rvLongDiam');
   const hint = document.getElementById('rv-long-hint');
+  const refHint = document.getElementById('rv-long-diam-ref');
+  const guidanceOn = isGuidanceModeEnabled();
   if (!inp || !hint) return;
   const v = parseFloat(inp.value);
   hint.textContent = '';
   hint.classList.remove('show', 'dilated', 'neutral');
+  if (refHint) refHint.classList.remove('abnormal-ref');
+  toggleFieldAbnormalLabel('f-rvLongDiam', false);
   inp.classList.remove('soft-red');
   if (inp.value.trim() === '' || isNaN(v)) return;
   const clinicalRed = v >= 85;
   if (clinicalRed) {
-    hint.textContent = 'Enlarged — at or above typical reference (≥85 mm).';
-    hint.classList.add('show', 'dilated');
+    if (!guidanceOn) toggleFieldAbnormalLabel('f-rvLongDiam', true);
+    else if (refHint) refHint.classList.add('abnormal-ref');
   }
   const unusual = evalUnusualPlausibility('f-rvLongDiam');
   applyUnusualWarn('f-rvLongDiam', unusual);
@@ -8203,32 +8420,41 @@ function checkRVLongDiameter() {
 function checkRVOTProximal() {
   const inp = document.getElementById('f-rvotProx');
   const hint = document.getElementById('rv-rvot-hint');
+  const refHint = document.getElementById('rv-prox-diam-ref');
+  const guidanceOn = isGuidanceModeEnabled();
   if (!inp || !hint) return;
   const v = parseFloat(inp.value);
   hint.textContent = '';
   hint.classList.remove('show', 'dilated', 'neutral');
+  if (refHint) refHint.classList.remove('abnormal-ref');
+  toggleFieldAbnormalLabel('f-rvotProx', false);
   inp.classList.remove('soft-red');
   if (inp.value.trim() === '' || isNaN(v)) return;
-  if (v >= 45) {
-    hint.textContent = 'Enlarged — at or above typical reference (≥45 mm).';
-    hint.classList.add('show', 'dilated');
-    inp.classList.add('soft-red');
+  const clinicalRed = v >= 45;
+  if (clinicalRed) {
+    if (!guidanceOn) toggleFieldAbnormalLabel('f-rvotProx', true);
+    else if (refHint) refHint.classList.add('abnormal-ref');
   }
+  inp.classList.toggle('soft-red', clinicalRed);
 }
 
 function checkRVWallThickness() {
   const inp = document.getElementById('f-rvWallThick');
   const hint = document.getElementById('rv-wall-hint');
+  const refHint = document.getElementById('rv-wall-thickness-ref');
+  const guidanceOn = isGuidanceModeEnabled();
   if (!inp || !hint) return;
   const v = parseFloat(inp.value);
   hint.textContent = '';
   hint.classList.remove('show', 'dilated', 'neutral');
+  if (refHint) refHint.classList.remove('abnormal-ref');
+  toggleFieldAbnormalLabel('f-rvWallThick', false);
   inp.classList.remove('soft-red');
   if (inp.value.trim() === '' || isNaN(v)) return;
   const clinicalRed = v > 5;
   if (clinicalRed) {
-    hint.textContent = 'Increased — above typical upper limit (>5 mm).';
-    hint.classList.add('show', 'dilated');
+    if (!guidanceOn) toggleFieldAbnormalLabel('f-rvWallThick', true);
+    else if (refHint) refHint.classList.add('abnormal-ref');
   }
   const unusual = evalUnusualPlausibility('f-rvWallThick');
   applyUnusualWarn('f-rvWallThick', unusual);
@@ -8238,10 +8464,12 @@ function checkRVWallThickness() {
 function checkRAArea() {
   const inp = document.getElementById('f-raArea');
   const hint = document.getElementById('rv-ra-area-hint');
+  const refHint = document.getElementById('rv-ra-area-ref');
   if (!inp || !hint) return;
   const v = parseFloat(inp.value);
   hint.textContent = '';
   hint.classList.remove('show', 'dilated', 'neutral', 'error');
+  if (refHint) refHint.classList.remove('abnormal-ref');
   inp.classList.remove('soft-red');
   if (inp.value.trim() === '' || isNaN(v)) return;
   const unusual = evalUnusualPlausibility('f-raArea');
@@ -8252,8 +8480,7 @@ function checkRAArea() {
       : 'Unusual value — above typical plausible range (&gt;28 cm²).';
     hint.classList.add('show', 'error');
   } else if (v >= 18) {
-    hint.textContent = 'Enlarged relative to typical normal (&lt;18 cm²).';
-    hint.classList.add('show', 'dilated');
+    if (refHint) refHint.classList.add('abnormal-ref');
   }
   inp.classList.toggle('soft-red', unusual || v >= 18);
 }
@@ -8298,19 +8525,67 @@ function checkRVESA() {
   inp.classList.toggle('soft-red', clinicalOrder || unusual);
 }
 
+function checkMAPSE() {
+  const inp = document.getElementById('f-mapse');
+  const refHint = document.getElementById('mapse-ref');
+  const guidanceOn = isGuidanceModeEnabled();
+  if (!inp) return;
+  const v = parseFloat(inp.value);
+  if (refHint) refHint.classList.remove('abnormal-ref');
+  toggleFieldAbnormalLabel('f-mapse', false);
+  inp.classList.remove('soft-red');
+  if (inp.value.trim() === '' || isNaN(v)) return;
+  const clinicalRed = v <= 12;
+  if (clinicalRed) {
+    if (!guidanceOn) toggleFieldAbnormalLabel('f-mapse', true);
+    else if (refHint) refHint.classList.add('abnormal-ref');
+  }
+  const unusual = evalUnusualPlausibility('f-mapse');
+  applyUnusualWarn('f-mapse', unusual);
+  inp.classList.toggle('soft-red', clinicalRed || unusual);
+}
+
+function checkLVSPrime() {
+  const inp = document.getElementById('f-lvSPrime');
+  const refHint = document.getElementById('lv-sprime-ref');
+  const guidanceOn = isGuidanceModeEnabled();
+  if (!inp) return;
+  const v = parseFloat(inp.value);
+  if (refHint) refHint.classList.remove('abnormal-ref');
+  toggleFieldAbnormalLabel('f-lvSPrime', false);
+  inp.classList.remove('soft-red');
+  if (inp.value.trim() === '' || isNaN(v)) return;
+  const clinicalRed = v <= 7;
+  if (clinicalRed) {
+    if (!guidanceOn) toggleFieldAbnormalLabel('f-lvSPrime', true);
+    else if (refHint) refHint.classList.add('abnormal-ref');
+  }
+  const unusual = evalUnusualPlausibility('f-lvSPrime');
+  applyUnusualWarn('f-lvSPrime', unusual);
+  inp.classList.toggle('soft-red', clinicalRed || unusual);
+}
+
 function checkRVFAC() {
   const inp = document.getElementById('fac-display-input');
   const hint = document.getElementById('rv-fac-hint');
+  const refHint = document.getElementById('rv-fac-ref');
+  const guidanceOn = isGuidanceModeEnabled();
   if (!inp || !hint) return;
   const v = parseFloat(inp.value);
   hint.textContent = '';
   hint.classList.remove('show', 'dilated', 'neutral');
+  if (refHint) refHint.classList.remove('abnormal-ref');
+  toggleFieldAbnormalLabel('fac-display-input', false);
   inp.classList.remove('soft-red');
   if (inp.value.trim() === '' || isNaN(v)) return;
   const clinicalRed = v <= 30;
   if (clinicalRed) {
-    hint.textContent = 'Below typical lower reference (≤30%).';
-    hint.classList.add('show', 'dilated');
+    if (!guidanceOn) toggleFieldAbnormalLabel('fac-display-input', true);
+    else if (refHint) refHint.classList.add('abnormal-ref');
+    else {
+      hint.textContent = 'Below typical lower reference (≤30%).';
+      hint.classList.add('show', 'dilated');
+    }
   }
   const unusual = evalUnusualPlausibility('fac-display-input');
   applyUnusualWarn('fac-display-input', unusual);
@@ -8320,16 +8595,20 @@ function checkRVFAC() {
 function checkRVTAPSE() {
   const inp = document.getElementById('f-tapse');
   const hint = document.getElementById('rv-tapse-hint');
+  const refHint = document.getElementById('rv-tapse-ref');
+  const guidanceOn = isGuidanceModeEnabled();
   if (!inp || !hint) return;
   const v = parseFloat(inp.value);
   hint.textContent = '';
   hint.classList.remove('show', 'dilated', 'neutral');
+  if (refHint) refHint.classList.remove('abnormal-ref');
+  toggleFieldAbnormalLabel('f-tapse', false);
   inp.classList.remove('soft-red');
   if (inp.value.trim() === '' || isNaN(v)) return;
   const clinicalRed = v <= 17;
   if (clinicalRed) {
-    hint.textContent = 'Reduced — at or below typical cut-off (≤17 mm).';
-    hint.classList.add('show', 'dilated');
+    if (!guidanceOn) toggleFieldAbnormalLabel('f-tapse', true);
+    else if (refHint) refHint.classList.add('abnormal-ref');
   }
   const unusual = evalUnusualPlausibility('f-tapse');
   applyUnusualWarn('f-tapse', unusual);
@@ -8339,16 +8618,20 @@ function checkRVTAPSE() {
 function checkRVSPrime() {
   const inp = document.getElementById('f-rvS');
   const hint = document.getElementById('rv-sprime-hint');
+  const refHint = document.getElementById('rv-sprime-ref');
+  const guidanceOn = isGuidanceModeEnabled();
   if (!inp || !hint) return;
   const v = parseFloat(inp.value);
   hint.textContent = '';
   hint.classList.remove('show', 'dilated', 'neutral');
+  if (refHint) refHint.classList.remove('abnormal-ref');
+  toggleFieldAbnormalLabel('f-rvS', false);
   inp.classList.remove('soft-red');
   if (inp.value.trim() === '' || isNaN(v)) return;
   const clinicalRed = v <= 9;
   if (clinicalRed) {
-    hint.textContent = 'Below typical lower reference (≤9 cm/s).';
-    hint.classList.add('show', 'dilated');
+    if (!guidanceOn) toggleFieldAbnormalLabel('f-rvS', true);
+    else if (refHint) refHint.classList.add('abnormal-ref');
   }
   const unusual = evalUnusualPlausibility('f-rvS');
   applyUnusualWarn('f-rvS', unusual);
@@ -8367,6 +8650,7 @@ function runRvFieldClinicalChecksOnly() {
   checkRVFAC();
   checkRVTAPSE();
   checkRVSPrime();
+  checkPHTAdvancedMeasurements();
 }
 
 function refreshRVFieldValidations() {
@@ -8381,10 +8665,14 @@ function runMainContentSoftValidation() {
   recalcRVFAC();
   refreshRVFieldValidations();
   checkLVIDdHint();
+  checkIVSd();
+  checkLVPWd();
   recalcLVOptionalMeasures();
   checkScanDateNotFuture();
   checkAge();
   checkHR();
+  checkMAPSE();
+  checkLVSPrime();
   checkLADiameter();
   checkLAArea();
   checkCIAnthropometrics();
@@ -9468,6 +9756,11 @@ function checkAge() {
   const ageEl = document.getElementById('f-age');
   const el = document.getElementById('age-warn');
   if (!el || !ageEl) return;
+  if (!isGuidanceModeEnabled()) {
+    el.classList.remove('show');
+    ageEl.classList.remove('soft-red');
+    return;
+  }
   if (ageEl.type === 'text') {
     el.classList.remove('show');
     ageEl.classList.remove('soft-red');
@@ -9552,8 +9845,10 @@ function recalcRRI() {
   const src = document.getElementById('rri-display-source');
   const icon = document.getElementById('rri-icon');
   const ref = document.getElementById('rri-ref');
+  const guidanceOn = isGuidanceModeEnabled();
   if (!el || !inp) return;
   const manual = isAutoCalcManual(inp);
+  toggleFieldAbnormalLabel('rri-display-input', false);
 
   if (isNaN(psv) || isNaN(edv) || psv <= 0) {
     if (!manual) {
@@ -9566,6 +9861,7 @@ function recalcRRI() {
       if (icon) icon.style.display = 'none';
       const n = parseFloat(inp.value);
       ref.textContent = !isNaN(n) ? (n > 0.70 ? 'Abnormal (>0.70)' : 'Normal (≤0.70)') : '';
+      if (!guidanceOn && !isNaN(n)) toggleFieldAbnormalLabel('rri-display-input', n > 0.70);
     }
     setAutoCalcSourceVisible(src, manual, inp.value.trim() !== '');
     return;
@@ -9578,10 +9874,12 @@ function recalcRRI() {
     if (icon) icon.style.display = 'none';
     const n = parseFloat(inp.value);
     ref.textContent = !isNaN(n) ? (n > 0.70 ? 'Abnormal (>0.70)' : 'Normal (≤0.70)') : '';
+    if (!guidanceOn && !isNaN(n)) toggleFieldAbnormalLabel('rri-display-input', n > 0.70);
   } else if (rri > 0.70) {
     el.className = 'lv-interp severe';
     if (icon) { icon.style.display = ''; icon.textContent = '⚠'; }
     ref.innerHTML = 'Abnormal (&gt;0.70)';
+    if (!guidanceOn) toggleFieldAbnormalLabel('rri-display-input', true);
   } else {
     el.className = 'lv-interp normal';
     if (icon) { icon.style.display = ''; icon.textContent = '✓'; }
@@ -9612,6 +9910,11 @@ function checkHR() {
   const hr = parseFloat(hrEl?.value);
   const el = document.getElementById('hr-warn');
   if (!el || !hrEl) return;
+  if (!isGuidanceModeEnabled()) {
+    el.classList.remove('show');
+    hrEl.classList.remove('soft-red');
+    return;
+  }
   const bad = !isNaN(hr) && (hr < 20 || hr > 250);
   el.classList.toggle('show', bad);
   hrEl.classList.toggle('soft-red', bad);
@@ -9781,6 +10084,7 @@ function applySettingsTogglesFromDraft(st) {
   toggleFusicHdQuestionsSection(!!document.getElementById('toggle-fusic-hd-questions')?.checked);
   toggleSummarySectionVisibility(!!document.getElementById('toggle-show-summary-section')?.checked);
   refreshMachineCapabilityFields();
+  applyGuidanceModeUI();
   syncHaemodynamicsMasterToggle();
   syncLVMasterToggle();
   syncValveMasterToggle();
@@ -11288,6 +11592,9 @@ function buildExportRows() {
         );
       }
     }
+    rowU('RVOT Acc. Time', getVal('f-phtRvotAccTime'), 'ms');
+    rowU('Early diastolic PR velocity', getVal('f-phtEarlyDiastolicPrVel'), 'm/s');
+    rowU('PA diameter', getVal('f-phtPaDiameter'), 'mm');
     row('Basic Features of PHT', selectedPHTBasic.size ? [...selectedPHTBasic].join(', ') : '');
     row('Advanced Features of PHT', selectedPHTAdvanced.size ? [...selectedPHTAdvanced].join(', ') : '');
   });
