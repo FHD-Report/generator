@@ -2,6 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<!-- Content Security Policy: blocks exfiltration of patient data to third-party origins
+     even if a future bug or compromised dependency tries to do so. Allowlist:
+     - 'self'                          : same-origin assets (sw.js, manifest.json, FHD.jpg, icon-*.png)
+     - 'unsafe-inline' (script/style)  : required by inline <script>/<style> blocks and ~119 inline
+                                         event handlers (onclick=, oninput=, onchange=, etc.)
+     - https://cdn.jsdelivr.net        : SheetJS XLSX library used for Excel export
+     - data:                           : inline SVG chevron backgrounds in CSS, FHD logo embedded as
+                                         data URL for PDF export, base64 fonts (none currently)
+     - blob:                           : XLSX writeFile() creates a temporary blob URL for download -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; manifest-src 'self'; worker-src 'self'">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>FUSIC HD Report Generator</title>
 <link rel="manifest" href="manifest.json">
@@ -611,32 +621,29 @@ html[data-theme="dark"] .edec-meas-block-title { background: #2a4c6e; }
 /* ─── COMPACT MODE (desktop only) ─────────────────────── */
 @media (min-width: 900px) {
   body.compact-mode #mainContent {
-    max-width: 100%;
+    max-width: 1280px;
     padding-left: 24px;
     padding-right: 24px;
     padding-top: 10px;
   }
   body.compact-mode .form-section { margin-bottom: 4px; }
   body.compact-mode .section-header { padding: 4px 10px; }
-  body.compact-mode .section-title { font-size: 12.5px; gap: 5px; }
+  body.compact-mode .section-title { gap: 5px; }
   body.compact-mode .section-icon { width: 18px; height: 18px; font-size: 10px; border-radius: 4px; }
   body.compact-mode .chevron svg { width: 13px; height: 13px; }
   body.compact-mode .section-body {
-    grid-template-columns: repeat(4, 1fr);
-    grid-auto-flow: dense;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 3px 12px;
     padding: 4px 10px 6px;
   }
-  body.compact-mode .section-body .field-group { gap: 1px; }
-  body.compact-mode label.field-label { font-size: 10.5px; }
-  body.compact-mode label.field-label .unit { font-size: 9.5px; }
+  body.compact-mode .section-body .field-group { gap: 1px; min-width: 0; }
   body.compact-mode input[type="text"],
   body.compact-mode input[type="number"],
   body.compact-mode input[type="date"],
   body.compact-mode textarea,
-  body.compact-mode select { padding: 4px 7px; font-size: 12.5px; }
+  body.compact-mode select { padding: 4px 7px; }
   body.compact-mode textarea { min-height: 24px; }
-  body.compact-mode .calc-hint { font-size: 9.5px; padding: 1px 2px 0; }
+  body.compact-mode .calc-hint { padding: 1px 2px 0; }
   body.compact-mode .rv-subheading { font-size: 11px; margin: 2px 0 1px; padding-top: 2px; }
   body.compact-mode .rv-subheading:first-child { margin-top: 0; padding-top: 0; }
   body.compact-mode .field-row.two-col { gap: 3px 10px; }
@@ -647,13 +654,11 @@ html[data-theme="dark"] .edec-meas-block-title { background: #2a4c6e; }
   }
   /* Compact chip groups (rhythm, CVS drugs, PHT, tamponade reuse .rhythm-chip) */
   body.compact-mode .rhythm-chips { gap: 4px; }
-  body.compact-mode .rhythm-chip { padding: 3px 9px; font-size: 12px; border-width: 1px; border-radius: 14px; }
-  body.compact-mode .rhythm-summary { font-size: 11px; padding-top: 2px; }
-  /* Default: all children span half-width so they pair up */
-  body.compact-mode .section-body > * { grid-column: span 2; }
-  /* Standalone field-groups span 1 col for max compaction */
-  body.compact-mode .section-body > .field-group { grid-column: span 1; }
-  /* Subheadings and complex full-section grids span all 4 cols */
+  body.compact-mode .rhythm-chip { padding: 3px 9px; border-width: 1px; border-radius: 14px; }
+  body.compact-mode .rhythm-summary { padding-top: 2px; }
+  /* Default: all direct children span 1 col */
+  body.compact-mode .section-body > * { grid-column: span 1; }
+  /* Full-width: subheadings, complex grids, chip blocks */
   body.compact-mode .section-body > .rv-subheading,
   body.compact-mode .section-body > .valve-grid,
   body.compact-mode .section-body > .aorta-grid,
@@ -662,15 +667,50 @@ html[data-theme="dark"] .edec-meas-block-title { background: #2a4c6e; }
   /* Demographics: rhythm / drugs chips on their own full-width row */
   body.compact-mode #demographics-cardiac-rhythm-wrap,
   body.compact-mode #demographics-cvs-drugs-wrap { grid-column: 1 / -1; }
-  body.compact-mode #demographics-clinical-indication-wrap { grid-column: span 2; }
-  /* RV: full-width rows for three-col and vis-function */
-  body.compact-mode #sec-rv .section-body > .field-row.three-col,
-  body.compact-mode #rv-vis-function-row { grid-column: 1 / -1; }
+  body.compact-mode #demographics-clinical-indication-wrap { grid-column: 1 / -1; }
   /* RV: PHT chip groups full-width */
   body.compact-mode #rv-pht-basic-features-wrap,
   body.compact-mode #rv-pht-advanced-features-wrap { grid-column: 1 / -1; }
   /* Pericardium: tamponade chips full-width */
   body.compact-mode #peri-tamponade-signs-wrap { grid-column: 1 / -1; }
+  /* Unwrap field-row wrappers so each field-group sits directly in the 5-col grid.
+     mc-doppler-wrap already has display:contents globally; field-rows inside them
+     also need flattening so their field-groups participate individually. */
+  body.compact-mode .section-body > .field-row,
+  body.compact-mode .section-body .mc-doppler-wrap > .field-row { display: contents; }
+  /* When field-rows are flattened into the 5-col grid, margin-top:auto on controls
+     causes large gaps because unrelated field-groups share grid rows of varying height. */
+  body.compact-mode .section-body .field-group > input,
+  body.compact-mode .section-body .field-group > select,
+  body.compact-mode .section-body .field-group > textarea,
+  body.compact-mode .section-body .field-group > .calc-display,
+  body.compact-mode .section-body .field-group > .field-row,
+  body.compact-mode .section-body .field-group > .lv-interp { margin-top: 0; }
+  /* Align Visual EF / EF biplane inputs with MAPSE / LV S' (which have calc-hint above) */
+  body.compact-mode .section-body .field-group > #f-lvidd,
+  body.compact-mode .section-body .field-group > #f-lvids,
+  body.compact-mode .section-body .field-group > #f-visualLvSize,
+  body.compact-mode .section-body .field-group > #f-ef,
+  body.compact-mode .section-body .field-group > #f-efSimpsonBiplane,
+  body.compact-mode .section-body .field-group > #f-laVisual,
+  body.compact-mode .section-body .field-group > #f-bLinesLung,
+  body.compact-mode .section-body .field-group > #f-atrialSeptalDev { margin-top: auto; }
+  /* Keep VTI intervention + respiration together on one row */
+  body.compact-mode #mc-pwd-vti-intervention-wrap {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    grid-column: span 2;
+    gap: 3px 10px;
+  }
+  /* Hide interpretation icons from E/e' and LAP probability in desktop mode */
+  body.compact-mode #ee-display .interp-icon,
+  body.compact-mode #lap-interp-display .interp-icon { display: none !important; }
+  /* Form controls fill their grid cell */
+  body.compact-mode .section-body .field-group > input,
+  body.compact-mode .section-body .field-group > select,
+  body.compact-mode .section-body .field-group > textarea,
+  body.compact-mode .section-body .field-group > .calc-display,
+  body.compact-mode .section-body .field-group > .lv-interp { width: 100%; min-width: 0; max-width: none; box-sizing: border-box; }
   /* Summary: single column */
   body.compact-mode #sec-summary .section-body {
     grid-template-columns: 1fr;
@@ -684,23 +724,38 @@ html[data-theme="dark"] .edec-meas-block-title { background: #2a4c6e; }
   }
   /* Scan info card: 6-col compact (fits all six fields on one row) */
   body.compact-mode .scan-info-header { padding: 6px 12px; }
-  body.compact-mode .scan-info-header-title { font-size: 13px; }
   body.compact-mode .scan-info-body {
     grid-template-columns: repeat(6, 1fr);
-    grid-auto-flow: dense;
     gap: 3px 10px;
     padding: 4px 10px;
   }
   body.compact-mode .scan-info-body .field-group { gap: 1px; }
-  body.compact-mode .scan-info-body label.field-label { font-size: 10.5px; }
   body.compact-mode .scan-info-body input[type="text"],
   body.compact-mode .scan-info-body input[type="date"],
   body.compact-mode .scan-info-body input[type="time"],
-  body.compact-mode .scan-info-body select { padding: 4px 7px; font-size: 12.5px; }
+  body.compact-mode .scan-info-body select { padding: 4px 7px; }
+  body.compact-mode .scan-info-body .field-group > input,
+  body.compact-mode .scan-info-body .field-group > select { width: 100%; max-width: none; box-sizing: border-box; }
+  body.compact-mode .scan-info-supervisor-panel.visible {
+    grid-column: auto;
+    margin-top: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    gap: 1px;
+  }
+  body.compact-mode .scan-info-supervisor-panel > input {
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+  }
   /* Editable calc displays */
-  body.compact-mode .calc-display.calc-display-editable { padding: 3px 6px; min-height: 26px; }
-  body.compact-mode .la-validate-hint { font-size: 9.5px; }
-  body.compact-mode .inline-warn { font-size: 9.5px; }
+  body.compact-mode .calc-display.calc-display-editable { padding: 3px 6px; min-height: 26px; min-width: 0; overflow: hidden; }
+  body.compact-mode .calc-display-editable .calc-editable-value-line { flex-wrap: nowrap; gap: 3px 5px; min-width: 0; }
+  body.compact-mode .calc-editable-prefix { font-size: 12px; }
+  body.compact-mode .calc-editable-value { font-size: 14px; min-width: 2em; }
+  body.compact-mode .calc-editable-suffix { font-size: 10.5px; }
 }
 
 /* ─── SCAN INFO CARD ──────────────────────────────────── */
@@ -796,9 +851,9 @@ html[data-theme="dark"] .edec-meas-block-title { background: #2a4c6e; }
 .field-row.three-col > .field-group > .field-row {
   margin-top: auto;
 }
-/* VTI Δ intervention: respiration input lives inside .vti-delta-resp-primary so it does not get margin-top:auto; when the intervention panel is hidden, do not push this input down in a stretched row (compact grid often stretches row height). */
-.field-row.two-col > .field-group:has(#vti-intervention-panel:not(.visible)) > #f-vtiDeltaIntervention,
-.field-row.three-col > .field-group:has(#vti-intervention-panel:not(.visible)) > #f-vtiDeltaIntervention {
+/* VTI Δ intervention: the input should always sit directly below its label — never pushed down by margin-top:auto — because the intervention panel content grows below it. */
+.field-row.two-col > .field-group > #f-vtiDeltaIntervention,
+.field-row.three-col > .field-group > #f-vtiDeltaIntervention {
   margin-top: 0;
 }
 /* Vein Doppler row: .vein-hint sits below the select; margin-top:auto on selects misaligns columns when only some hints are visible (compact and normal). */
@@ -1154,7 +1209,8 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
 
 #pasp-field-group-wrap.section-hidden,
 #rv-lv-basal-ratio-field-wrap.section-hidden,
-#tapse-pasp-ratio-field-wrap.section-hidden { display: none; }
+#tapse-pasp-ratio-field-wrap.section-hidden,
+#rvot-vti-field-wrap.section-hidden { display: none; }
 #ea-field-group-wrap.section-hidden { display: none; }
 #lv-fs-field-wrap.section-hidden,
 #rwt-field-wrap.section-hidden,
@@ -1314,6 +1370,21 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
   align-items: center;
 }
 .plain-text-report-toolbar-actions .btn { min-height: 42px; }
+.plain-text-report-instructions {
+  max-width: min(72ch, 100%);
+  margin: 0 auto 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.98rem;
+  line-height: 1.5;
+  box-shadow: var(--shadow-sm);
+}
+.plain-text-report-instructions[hidden] { display: none !important; }
+.plain-text-report-instructions p { margin: 0 0 10px; }
+.plain-text-report-instructions p:last-child { margin-bottom: 0; }
 .plain-text-report-body-wrap {
   flex: 1;
   min-height: 0;
@@ -1333,8 +1404,13 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
   user-select: text;
   tab-size: 4;
 }
+#plainTextReportBody[data-copy-kind="quickData"] {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
 @media (min-width: 800px) {
   #plainTextReportBody { font-size: 1.3rem; line-height: 1.58; }
+  #plainTextReportBody[data-copy-kind="quickData"] { font-size: 0.98rem; line-height: 1.5; }
 }
 
 /* ─── EXPORT MODAL ───────────────────────────────────── */
@@ -2454,13 +2530,13 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
   .print-meta-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr) minmax(0, 1fr) minmax(0, 1.05fr);
-    gap: 1px;
     width: 100%;
     margin-bottom: 3px;
     font-size: 8.1pt;
     line-height: 1.25;
-    background: #b0b0b0;
-    border: 1px solid #b0b0b0;
+    background: #fff;
+    border-top: 1px solid #ccc;
+    border-left: 1px solid #ccc;
     box-sizing: border-box;
     break-inside: avoid;
     page-break-inside: avoid;
@@ -2470,21 +2546,23 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
     padding: 2px 5px;
     word-break: break-word;
     min-width: 0;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
   }
   .print-meta-grid > .print-meta-k {
     font-weight: 600;
-    background: #f3f4f6;
+    background: #fff;
     color: #222;
   }
   .print-meta-grid > .print-meta-v {
     background: #fff;
     color: #111;
   }
-  .print-meta-grid > .print-meta-empty.print-meta-k {
-    background: #f3f4f6;
-  }
+  .print-meta-grid > .print-meta-empty.print-meta-k,
   .print-meta-grid > .print-meta-empty.print-meta-v {
     background: #fff;
+    border-right: none;
+    border-bottom: none;
   }
   /* Clinical / structural sections: do not split across pages (LV, RV, Aorta, etc.) */
   .print-section:not(.print-section--summary) {
@@ -2548,13 +2626,13 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
   .print-field-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr) minmax(0, 1fr) minmax(0, 1.05fr);
-    gap: 1px;
     width: 100%;
     margin-bottom: 2px;
     font-size: 8.1pt;
     line-height: 1.25;
-    background: #c5c5c5;
-    border: 1px solid #c5c5c5;
+    background: #fff;
+    border-top: 1px solid #ccc;
+    border-left: 1px solid #ccc;
     box-sizing: border-box;
   }
   .print-field-grid > .print-fld-k,
@@ -2564,21 +2642,35 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
     vertical-align: top;
     word-break: break-word;
     min-width: 0;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
   }
   .print-field-grid > .print-fld-k {
     font-weight: 600;
-    background: #fafafa;
+    background: #fff;
     color: #222;
   }
   .print-field-grid > .print-fld-v {
     color: #111;
   }
   .print-field-grid > .print-fld-empty {
-    background: #fafafa;
+    background: #fff;
     min-height: 1.2em;
+    border-right: none;
+    border-bottom: none;
   }
   .print-field-grid > .print-fld-empty.print-fld-v {
     background: #fff;
+  }
+  .print-field-grid > .print-fld-empty.print-fld-empty--line-pad {
+    border-bottom: 1px solid #ccc;
+  }
+  /* Indication: full-width row spanning all 4 grid columns */
+  .print-indication-k {
+    grid-column: 1 / 2;
+  }
+  .print-indication-v {
+    grid-column: 2 / -1;
   }
   /* FUSIC HD QUESTIONS: one Q|A per row (10 neat rows; no 4-col pair padding) */
   .print-field-grid.print-field-grid--fusic {
@@ -3002,16 +3094,16 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <div class="settings-group-title">Report Fields</div>
       <div class="settings-group-body">
         <div class="toggle-row">
-          <div><div class="toggle-label">FUSIC HD Questions</div></div>
+          <div><div class="toggle-label">FUSIC HD Questions</div><div class="settings-toggle-hint">Enable/Disable the visibility of the ten FUSIC HD questions.</div></div>
           <label class="toggle-switch"><input type="checkbox" id="toggle-fusic-hd-questions" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
         </div>
         <div class="toggle-row">
-          <div><div class="toggle-label">Summary &amp; Conclusions</div><div class="settings-toggle-hint">Section 10 — FUSIC HD questions, impression, significance, and recommended actions</div></div>
+            <div><div class="toggle-label">Summary &amp; conclusions</div><div class="settings-toggle-hint">Toggles entire Summary &amp; conclusions section on/off</div></div>
           <label class="toggle-switch"><input type="checkbox" id="toggle-show-summary-section" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
         </div>
         <div class="settings-machine-cap-block">
           <div class="rv-subheading">Machine Capabilities</div>
-          <p class="settings-machine-cap-desc">Hide fields for Doppler modes your machine cannot do.</p>
+          <p class="settings-machine-cap-desc">Show/hide fields based on your machine's capabilities</p>
           <div class="toggle-row">
             <div><div class="toggle-label">Continuous wave (CWD)</div></div>
             <label class="toggle-switch"><input type="checkbox" id="toggle-machine-cwd" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
@@ -3149,6 +3241,10 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
                   <div><div class="toggle-label">TAPSE / PASP ratio</div><div class="settings-toggle-hint">TAPSE (mm) ÷ estimated PASP (mmHg)</div></div>
                   <label class="toggle-switch"><input type="checkbox" id="toggle-show-tapse-pasp-ratio"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
                 </div>
+                <div class="toggle-row">
+                  <div><div class="toggle-label">RVOT VTI</div><div class="settings-toggle-hint">Right ventricular outflow tract velocity-time integral (cm)</div></div>
+                  <label class="toggle-switch"><input type="checkbox" id="toggle-show-rvot-vti"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                </div>
               </div>
             </div>
           </details>
@@ -3197,21 +3293,21 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <div class="settings-group-body">
         <div class="toggle-row">
           <div>
-            <div class="toggle-label">Enable temporary auto-save (clears when tab closes)</div>
-            <div class="settings-toggle-hint">Saves your report in this tab&rsquo;s <strong>sessionStorage</strong> only — survives refresh but not closing the tab; nothing is written to long-term browser storage.</div>
+            <div class="toggle-label">Auto-save while you work.</div>
+            <div class="settings-toggle-hint">Your draft is kept safe if you refresh the page, but will be cleared once you close the tab.</div>
           </div>
           <label class="toggle-switch"><input type="checkbox" id="toggle-session-draft-autosave"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
         </div>
         <div class="toggle-row">
           <div>
             <div class="toggle-label">Warn before closing if form contains data</div>
-            <div class="settings-toggle-hint">Uses the browser&rsquo;s native leave warning when the report looks non-empty (reduces loss from an accidental swipe-back or tab close).</div>
+            <div class="settings-toggle-hint">If you have unsaved work, you'll get a warning before accidentally leaving the page.</div>
           </div>
           <label class="toggle-switch"><input type="checkbox" id="toggle-warn-before-unload" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
         </div>
         <div class="toggle-row">
           <div>
-            <div class="toggle-label">Compact mode</div>
+            <div class="toggle-label">Desktop mode</div>
             <div class="settings-toggle-hint">Reduces vertical space and uses the full screen width on desktop, fitting more fields into view and minimising scrolling. No effect on mobile.</div>
           </div>
           <label class="toggle-switch"><input type="checkbox" id="toggle-compact-mode"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
@@ -3265,11 +3361,12 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         <div class="toggle-row">
           <div>
             <div class="toggle-label">Guidance mode</div>
-            <div class="settings-toggle-hint">Show in-form guidance/reference text and unusual-value checks.</div>
+            <div class="settings-toggle-hint">Show in-form guidance and reference text.</div>
           </div>
           <label class="toggle-switch"><input type="checkbox" id="toggle-guidance-mode" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
         </div>
-        <button type="button" class="btn btn-secondary settings-anonymise-btn" id="populateTestDataBtn" title="Load septic shock / fluid-responsive demo data">Populate test data…</button>
+        <button type="button" class="btn btn-secondary settings-anonymise-btn" id="populateTestDataBtn" title="Load septic shock / fluid-responsive demo data">Populate test data A…</button>
+        <button type="button" class="btn btn-secondary settings-anonymise-btn" id="populateTestDataBBtn" title="Load comprehensive demo data (all fields)">Populate test data B…</button>
       </div>
     </div>
   </div>
@@ -3281,7 +3378,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
   <!-- ── SCAN INFORMATION CARD ─────────────────────── -->
   <div id="scanInfoCard">
     <div class="scan-info-header">
-      <span class="scan-info-header-title">Scan Information</span>
+      <span class="scan-info-header-title">Scan information</span>
       <button type="button" class="scan-info-collapse-all-btn" id="scanInfoCollapseAllBtn" aria-label="Collapse all report sections" title="Collapse all sections">
         <svg class="scan-info-icon-collapse" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 15 12 9 18 15"/></svg>
         <svg class="scan-info-icon-expand" hidden xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
@@ -3290,12 +3387,12 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
     <div class="scan-info-body">
 
       <div class="field-group">
-        <label class="field-label" for="f-operatorName">Operator Name</label>
+        <label class="field-label" for="f-operatorName">Operator name</label>
         <input type="text" id="f-operatorName" placeholder="Enter your name">
       </div>
 
       <div class="field-group">
-        <label class="field-label" for="f-supervision">Supervision Status</label>
+        <label class="field-label" for="f-supervision">Supervision status</label>
         <select id="f-supervision" onchange="checkSupervisionField()">
           <option value="independent">Independent</option>
           <option value="direct">Directly Supervised</option>
@@ -3305,23 +3402,23 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       </div>
 
       <div id="f-supervisorName-wrap" class="conditional-field scan-info-supervisor-panel">
-        <label class="field-label" for="f-supervisorName">Supervising Clinician Name</label>
-        <input type="text" id="f-supervisorName" placeholder="Name of supervising clinician">
+        <label class="field-label" for="f-supervisorName">Supervising clinician</label>
+        <input type="text" id="f-supervisorName">
       </div>
 
       <div class="field-group">
-        <label class="field-label" for="f-scanDate" id="f-scanDate-label">Date of Scan</label>
+        <label class="field-label" for="f-scanDate" id="f-scanDate-label">Date of scan</label>
         <input type="date" id="f-scanDate">
         <div id="scan-date-future-hint" class="la-validate-hint" aria-live="polite"></div>
       </div>
 
       <div class="field-group">
-        <label class="field-label" for="f-scanTime" id="f-scanTime-label">Time of Scan</label>
+        <label class="field-label" for="f-scanTime" id="f-scanTime-label">Time of scan</label>
         <input type="time" id="f-scanTime">
       </div>
 
       <div class="field-group">
-        <label class="field-label" for="f-imageQuality">Image Quality</label>
+        <label class="field-label" for="f-imageQuality">Image quality</label>
         <select id="f-imageQuality">
           <option value="">— Select —</option>
           <option>Good</option><option>Adequate</option><option>Poor</option>
@@ -3349,18 +3446,23 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
   <!-- ── 1. PATIENT DEMOGRAPHICS ───────────────────── -->
   <section class="form-section" id="sec-demographics">
     <div class="section-header" onclick="toggleSection('sec-demographics')">
-      <div class="section-title"><span class="section-icon">1</span>Patient Demographics</div>
+      <div class="section-title"><span class="section-icon">1</span>Patient demographics</div>
       <div class="chevron"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div>
     </div>
     <div class="section-body">
 
       <div class="field-group">
-        <label class="field-label" for="f-patientName">Patient Name</label>
+        <label class="field-label" for="f-patientName">Patient name</label>
         <input type="text" id="f-patientName" placeholder="Patient name" autocomplete="name">
       </div>
       <div class="field-group">
-        <label class="field-label" for="f-patientId">Patient ID / Sticker Reference</label>
-        <input type="text" id="f-patientId" placeholder="Patient ID, NHS number, or sticker reference">
+        <label class="field-label" for="f-patientId">Patient ID</label>
+        <input type="text" id="f-patientId" placeholder="e.g. Patient ID, NHS number">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="f-dob">Date of birth</label>
+        <input type="date" id="f-dob" oninput="recalcAgeFromDOB()">
       </div>
 
       <div class="field-row two-col">
@@ -3375,20 +3477,17 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         <div class="field-group">
           <label class="field-label" for="f-age" id="f-age-label">Age <span class="unit">(years)</span></label>
           <input type="number" id="f-age" placeholder="e.g. 64" min="0" max="130" step="1">
-          <div id="age-warn" class="inline-warn">Unusual value.</div>
         </div>
       </div>
 
       <div id="ci-wt-ht-fields" class="field-row two-col section-hidden">
         <div class="field-group">
           <label class="field-label" for="f-weight">Weight <span class="unit">(kg)</span></label>
-          <input type="number" id="f-weight" placeholder="e.g. 70" min="1" max="400" step="0.1" oninput="checkCIAnthropometrics(); recalcCardiacIndex(); recalcBSAField(); recalcDerivedHaemodynamics(); recalcLVOptionalMeasures();">
-          <div id="weight-plaus-hint" class="inline-warn"></div>
+          <input type="number" id="f-weight" placeholder="e.g. 70" min="1" max="400" step="0.1" oninput="recalcCardiacIndex(); recalcBSAField(); recalcDerivedHaemodynamics(); recalcLVOptionalMeasures(); recalcTVmLkg();">
         </div>
         <div class="field-group">
           <label class="field-label" for="f-height">Height <span class="unit">(cm)</span></label>
-          <input type="number" id="f-height" placeholder="e.g. 170" min="30" max="280" step="0.1" oninput="checkCIAnthropometrics(); recalcCardiacIndex(); recalcBSAField(); recalcDerivedHaemodynamics(); recalcLVOptionalMeasures();">
-          <div id="height-plaus-hint" class="inline-warn"></div>
+          <input type="number" id="f-height" placeholder="e.g. 170" min="30" max="280" step="0.1" oninput="recalcCardiacIndex(); recalcBSAField(); recalcDerivedHaemodynamics(); recalcLVOptionalMeasures();">
         </div>
       </div>
 
@@ -3401,18 +3500,17 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
             <span class="calc-editable-suffix">m²</span>
           </div>
         </div>
-        <div class="calc-hint">Mosteller: √[(height cm × weight kg) ÷ 3600]</div>
+        <div class="calc-hint guidance-text">Mosteller: √[(height cm × weight kg) ÷ 3600]</div>
       </div>
 
       <div class="field-group">
-        <label class="field-label" for="f-hr">Heart Rate <span class="unit">(bpm)</span></label>
+        <label class="field-label" for="f-hr">Heart rate <span class="unit">(bpm)</span></label>
           <input type="number" id="f-hr" placeholder="e.g. 72" min="0" max="350" step="1" oninput="recalcHaemodynamics()">
-        <div id="hr-warn" class="inline-warn">Unusual value.</div>
       </div>
 
       <div class="field-row two-col">
         <div class="field-group">
-          <label class="field-label">Blood Pressure <span class="unit">(mmHg)</span></label>
+          <label class="field-label">Blood pressure <span class="unit">(mmHg)</span></label>
           <div class="field-row two-col" style="gap:10px;">
             <div class="field-group">
               <label class="field-label" for="f-sbp">Systolic</label>
@@ -3425,7 +3523,8 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
           </div>
         </div>
         <div class="field-group">
-          <label class="field-label" for="map-display-input">Mean Arterial Pressure <span class="unit">(mmHg)</span><span class="field-label-source-tag" id="map-display-source" hidden></span></label>
+          <label class="field-label" for="map-display-input">Mean arterial pressure <span class="unit">(mmHg)</span><span class="field-label-source-tag" id="map-display-source" hidden></span></label>
+          <div class="calc-hint guidance-text">MAP = (SBP + 2×DBP) / 3</div>
           <div class="calc-display calc-display-editable" id="map-display">
             <div class="calc-editable-value-line">
               <span class="calc-editable-prefix">MAP:</span>
@@ -3433,12 +3532,11 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
               <span class="calc-editable-suffix">mmHg</span>
             </div>
           </div>
-          <div class="calc-hint guidance-text">MAP = (SBP + 2×DBP) / 3</div>
         </div>
       </div>
 
       <div class="field-group" id="demographics-cardiac-rhythm-wrap">
-        <label class="field-label">Cardiac Rhythm <span class="unit">(tap to select — multiple allowed)</span></label>
+        <label class="field-label">Cardiac rhythm <span class="unit">(tap to select — multiple allowed)</span></label>
         <div id="rhythmChips" class="rhythm-chips"></div>
         <div id="rhythmSummary" class="rhythm-summary">None selected</div>
       </div>
@@ -3446,14 +3544,13 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <div class="field-row two-col">
         <div class="field-group">
           <label class="field-label" for="f-ventilation">Ventilation</label>
-          <select id="f-ventilation" onchange="updateVTIRespirationCaution()">
+          <select id="f-ventilation" onchange="updateVentilationSubFields(); updateVTIRespirationCaution();">
             <option value="">— Select —</option>
             <option>Self-Vent: Room Air</option>
             <option>Self-Vent: Oxygen</option>
             <option>Self-Vent: CPAP</option>
             <option>Self-Vent: BiPAP</option>
-            <option>IPPV</option>
-            <option>PSV</option>
+            <option>Ventilated</option>
           </select>
         </div>
         <div class="field-group">
@@ -3462,14 +3559,59 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         </div>
       </div>
 
+      <!-- Ventilation sub-fields: conditionally shown based on selected mode -->
+      <div id="f-ventilatory-mode-wrap" class="field-group conditional-field">
+        <label class="field-label" for="f-ventilatory-mode">Ventilatory Mode</label>
+        <select id="f-ventilatory-mode">
+          <option value="">— Select —</option>
+          <option>Mandatory/IPPV</option>
+          <option>APRV</option>
+          <option>Patient-triggered (PS/CPAP/SIMV)</option>
+        </select>
+      </div>
+      <div id="f-fio2-wrap" class="field-group conditional-field">
+        <label class="field-label" for="f-fio2">FiO<sub>2</sub> <span class="unit">(%)</span></label>
+        <input type="number" id="f-fio2" placeholder="e.g. 40" min="21" max="100" step="1">
+      </div>
+      <div id="f-peep-wrap" class="field-group conditional-field">
+        <label class="field-label" for="f-peep">PEEP <span class="unit">(cmH<sub>2</sub>O)</span></label>
+        <input type="number" id="f-peep" placeholder="e.g. 5" min="0" max="40" step="0.5">
+      </div>
+      <div id="f-ipap-wrap" class="field-group conditional-field">
+        <label class="field-label" for="f-ipap">IPAP <span class="unit">(cmH<sub>2</sub>O)</span></label>
+        <input type="number" id="f-ipap" placeholder="e.g. 14" min="0" max="50" step="0.5">
+      </div>
+      <div id="ventilated-extra-wrap" class="conditional-field">
+        <div class="field-row two-col">
+          <div class="field-group">
+            <label class="field-label" for="f-pplat">Pplat <span class="unit">(cmH<sub>2</sub>O)</span></label>
+            <input type="number" id="f-pplat" placeholder="e.g. 24" min="0" max="60" step="0.5">
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="f-tidal-volume">Tidal Volume <span class="unit">(mL)</span></label>
+            <input type="number" id="f-tidal-volume" placeholder="e.g. 450" min="0" max="2000" step="1" oninput="recalcTVmLkg();">
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="f-tv-mlkg-input">Tidal Volume <span class="unit">(mL/kg)</span><span class="field-label-source-tag" id="f-tv-mlkg-source" hidden></span></label>
+          <div class="calc-display calc-display-editable" id="f-tv-mlkg-display">
+            <div class="calc-editable-value-line">
+              <span class="calc-editable-prefix">TV:</span>
+              <input type="text" class="calc-editable-value auto-calc-input" id="f-tv-mlkg-input" inputmode="decimal" autocomplete="off" aria-label="Tidal volume mL per kg">
+              <span class="calc-editable-suffix">mL/kg</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="field-group" id="demographics-clinical-indication-wrap">
-        <label class="field-label" for="f-indication">Clinical Indication</label>
+        <label class="field-label" for="f-indication">Clinical indication</label>
         <textarea id="f-indication" placeholder="Describe clinical indication for scan..." rows="3"></textarea>
         <p class="anonymise-pii-reminder">Ensure you have removed all patient identifiable information.</p>
       </div>
 
       <div class="field-group" id="demographics-cvs-drugs-wrap">
-        <label class="field-label">CVS Drugs <span class="unit">(tap to select — multiple allowed)</span></label>
+        <label class="field-label">CVS drugs <span class="unit">(tap to select — multiple allowed)</span></label>
         <div id="cvsDrugChips" class="rhythm-chips"></div>
         <div id="cvsDrugSummary" class="rhythm-summary">None selected</div>
         <div id="cvs-drug-details-panel" class="conditional-field" aria-live="polite"></div>
@@ -3489,8 +3631,8 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <div class="field-row two-col">
         <div class="field-group">
           <label class="field-label" for="f-lvidd">LVIDd <span class="unit">(mm)</span></label>
-          <input type="number" id="f-lvidd" placeholder="e.g. 50" min="10" max="120" step="0.1" oninput="scheduleMainContentSoftValidation()">
           <div id="lv-idd-hint" class="la-validate-hint" aria-live="polite"></div>
+          <input type="number" id="f-lvidd" placeholder="e.g. 50" min="10" max="120" step="0.1" oninput="scheduleMainContentSoftValidation()">
         </div>
         <div class="field-group">
           <label class="field-label" for="f-lvids">LVIDs <span class="unit">(mm)</span></label>
@@ -3500,13 +3642,13 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <div class="field-row two-col">
         <div class="field-group">
           <label class="field-label" for="f-ivsd">IVSd <span class="unit">(mm)</span></label>
-          <input type="number" id="f-ivsd" placeholder="e.g. 9" min="3" max="30" step="0.1" oninput="scheduleMainContentSoftValidation()">
           <div class="calc-hint guidance-text" id="ivsd-ref">Normal &lt;12 mm</div>
+          <input type="number" id="f-ivsd" placeholder="e.g. 9" min="3" max="30" step="0.1" oninput="scheduleMainContentSoftValidation()">
         </div>
         <div class="field-group">
           <label class="field-label" for="f-lvpwd">LVPWd <span class="unit">(mm)</span></label>
-          <input type="number" id="f-lvpwd" placeholder="e.g. 9" min="3" max="30" step="0.1" oninput="scheduleMainContentSoftValidation()">
           <div class="calc-hint guidance-text" id="lvpwd-ref">Normal &lt;12 mm</div>
+          <input type="number" id="f-lvpwd" placeholder="e.g. 9" min="3" max="30" step="0.1" oninput="scheduleMainContentSoftValidation()">
         </div>
       </div>
 
@@ -3518,7 +3660,6 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
             <input type="text" class="calc-editable-value auto-calc-input" id="rwt-display-input" inputmode="decimal" autocomplete="off" aria-label="Relative wall thickness">
           </div>
         </div>
-        <div class="calc-hint">(2 × LVPWd) / LVIDd</div>
       </div>
       <div id="lv-mass-field-wrap" class="field-group section-hidden">
         <label class="field-label" for="lv-mass-display-input">LV mass <span class="unit">(g)</span><span class="field-label-source-tag" id="lv-mass-display-source" hidden></span></label>
@@ -3529,7 +3670,6 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
             <span class="calc-editable-suffix">g</span>
           </div>
         </div>
-        <div class="calc-hint">0.8 × 1.04 × [(LVIDd + IVSd + LVPWd)³ − LVIDd³] + 0.6 — linear mm → cm</div>
       </div>
       <div id="lvmi-field-wrap" class="field-group section-hidden">
         <label class="field-label" for="lvmi-display-input">LV mass index <span class="unit">(g/m²)</span><span class="field-label-source-tag" id="lvmi-display-source" hidden></span></label>
@@ -3540,7 +3680,6 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
             <span class="calc-editable-suffix">g/m²</span>
           </div>
         </div>
-        <div class="calc-hint">LV mass ÷ BSA — uses LV mass field if shown, else calculated mass</div>
       </div>
       <div id="lvidd-index-field-wrap" class="field-group section-hidden">
         <label class="field-label" for="lvidd-index-display-input">Indexed LVIDd <span class="unit">(mm/m²)</span><span class="field-label-source-tag" id="lvidd-index-display-source" hidden></span></label>
@@ -3551,7 +3690,6 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
             <span class="calc-editable-suffix">mm/m²</span>
           </div>
         </div>
-        <div class="calc-hint">LVIDd ÷ BSA</div>
       </div>
 
       <div class="field-group">
@@ -3585,14 +3723,14 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <div class="field-row two-col">
         <div class="field-group">
           <label class="field-label" for="f-mapse">MAPSE <span class="unit">(mm)</span></label>
-          <input type="number" id="f-mapse" placeholder="e.g. 14" min="0" max="40" step="0.1">
           <div class="calc-hint guidance-text" id="mapse-ref">Normal &gt;12 mm</div>
+          <input type="number" id="f-mapse" placeholder="e.g. 14" min="0" max="40" step="0.1">
         </div>
         <div id="mc-tdi-lv-sprime-wrap" class="mc-doppler-wrap">
           <div class="field-group">
             <label class="field-label" for="f-lvSPrime">LV S&rsquo; <span class="unit">(cm/s)</span></label>
-            <input type="number" id="f-lvSPrime" placeholder="e.g. 9" min="0" max="30" step="0.1">
             <div class="calc-hint guidance-text" id="lv-sprime-ref">Normal &gt;7 cm/s</div>
+            <input type="number" id="f-lvSPrime" placeholder="e.g. 9" min="0" max="30" step="0.1">
           </div>
         </div>
       </div>
@@ -3606,7 +3744,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
             <span class="calc-editable-suffix">%</span>
           </div>
         </div>
-        <div class="calc-hint">⟵ [(LVIDd − LVIDs) / LVIDd] × 100</div>
+        <div class="calc-hint guidance-text">⟵ [(LVIDd − LVIDs) / LVIDd] × 100</div>
       </div>
 
       <!-- RWMA -->
@@ -3647,7 +3785,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <div id="mc-pwd-sv-co-wrap" class="mc-doppler-wrap">
       <div class="field-row two-col">
         <div class="field-group">
-          <label class="field-label" for="sv-display-input">Stroke Volume <span class="unit">(mL)</span><span class="field-label-source-tag" id="sv-display-source" hidden></span></label>
+          <label class="field-label" for="sv-display-input">Stroke volume <span class="unit">(mL)</span><span class="field-label-source-tag" id="sv-display-source" hidden></span></label>
           <div class="calc-display calc-display-editable" id="sv-display">
             <div class="calc-editable-value-line">
               <span class="calc-editable-prefix">SV:</span>
@@ -3658,7 +3796,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
           <div class="calc-hint guidance-text">⟵ Requires LVOT Diameter &amp; LVOT VTI</div>
         </div>
         <div class="field-group">
-          <label class="field-label" for="co-display-input">Cardiac Output <span class="unit">(L/min)</span><span class="field-label-source-tag" id="co-display-source" hidden></span></label>
+          <label class="field-label" for="co-display-input">Cardiac output <span class="unit">(L/min)</span><span class="field-label-source-tag" id="co-display-source" hidden></span></label>
           <div class="calc-display calc-display-editable" id="co-display">
             <div class="calc-editable-value-line">
               <span class="calc-editable-prefix">CO:</span>
@@ -3673,7 +3811,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
 
       <div id="ci-field-wrap" class="section-hidden">
         <div class="field-group">
-          <label class="field-label" for="ci-display-input">Cardiac Index <span class="unit">(L/min/m²)</span><span class="field-label-source-tag" id="ci-display-source" hidden></span></label>
+          <label class="field-label" for="ci-display-input">Cardiac index <span class="unit">(L/min/m²)</span><span class="field-label-source-tag" id="ci-display-source" hidden></span></label>
           <div class="calc-display calc-display-editable" id="ci-display">
             <div class="calc-editable-value-line">
               <span class="calc-editable-prefix">CI:</span>
@@ -3681,7 +3819,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
               <span class="calc-editable-suffix">L/min/m²</span>
             </div>
           </div>
-          <div class="calc-hint">⟵ Requires CO + Weight &amp; Height (Section 1)</div>
+          <div class="calc-hint guidance-text">⟵ Requires CO + Weight &amp; Height (Section 1)</div>
           <div id="ci-range-hint" class="inline-warn"></div>
           <div id="ci-high-output-hint" class="inline-warn ci-amber-note"></div>
         </div>
@@ -3711,7 +3849,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
               <span class="calc-editable-suffix"></span>
             </div>
           </div>
-          <div class="calc-hint">[(MAP − CVP) ÷ CO] × 80 — MAP, CVP (Section 1), CO above</div>
+          <div class="calc-hint guidance-text">[(MAP − CVP) ÷ CO] × 80 — MAP, CVP (Section 1), CO above</div>
         </div>
       </div>
 
@@ -3725,29 +3863,12 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
               <span class="calc-editable-suffix"></span>
             </div>
           </div>
-          <div class="calc-hint">SVR × BSA</div>
+          <div class="calc-hint guidance-text">SVR × BSA</div>
         </div>
       </div>
 
       <div id="mc-pwd-vti-intervention-wrap" class="mc-doppler-wrap">
       <div class="field-row two-col">
-        <div class="field-group">
-          <div class="vti-delta-resp-primary" id="vti-delta-resp-primary">
-            <label class="field-label" for="f-vtiDeltaResp">VTI % <span class="unit">△</span> respiration</label>
-            <input type="number" id="f-vtiDeltaResp" placeholder="e.g. 12" step="0.1" oninput="updateVTIRespirationCaution()">
-          </div>
-          <div id="vti-resp-caution" class="vti-caution-box" role="note">
-            <strong>Caution — validity conditions</strong>
-            This metric is only valid if <em>all</em> of the following are met:
-            <ul>
-              <li>Sinus rhythm</li>
-              <li>Mechanically ventilated with no spontaneous breaths</li>
-              <li>Tidal volumes of at least 8 mL/kg</li>
-              <li>Normal intra-abdominal pressure</li>
-              <li>An intact thorax</li>
-            </ul>
-          </div>
-        </div>
         <div class="field-group">
           <label class="field-label" for="f-vtiDeltaIntervention">VTI % <span class="unit">△</span> intervention</label>
           <input type="number" id="f-vtiDeltaIntervention" placeholder="e.g. 15" step="0.1" oninput="updateVTIInterventionUI()" onchange="updateVTIInterventionUI()">
@@ -3765,6 +3886,23 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
             </div>
           </div>
         </div>
+        <div class="field-group">
+          <div class="vti-delta-resp-primary" id="vti-delta-resp-primary">
+            <label class="field-label" for="f-vtiDeltaResp">VTI % <span class="unit">△</span> respiration</label>
+            <input type="number" id="f-vtiDeltaResp" placeholder="e.g. 12" step="0.1" oninput="updateVTIRespirationCaution()">
+          </div>
+          <div id="vti-resp-caution" class="vti-caution-box" role="note">
+            <strong>Caution — validity conditions</strong>
+            This metric is only valid if <em>all</em> of the following are met:
+            <ul>
+              <li>Sinus rhythm</li>
+              <li>Mechanically ventilated with no spontaneous breaths</li>
+              <li>Tidal volumes of at least 8 mL/kg</li>
+              <li>Normal intra-abdominal pressure</li>
+              <li>An intact thorax</li>
+            </ul>
+          </div>
+        </div>
       </div>
       </div>
 
@@ -3780,7 +3918,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
     <div class="section-body">
       <div class="field-row two-col">
         <div class="field-group">
-          <label class="field-label" for="f-bLinesLung">B-Lines on Lung Ultrasound</label>
+          <label class="field-label" for="f-bLinesLung">B-lines on lung ultrasound</label>
           <select id="f-bLinesLung" onchange="updateLAPRaisedPressureHint(); recalcLAPInterp()">
             <option value="">— Select —</option>
             <option>Yes - Bilateral</option>
@@ -3809,7 +3947,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         </div>
         <div class="field-group">
           <label class="field-label" for="f-laDiamSys">LA diameter (end systole) <span class="unit">(mm)</span></label>
-          <p class="calc-hint guidance-text" id="la-diam-ref">Normal: &lt;45 mm (female), &lt;50 mm (male)</p>
+          <p class="calc-hint guidance-text" id="la-diam-ref">Normal: &lt;45 mm (F), &lt;50 mm (M)</p>
           <input type="number" id="f-laDiamSys" placeholder="e.g. 42" min="0" max="120" step="0.1" oninput="recalcLAPInterp()" onchange="recalcLAPInterp()">
           <div id="la-diam-hint" class="la-validate-hint" aria-live="polite"></div>
         </div>
@@ -3829,11 +3967,11 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <div id="mc-pwd-mv-inflow-wrap" class="mc-doppler-wrap">
         <div class="field-row two-col">
           <div class="field-group">
-            <label class="field-label" for="f-eWave">E Wave Velocity <span class="unit">(cm/s)</span></label>
+            <label class="field-label" for="f-eWave">E wave velocity <span class="unit">(cm/s)</span></label>
             <input type="number" id="f-eWave" placeholder="e.g. 70" min="0" step="0.1" oninput="recalcEA(); recalcEe(); recalcLAPInterp()">
           </div>
           <div class="field-group">
-            <label class="field-label" for="f-aWave">A Wave Velocity <span class="unit">(cm/s)</span></label>
+            <label class="field-label" for="f-aWave">A wave velocity <span class="unit">(cm/s)</span></label>
             <input type="number" id="f-aWave" placeholder="e.g. 60" min="0" step="0.1" oninput="recalcEA()">
           </div>
         </div>
@@ -3981,13 +4119,13 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
             <input type="text" class="calc-editable-value auto-calc-input" id="rv-lv-basal-ratio-display-input" inputmode="decimal" autocomplete="off" aria-label="RV to LV basal diameter ratio">
           </div>
         </div>
-        <div class="calc-hint">RV basal diameter ÷ LVIDd (section 2), both in mm</div>
+        <div class="calc-hint guidance-text">RV basal diameter ÷ LVIDd (section 2), both in mm</div>
       </div>
 
       <div class="rv-subheading">Function assessment</div>
       <div class="field-row two-col" id="rv-vis-function-row">
         <div class="field-group">
-          <label class="field-label" for="f-rvVisLongitudinal">Visual impression — longitudinal systolic function</label>
+          <label class="field-label" for="f-rvVisLongitudinal">Visual longitudinal systolic function</label>
           <select id="f-rvVisLongitudinal" data-important="true">
             <option value="">— Select —</option>
             <option>Normal</option>
@@ -3995,7 +4133,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
           </select>
         </div>
         <div class="field-group">
-          <label class="field-label" for="f-rvVisRadial">Visual impression — radial systolic function</label>
+          <label class="field-label" for="f-rvVisRadial">Visual radial systolic function</label>
           <select id="f-rvVisRadial" data-important="true">
             <option value="">— Select —</option>
             <option>Normal</option>
@@ -4006,15 +4144,13 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <div class="field-row three-col">
         <div class="field-group">
           <label class="field-label" for="f-rvEDA">RV end-diastolic area <span class="unit">(cm²)</span></label>
-          <p class="calc-hint calc-hint-spacer" aria-hidden="true">&nbsp;</p>
-          <input type="number" id="f-rvEDA" placeholder="e.g. 28" min="0" max="120" step="0.1" oninput="recalcRVFAC(); scheduleMainContentSoftValidation()" onchange="recalcRVFAC(); scheduleMainContentSoftValidation()">
           <div id="rv-eda-hint" class="la-validate-hint" aria-live="polite"></div>
+          <input type="number" id="f-rvEDA" placeholder="e.g. 28" min="0" max="120" step="0.1" oninput="recalcRVFAC(); scheduleMainContentSoftValidation()" onchange="recalcRVFAC(); scheduleMainContentSoftValidation()">
         </div>
         <div class="field-group">
           <label class="field-label" for="f-rvESA">RV end-systolic area <span class="unit">(cm²)</span></label>
-          <p class="calc-hint calc-hint-spacer" aria-hidden="true">&nbsp;</p>
-          <input type="number" id="f-rvESA" placeholder="e.g. 15" min="0" max="120" step="0.1" oninput="recalcRVFAC(); scheduleMainContentSoftValidation()" onchange="recalcRVFAC(); scheduleMainContentSoftValidation()">
           <div id="rv-esa-hint" class="la-validate-hint" aria-live="polite"></div>
+          <input type="number" id="f-rvESA" placeholder="e.g. 15" min="0" max="120" step="0.1" oninput="recalcRVFAC(); scheduleMainContentSoftValidation()" onchange="recalcRVFAC(); scheduleMainContentSoftValidation()">
         </div>
         <div class="field-group">
           <label class="field-label" for="fac-display-input">FAC <span class="unit">(%)</span><span class="field-label-source-tag" id="fac-display-source" hidden></span></label>
@@ -4044,6 +4180,14 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         </div>
       </div>
 
+      <div id="rvot-vti-field-wrap" class="field-row two-col section-hidden">
+        <div class="field-group">
+          <label class="field-label" for="f-rvotVTI-measure">RVOT VTI <span class="unit">(cm)</span></label>
+          <p class="calc-hint guidance-text" id="rvot-vti-ref">Normal 12–16 cm</p>
+          <input type="number" id="f-rvotVTI-measure" placeholder="e.g. 14" min="0" max="60" step="0.1">
+        </div>
+      </div>
+
       <div class="rv-subheading">Pulmonary Hypertension Assessment</div>
       <div id="mc-cwd-rv-ph-wrap" class="mc-doppler-wrap">
         <div class="field-row two-col">
@@ -4061,7 +4205,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         <div class="field-group">
           <label class="field-label">PASP <span class="unit">(mmHg, TR Vmax + CVP or IVC-derived RAP)</span></label>
           <div class="calc-display" id="pasp-cvp-display"><span class="calc-empty">Enter TR Vmax, then CVP (Section 1) or IVC diameter (cm) + collapsibility (Veins)</span></div>
-          <div class="calc-hint">PASP ≈ 4×TR Vmax² + RAP (mmHg). RAP = CVP when entered; if CVP blank, mean RAP is inferred from IVC diameter (cm) + collapse (published table).</div>
+          <div class="calc-hint guidance-text">PASP ≈ 4×TR Vmax² + RAP (mmHg). RAP = CVP when entered; if CVP blank, mean RAP is inferred from IVC diameter (cm) + collapse (published table).</div>
         </div>
       </div>
       <div id="tapse-pasp-ratio-field-wrap" class="field-group section-hidden">
@@ -4072,15 +4216,15 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
             <span class="calc-editable-suffix">mm/mmHg</span>
           </div>
         </div>
-        <div class="calc-hint">TAPSE ÷ estimated PASP (same calculation as PASP above: TR Vmax + CVP or IVC-derived RAP)</div>
+        <div class="calc-hint guidance-text">TAPSE ÷ estimated PASP (same calculation as PASP above: TR Vmax + CVP or IVC-derived RAP)</div>
       </div>
       <div class="field-group" id="rv-pht-basic-features-wrap">
-        <label class="field-label">Basic Features of PHT <span class="unit">(tap to select — multiple allowed)</span></label>
+        <label class="field-label">Basic features of PHT <span class="unit">(tap to select — multiple allowed)</span></label>
         <div id="phtBasicChips" class="rhythm-chips"></div>
         <div id="phtBasicSummary" class="rhythm-summary">None selected</div>
       </div>
       <div class="field-group" id="rv-pht-advanced-features-wrap">
-        <label class="field-label">Advanced Features of PHT <span class="unit">(enter values; RVOT notching remains tap-to-select)</span></label>
+        <label class="field-label">Advanced features of PHT</label>
         <div class="field-row three-col">
           <div class="field-group">
             <label class="field-label" for="f-phtRvotAccTime">RVOT Acc. Time <span class="unit">(ms)</span></label>
@@ -4147,7 +4291,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
           </div>
           <div id="mc-di-wrap" class="mc-doppler-wrap">
             <div class="field-group">
-              <label class="field-label" for="di-display-input">Dimensionless Index <span class="unit">(LVOT VTI ÷ AV VTI)</span><span class="field-label-source-tag" id="di-display-source" hidden></span></label>
+              <label class="field-label" for="di-display-input">Dimensionless index <span class="unit">(LVOT VTI ÷ AV VTI)</span><span class="field-label-source-tag" id="di-display-source" hidden></span></label>
               <div class="calc-display calc-display-editable" id="di-display">
                 <div class="calc-editable-value-line">
                   <span class="calc-editable-prefix">DI:</span>
@@ -4157,7 +4301,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
             </div>
           </div>
           <div id="ava-continuity-field-wrap" class="field-group section-hidden">
-            <div class="lvot-csa-readout" id="lvot-csa-readout" aria-live="polite"></div>
+            <div class="lvot-csa-readout guidance-text" id="lvot-csa-readout" aria-live="polite"></div>
             <label class="field-label" for="ava-continuity-display-input">Aortic valve area (continuity) <span class="unit">(cm²)</span><span class="field-label-source-tag" id="ava-continuity-display-source" hidden></span></label>
             <div class="calc-display calc-display-editable" id="ava-continuity-display">
               <div class="calc-editable-value-line">
@@ -4166,7 +4310,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
                 <span class="calc-editable-suffix">cm²</span>
               </div>
             </div>
-            <div class="calc-hint">LVOT CSA × (LVOT VTI ÷ AV VTI) — uses LVOT diameter from section 2</div>
+            <div class="calc-hint guidance-text">LVOT CSA × (LVOT VTI ÷ AV VTI) — uses LVOT diameter from section 2</div>
           </div>
         </div>
         <div class="valve-card">
@@ -4199,13 +4343,13 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
     </div>
     <div class="section-body" id="peri-section-body">
       <div class="field-group">
-        <label class="field-label" for="f-periEffusion">Pericardial Effusion</label>
+        <label class="field-label" for="f-periEffusion">Pericardial effusion</label>
         <select id="f-periEffusion" data-important="true" onchange="checkPericardialEffusion()">
           <option value="">— Select —</option><option>None</option><option>Trivial</option><option>Small</option><option>Moderate</option><option>Large</option>
         </select>
       </div>
       <div class="field-group conditional-field" id="f-periLocation-wrap">
-        <label class="field-label">Effusion Location</label>
+        <label class="field-label">Effusion location</label>
         <div class="checkbox-group">
           <label class="checkbox-item"><input type="checkbox" id="f-periGlobal"> Global</label>
           <label class="checkbox-item"><input type="checkbox" id="f-periAnterior"> Anterior</label>
@@ -4223,7 +4367,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         </select>
       </div>
       <div class="field-group" id="peri-tamponade-signs-wrap">
-        <label class="field-label">Signs of Tamponade <span class="unit">(tap to select — multiple allowed)</span></label>
+        <label class="field-label">Signs of tamponade <span class="unit">(tap to select — multiple allowed)</span></label>
         <div id="tamponadeChips" class="rhythm-chips"></div>
         <div id="tamponadeSummary" class="rhythm-summary">None selected</div>
       </div>
@@ -4241,33 +4385,33 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         <div class="aorta-card" id="aorta-card-root">
           <div class="aorta-card-title">Root (PSLAX)</div>
           <div class="field-group"><label class="field-label" for="f-aortaRootDiam">Diameter <span class="unit">(mm)</span></label><input type="number" id="f-aortaRootDiam" placeholder="e.g. 34" min="0" step="0.1" oninput="checkAortaCards()"></div>
-          <div class="field-group"><label class="field-label" for="f-aortaRootFlap">Dissection Flap</label><select id="f-aortaRootFlap" onchange="checkAortaCards()"><option value="">— Select —</option><option>Absent</option><option>Present</option></select></div>
-          <div class="field-group"><label class="field-label" for="f-aortaRootFlow">Colour Flow Pattern</label><select id="f-aortaRootFlow" onchange="checkAortaCards()"><option value="">— Select —</option><option>Normal</option><option>Abnormal</option></select></div>
+          <div class="field-group"><label class="field-label" for="f-aortaRootFlap">Dissection flap</label><select id="f-aortaRootFlap" onchange="checkAortaCards()"><option value="">— Select —</option><option>Absent</option><option>Present</option></select></div>
+          <div class="field-group"><label class="field-label" for="f-aortaRootFlow">Colour flow pattern</label><select id="f-aortaRootFlow" onchange="checkAortaCards()"><option value="">— Select —</option><option>Normal</option><option>Abnormal</option></select></div>
         </div>
         <div class="aorta-card" id="aorta-card-asc">
           <div class="aorta-card-title">Ascending (Mod PSLAX)</div>
           <div class="field-group"><label class="field-label" for="f-aortaAscDiam">Diameter <span class="unit">(mm)</span></label><input type="number" id="f-aortaAscDiam" placeholder="e.g. 36" min="0" step="0.1" oninput="checkAortaCards()"></div>
-          <div class="field-group"><label class="field-label" for="f-aortaAscFlap">Dissection Flap</label><select id="f-aortaAscFlap" onchange="checkAortaCards()"><option value="">— Select —</option><option>Absent</option><option>Present</option></select></div>
-          <div class="field-group"><label class="field-label" for="f-aortaAscFlow">Colour Flow Pattern</label><select id="f-aortaAscFlow" onchange="checkAortaCards()"><option value="">— Select —</option><option>Normal</option><option>Abnormal</option></select></div>
+          <div class="field-group"><label class="field-label" for="f-aortaAscFlap">Dissection flap</label><select id="f-aortaAscFlap" onchange="checkAortaCards()"><option value="">— Select —</option><option>Absent</option><option>Present</option></select></div>
+          <div class="field-group"><label class="field-label" for="f-aortaAscFlow">Colour flow pattern</label><select id="f-aortaAscFlow" onchange="checkAortaCards()"><option value="">— Select —</option><option>Normal</option><option>Abnormal</option></select></div>
         </div>
         <div class="aorta-card" id="aorta-card-arch">
           <div class="aorta-card-title">Arch (Supra-sternal)</div>
           <div class="field-group"><label class="field-label" for="f-aortaArchDiam">Diameter <span class="unit">(mm)</span></label><input type="number" id="f-aortaArchDiam" placeholder="e.g. 30" min="0" step="0.1" oninput="checkAortaCards()"></div>
-          <div class="field-group"><label class="field-label" for="f-aortaArchFlap">Dissection Flap</label><select id="f-aortaArchFlap" onchange="checkAortaCards()"><option value="">— Select —</option><option>Absent</option><option>Present</option></select></div>
-          <div class="field-group"><label class="field-label" for="f-aortaArchFlow">Colour Flow Pattern</label><select id="f-aortaArchFlow" onchange="checkAortaCards()"><option value="">— Select —</option><option>Normal</option><option>Abnormal</option></select></div>
+          <div class="field-group"><label class="field-label" for="f-aortaArchFlap">Dissection flap</label><select id="f-aortaArchFlap" onchange="checkAortaCards()"><option value="">— Select —</option><option>Absent</option><option>Present</option></select></div>
+          <div class="field-group"><label class="field-label" for="f-aortaArchFlow">Colour flow pattern</label><select id="f-aortaArchFlow" onchange="checkAortaCards()"><option value="">— Select —</option><option>Normal</option><option>Abnormal</option></select></div>
         </div>
         <div class="aorta-card" id="aorta-card-desc">
           <div class="aorta-card-title">Descending (A2C)</div>
           <div class="field-group"><label class="field-label" for="f-aortaDescDiam">Diameter <span class="unit">(mm)</span></label><input type="number" id="f-aortaDescDiam" placeholder="e.g. 28" min="0" step="0.1" oninput="checkAortaCards()"></div>
-          <div class="field-group"><label class="field-label" for="f-aortaDescFlap">Dissection Flap</label><select id="f-aortaDescFlap" onchange="checkAortaCards()"><option value="">— Select —</option><option>Absent</option><option>Present</option></select></div>
-          <div class="field-group"><label class="field-label" for="f-aortaDescFlow">Colour Flow Pattern</label><select id="f-aortaDescFlow" onchange="checkAortaCards()"><option value="">— Select —</option><option>Normal</option><option>Abnormal</option></select></div>
+          <div class="field-group"><label class="field-label" for="f-aortaDescFlap">Dissection flap</label><select id="f-aortaDescFlap" onchange="checkAortaCards()"><option value="">— Select —</option><option>Absent</option><option>Present</option></select></div>
+          <div class="field-group"><label class="field-label" for="f-aortaDescFlow">Colour flow pattern</label><select id="f-aortaDescFlow" onchange="checkAortaCards()"><option value="">— Select —</option><option>Normal</option><option>Abnormal</option></select></div>
         </div>
         <div class="aorta-card aorta-card-full" id="aorta-card-abd">
           <div class="aorta-card-title">Abdominal</div>
           <div class="field-row three-col">
             <div class="field-group"><label class="field-label" for="f-aortaAbdDiam">Diameter <span class="unit">(mm)</span></label><input type="number" id="f-aortaAbdDiam" placeholder="e.g. 20" min="0" step="0.1" oninput="checkAortaCards()"></div>
-            <div class="field-group"><label class="field-label" for="f-aortaAbdFlap">Dissection Flap</label><select id="f-aortaAbdFlap" onchange="checkAortaCards()"><option value="">— Select —</option><option>Absent</option><option>Present</option></select></div>
-            <div class="field-group"><label class="field-label" for="f-aortaAbdFlow">Colour Flow Pattern</label><select id="f-aortaAbdFlow" onchange="checkAortaCards()"><option value="">— Select —</option><option>Normal</option><option>Abnormal</option></select></div>
+            <div class="field-group"><label class="field-label" for="f-aortaAbdFlap">Dissection flap</label><select id="f-aortaAbdFlap" onchange="checkAortaCards()"><option value="">— Select —</option><option>Absent</option><option>Present</option></select></div>
+            <div class="field-group"><label class="field-label" for="f-aortaAbdFlow">Colour flow pattern</label><select id="f-aortaAbdFlow" onchange="checkAortaCards()"><option value="">— Select —</option><option>Normal</option><option>Abnormal</option></select></div>
           </div>
         </div>
       </div>
@@ -4329,7 +4473,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         </div>
 
         <div class="field-group">
-          <label class="field-label">VeXUS Score <span class="unit">(auto-calculated)</span></label>
+          <label class="field-label">VeXUS score <span class="unit">(auto-calculated)</span></label>
           <div class="lv-interp empty" id="vexus-display">Enter IVC diameter and vein assessments above</div>
         </div>
 
@@ -4344,7 +4488,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
           </div>
         </div>
         <div class="field-group">
-          <label class="field-label" for="rri-display-input">Renal Resistive Index <span class="unit">(RRI)</span><span class="field-label-source-tag" id="rri-display-source" hidden></span></label>
+          <label class="field-label" for="rri-display-input">Renal resistive index <span class="unit">(RRI)</span><span class="field-label-source-tag" id="rri-display-source" hidden></span></label>
           <div class="lv-interp empty lv-interp-auto-editable" id="rri-display">
             <div class="auto-editable-top">
               <span class="interp-icon" id="rri-icon" style="display:none"></span>
@@ -4422,7 +4566,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
   <!-- ── 10. SUMMARY ───────────────────────────────── -->
   <section class="form-section" id="sec-summary">
     <div class="section-header" onclick="toggleSection('sec-summary')">
-      <div class="section-title"><span class="section-icon">10</span>Summary &amp; Conclusions</div>
+      <div class="section-title"><span class="section-icon">10</span>Summary &amp; conclusions</div>
       <div class="chevron"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div>
     </div>
     <div class="section-body">
@@ -4480,7 +4624,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <div class="field-group" id="summary-clinical-significance-wrap">
         <label class="field-label" for="f-significance">Clinical Significance</label>
         <select id="f-significance" data-important="true">
-          <option value="">— Select —</option><option>Normal study</option><option>Abnormal — expected</option><option>Abnormal — new finding</option><option>Critical finding</option>
+          <option value="">— Select —</option><option>Normal study</option><option>Abnormal (expected)</option><option>Abnormal (new finding)</option><option>Critical finding</option>
         </select>
       </div>
       <div class="field-group" id="summary-overall-impression-wrap">
@@ -4514,10 +4658,11 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
     </button>
     <div class="footer-export-dropdown" id="exportDropdown" role="menu" aria-hidden="true">
       <button type="button" class="footer-export-menu-item" role="menuitem" data-export-format="xlsx">Excel workbook (.xlsx)</button>
+      <button type="button" class="footer-export-menu-item" role="menuitem" data-export-format="quick-data-page">Export for TOTEM FUSIC HD Reporting Tool</button>
       <button type="button" class="footer-export-menu-item" role="menuitem" data-export-format="clipboard-text">Plain text — copy to clipboard</button>
       <button type="button" class="footer-export-menu-item" role="menuitem" data-export-format="plain-text-page">Plain text — full page (select & copy)</button>
-      <button type="button" class="footer-export-menu-item" role="menuitem" data-export-format="print-pdf">Print / Save as PDF (A4)<span class="export-attached-img-badge" title="Study has Images Attached" aria-label="Study has Images Attached"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span></button>
-      <button type="button" class="footer-export-menu-item" role="menuitem" data-export-format="edec">BSE/EDEC Style Report<span class="export-attached-img-badge" title="Study has Images Attached" aria-label="Study has Images Attached"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span></button>
+      <button type="button" class="footer-export-menu-item" role="menuitem" data-export-format="print-pdf">Print / Save as PDF (A4)<span class="export-attached-img-badge" title="Study has images attached" aria-label="Study has images attached"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span></button>
+      <button type="button" class="footer-export-menu-item" role="menuitem" data-export-format="edec">BSE/EDEC Style Report<span class="export-attached-img-badge" title="Study has images attached" aria-label="Study has images attached"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span></button>
     </div>
   </div>
 </div>
@@ -4585,6 +4730,16 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
         </li>
         <li class="export-format-row">
           <span class="export-format-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>
+          </span>
+          <div class="export-format-text">
+            <h3>Export for TOTEM FUSIC HD Reporting Tool</h3>
+            <p>Allows you to quickly copy and paste values into Dr Kendall's Excel-based FUSIC HD reporting tool.</p>
+          </div>
+          <button type="button" class="btn btn-secondary export-format-action" onclick="triggerExportFromModal('quick-data-page')">Open</button>
+        </li>
+        <li class="export-format-row">
+          <span class="export-format-icon" aria-hidden="true">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           </span>
           <div class="export-format-text">
@@ -4608,7 +4763,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           </span>
           <div class="export-format-text">
-            <h3>Print / Save as PDF<span class="export-attached-img-badge" title="Study has Images Attached" aria-label="Study has Images Attached"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span></h3>
+            <h3>Print / save as PDF<span class="export-attached-img-badge" title="Study has images attached" aria-label="Study has images attached"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span></h3>
             <p>Browser print dialog with a compact A4 layout.</p>
           </div>
           <button type="button" class="btn btn-secondary export-format-action" onclick="triggerExportFromModal('print-pdf')">Print</button>
@@ -4618,7 +4773,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M10.5 15.5l1.5 1.5 3-3"/></svg>
           </span>
           <div class="export-format-text">
-            <h3>BSE/EDEC Style Report<span class="export-attached-img-badge" title="Study has Images Attached" aria-label="Study has Images Attached"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span></h3>
+            <h3>BSE/EDEC style report<span class="export-attached-img-badge" title="Study has images attached" aria-label="Study has images attached"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span></h3>
             <p>Free-text editor, produces a PDF in BSE/EDEC style.</p>
           </div>
           <button type="button" class="btn btn-secondary export-format-action" onclick="triggerExportFromModal('edec')">Open editor</button>
@@ -4681,7 +4836,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
 
 <div id="plainTextReportOverlay" aria-hidden="true">
   <div class="plain-text-report-toolbar">
-    <h2>Plain text report</h2>
+    <h2 id="plainTextReportTitle">Plain text report</h2>
     <div class="plain-text-report-toolbar-actions">
       <button type="button" class="btn btn-secondary" id="plainTextReportSelectAllBtn">Select all</button>
       <button type="button" class="btn btn-secondary" id="plainTextReportCopyBtn">Copy to clipboard</button>
@@ -4689,6 +4844,12 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
     </div>
   </div>
   <div class="plain-text-report-body-wrap">
+    <div class="plain-text-report-instructions" id="quickDataInputInstructions" hidden>
+      <p>Copy and paste these values directly into the TOTEM FUSIC HD Reporting Tool Quick Entry sheet. Blank lines are intentional as they match empty fields you haven't filled in and keep everything aligned.</p>
+      <p>Click Select All then Copy to Clipboard (or select manually).</p>
+      <p>Paste into cells C3 through C55 on the Quick Entry sheet.</p>
+      <p>Always double-check the pasted values. Any future updates to the Excel sheet may shift the cell layout and break the alignment.</p>
+    </div>
     <pre id="plainTextReportBody" tabindex="0"></pre>
   </div>
 </div>
@@ -4736,20 +4897,20 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <p>This FUSIC HD Report Generator was created by Dr Christopher Partridge, a FUSIC HD accredited anaesthetics trainee, as a free tool to support point-of-care echocardiography reporting in acute and critical care settings.</p>
       <p><strong>This tool is not affiliated with the Intensive Care Society.</strong></p>
 
-      <h3>How It Works</h3>
+      <h3>How it works</h3>
       <p>This application is a single, self-contained HTML file. It runs entirely within your browser — no internet connection is required beyond the initial page load, no data is sent to any server, and nothing is stored anywhere. When you export (for example to Excel), the file is generated locally on your device. Plain-text export only copies to your clipboard. Once the browser tab is closed, all entered information is permanently gone.</p>
       <p>This tool does not collect, transmit, store, or process patient data in any form.</p>
 
-      <h3>Intended Use &amp; Limitations</h3>
+      <h3>Intended use &amp; limitations</h3>
       <p>This tool is designed to assist clinicians in structuring echocardiography findings into a readable report format. It is intended as a documentation aid only and does not provide clinical decision support, diagnostic conclusions, or medical advice.</p>
       <p>All clinical interpretations, measurements, and conclusions entered into this tool remain the sole responsibility of the reporting clinician. Auto-generated values — including LV size categorisation, stroke volume, cardiac output, and diastolic indices — are derived from standard published formulae and reference ranges, but should always be reviewed in the context of the individual patient, image quality, and clinical scenario. They are intended as a prompt, not a substitute for clinical judgement.</p>
       <p>This tool has not been validated as a medical device and is not registered as such. It should not be used as the sole basis for clinical decision-making.</p>
 
-      <h3>Medicolegal Notice</h3>
+      <h3>Medicolegal notice</h3>
       <p>Use of this application does not constitute or replace a formal echocardiography report verified by an accredited practitioner. Clinicians using this tool remain personally and professionally responsible for the accuracy and appropriateness of all data entered, all interpretations made, and all clinical actions taken on the basis of those findings. Supervision requirements applicable to your scope of practice, employer, and training programme remain in effect regardless of the supervision status selected within this tool.</p>
       <p>This software is provided as-is, without warranty of any kind. The author accepts no liability for clinical outcomes arising from its use.</p>
 
-      <h3>Usage &amp; Permissions</h3>
+      <h3>Usage &amp; permissions</h3>
       <p>This tool is proprietary and all rights are reserved. It may not be copied, modified, redistributed, or used as the basis for derivative works without explicit written permission. If you have suggestions for improvement, feedback is always welcome.</p>
     </div>
   </div>
@@ -4758,7 +4919,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
 <div class="modal-overlay" id="rwmaModal" onclick="if(event.target===this)closeRwmaModal()">
   <div class="modal-box modal-box--rwma" role="dialog" aria-labelledby="rwmaModalTitle" aria-modal="true" onclick="event.stopPropagation()">
     <div class="about-modal-header">
-      <h2 id="rwmaModalTitle">17-Segment Wall Motion Model</h2>
+      <h2 id="rwmaModalTitle">17-segment wall motion model</h2>
       <button type="button" class="about-modal-close" onclick="closeRwmaModal()" aria-label="Close 17-segment model">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
@@ -4798,7 +4959,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
 
 <div id="edecEditorPanel" class="edec-editor-panel" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="edecEditorTitle">
   <div class="edec-editor-header">
-    <h2 id="edecEditorTitle">BSE/EDEC Style Report</h2>
+    <h2 id="edecEditorTitle">BSE/EDEC style report</h2>
     <button type="button" class="btn btn-primary" id="edecExportPdfBtn">Export as PDF</button>
     <button type="button" class="btn btn-secondary" id="edecExportTextBtn">Export as plain text</button>
     <button type="button" class="edec-editor-close" id="edecEditorCloseBtn" aria-label="Close EDEC editor">
@@ -4808,7 +4969,7 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
   <div class="edec-editor-scroll">
     <p class="edec-desktop-note">We recommend completion on a desktop computer. The free-text fields below will appear in the exported PDF alongside a compact measurements table.</p>
 
-    <h3 class="edec-section-heading">Clinical Interpretation</h3>
+    <h3 class="edec-section-heading">Clinical interpretation</h3>
     <div class="edec-interp-grid">
       <div class="edec-interp-field"><label for="edec-interp-lv">Left Ventricle</label><textarea id="edec-interp-lv" rows="4"></textarea></div>
       <div class="edec-interp-field"><label for="edec-interp-la">Left Atria</label><textarea id="edec-interp-la" rows="4"></textarea></div>
@@ -4820,25 +4981,25 @@ body[data-study-pseudo-anonymised="1"] .anonymise-pii-reminder { display: block;
       <div class="edec-interp-field"><label for="edec-interp-lungs">Lungs</label><textarea id="edec-interp-lungs" rows="4"></textarea></div>
     </div>
 
-    <h3 class="edec-section-heading">Summary &amp; Conclusions</h3>
+    <h3 class="edec-section-heading">Summary &amp; conclusions</h3>
     <div class="edec-summary-grid">
       <div class="edec-summary-field">
-        <label for="edec-significance">Clinical Significance</label>
+        <label for="edec-significance">Clinical significance</label>
         <select id="edec-significance">
-          <option value="">— Select —</option><option>Normal study</option><option>Abnormal — expected</option><option>Abnormal — new finding</option><option>Critical finding</option>
+            <option value="">— Select —</option><option>Normal study</option><option>Abnormal (expected)</option><option>Abnormal (new finding)</option><option>Critical finding</option>
         </select>
       </div>
       <div class="edec-summary-field">
-        <label for="edec-impression">Overall Impression</label>
+        <label for="edec-impression">Overall impression</label>
         <textarea id="edec-impression" rows="4"></textarea>
       </div>
       <div class="edec-summary-field">
-        <label for="edec-actions">Recommended Actions</label>
+        <label for="edec-actions">Recommended actions</label>
         <textarea id="edec-actions" rows="2"></textarea>
       </div>
     </div>
 
-    <h3 class="edec-section-heading">Measurements Reference</h3>
+    <h3 class="edec-section-heading">Measurements reference</h3>
     <div class="edec-meas-wrap" id="edecMeasMount"></div>
   </div>
 </div>
@@ -5385,6 +5546,7 @@ const EDEC_MEAS_GROUPS = [
     ['FAC', 'fac-display-input', '%'],
     ['TAPSE', 'f-tapse', 'mm'],
     ['RV S\'', 'f-rvS', 'cm/s'],
+    ['RVOT VTI', 'f-rvotVTI-measure', 'cm', { toggleId: 'toggle-show-rvot-vti' }],
     ['RVOT Acc. Time', 'f-phtRvotAccTime', 'ms'],
     ['Early diastolic PR velocity', 'f-phtEarlyDiastolicPrVel', 'm/s'],
     ['PA diameter', 'f-phtPaDiameter', 'mm'],
@@ -5486,14 +5648,36 @@ function buildEdecPrintHTML() {
 
   /* Demographics table */
   const demoRows = [
-    ['Name', gv('f-patientName')], ['Study Date', scanDate + (scanTime ? ' ' + scanTime : '')],
+    ['Name', gv('f-patientName')], ['Study Date', formatStudyDateTime(scanDate, scanTime)],
     ['Patient ID', gv('f-patientId')], ['Operator', gv('f-operatorName') || 'Not specified'],
-    ['Age', gv('f-age') ? gv('f-age') + ' years' : ''], ['Height', gv('f-height') ? gv('f-height') + ' cm' : ''],
-    ['Weight', gv('f-weight') ? gv('f-weight') + ' kg' : ''], ['BSA', edecGetVal('bsa-display-input') ? edecGetVal('bsa-display-input') + ' m²' : ''],
+    ['Date of Birth', formatStudyDateTime(gv('f-dob'), '')], ['Age', gv('f-age') ? gv('f-age') + ' years' : ''],
+    ['Height', gv('f-height') ? gv('f-height') + ' cm' : ''], ['Weight', gv('f-weight') ? gv('f-weight') + ' kg' : ''],
+    ['BSA', edecGetVal('bsa-display-input') ? edecGetVal('bsa-display-input') + ' m²' : ''],
     ['Heart Rate', gv('f-hr') ? gv('f-hr') + ' bpm' : ''], ['Image Quality', gv('f-imageQuality')],
     ['Rhythm', typeof selectedRhythms !== 'undefined' && selectedRhythms.size ? [...selectedRhythms].join(', ') : ''],
-    ['Report Generated', `${nd} ${nt.slice(0,2)}:${nt.slice(2,4)}:${nt.slice(4,6)}`],
+    ['Report Generated', formatStudyDateTime(nd, `${nt.slice(0,2)}:${nt.slice(2,4)}`)],
   ];
+  {
+    const ventMode = gv('f-ventilation');
+    if (ventMode) {
+      const ventRows = [['Ventilation', ventMode]];
+      if (['Self-Vent: Oxygen', 'Self-Vent: CPAP', 'Self-Vent: BiPAP', 'Ventilated'].includes(ventMode) && gv('f-fio2'))
+        ventRows.push(['FiO\u2082', gv('f-fio2') + ' %']);
+      if (['Self-Vent: CPAP', 'Self-Vent: BiPAP', 'Ventilated'].includes(ventMode) && gv('f-peep'))
+        ventRows.push(['PEEP', gv('f-peep') + ' cmH\u2082O']);
+      if (ventMode === 'Self-Vent: BiPAP' && gv('f-ipap'))
+        ventRows.push(['IPAP', gv('f-ipap') + ' cmH\u2082O']);
+      if (ventMode === 'Ventilated') {
+        if (gv('f-ventilatory-mode')) ventRows.push(['Ventilatory Mode', gv('f-ventilatory-mode')]);
+        if (gv('f-pplat')) ventRows.push(['Pplat', gv('f-pplat') + ' cmH\u2082O']);
+        if (gv('f-tidal-volume')) ventRows.push(['Tidal Volume', gv('f-tidal-volume') + ' mL']);
+        const tvmlkg = getTVmLkgCalc();
+        if (tvmlkg) ventRows.push(['Tidal Volume', tvmlkg + ' mL/kg']);
+      }
+      const insertAt = demoRows.findIndex(r => r[0] === 'Report Generated');
+      demoRows.splice(insertAt, 0, ...ventRows);
+    }
+  }
   parts.push('<table class="edec-print-demo"><tbody>');
   for (let i = 0; i < demoRows.length; i += 2) {
     const a = demoRows[i], b = demoRows[i+1];
@@ -5546,10 +5730,10 @@ function buildEdecPrintHTML() {
     const act = gv('edec-actions');
     if (sig || imp || act) {
       summaryHtml = '<div class="edec-print-summary-block">';
-      summaryHtml += '<h3 class="edec-print-summary-heading">Summary &amp; Conclusions</h3>';
-      if (sig) summaryHtml += `<p><strong>Clinical Significance:</strong> ${esc(sig)}</p>`;
-      if (imp) summaryHtml += `<p><strong>Overall Impression:</strong> ${esc(imp)}</p>`;
-      if (act) summaryHtml += `<p><strong>Recommended Actions:</strong> ${esc(act)}</p>`;
+      summaryHtml += '<h3 class="edec-print-summary-heading">Summary &amp; conclusions</h3>';
+      if (sig) summaryHtml += `<p><strong>Clinical significance:</strong> ${esc(sig)}</p>`;
+      if (imp) summaryHtml += `<p><strong>Overall impression:</strong> ${esc(imp)}</p>`;
+      if (act) summaryHtml += `<p><strong>Recommended actions:</strong> ${esc(act)}</p>`;
       summaryHtml += '</div>';
     }
 
@@ -5677,6 +5861,10 @@ function doEdecExportPdf() {
   if (!isAndroid) window.addEventListener('afterprint', cleanup);
   else window.addEventListener('focus', cleanup, { once: true });
 
+  /* Print scheduling — see the long comment in doExportPdf() / printReport() for why
+     this nested rAF → rAF → setTimeout → window.print() → setTimeout(cleanup) chain
+     exists. Each layer addresses a different browser quirk (DOM commit, style/font
+     resolution, paint stabilisation, dialog teardown). DO NOT collapse or simplify. */
   const delayMs = isAndroid ? 400 : 80;
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
@@ -5708,8 +5896,9 @@ function buildEdecPlainText() {
   const demoRows = [
     ['Name', gv('f-patientName')],
     ['Patient ID', gv('f-patientId')],
-    ['Study Date', scanDate + (scanTime ? ' ' + scanTime : '')],
+    ['Study Date', formatStudyDateTime(scanDate, scanTime)],
     ['Operator', gv('f-operatorName') || 'Not specified'],
+    ['Date of Birth', formatStudyDateTime(gv('f-dob'), '')],
     ['Age', gv('f-age') ? gv('f-age') + ' years' : ''],
     ['Height', gv('f-height') ? gv('f-height') + ' cm' : ''],
     ['Weight', gv('f-weight') ? gv('f-weight') + ' kg' : ''],
@@ -5717,8 +5906,29 @@ function buildEdecPlainText() {
     ['Heart Rate', gv('f-hr') ? gv('f-hr') + ' bpm' : ''],
     ['Image Quality', gv('f-imageQuality')],
     ['Rhythm', typeof selectedRhythms !== 'undefined' && selectedRhythms.size ? [...selectedRhythms].join(', ') : ''],
-    ['Report Generated', `${nd} ${nt.slice(0,2)}:${nt.slice(2,4)}:${nt.slice(4,6)}`],
+    ['Report Generated', formatStudyDateTime(nd, `${nt.slice(0,2)}:${nt.slice(2,4)}`)],
   ];
+  {
+    const ventMode = gv('f-ventilation');
+    if (ventMode) {
+      const ventRows = [['Ventilation', ventMode]];
+      if (['Self-Vent: Oxygen', 'Self-Vent: CPAP', 'Self-Vent: BiPAP', 'Ventilated'].includes(ventMode) && gv('f-fio2'))
+        ventRows.push(['FiO\u2082', gv('f-fio2') + ' %']);
+      if (['Self-Vent: CPAP', 'Self-Vent: BiPAP', 'Ventilated'].includes(ventMode) && gv('f-peep'))
+        ventRows.push(['PEEP', gv('f-peep') + ' cmH\u2082O']);
+      if (ventMode === 'Self-Vent: BiPAP' && gv('f-ipap'))
+        ventRows.push(['IPAP', gv('f-ipap') + ' cmH\u2082O']);
+      if (ventMode === 'Ventilated') {
+        if (gv('f-ventilatory-mode')) ventRows.push(['Ventilatory Mode', gv('f-ventilatory-mode')]);
+        if (gv('f-pplat')) ventRows.push(['Pplat', gv('f-pplat') + ' cmH\u2082O']);
+        if (gv('f-tidal-volume')) ventRows.push(['Tidal Volume', gv('f-tidal-volume') + ' mL']);
+        const tvmlkg = getTVmLkgCalc();
+        if (tvmlkg) ventRows.push(['Tidal Volume', tvmlkg + ' mL/kg']);
+      }
+      const insertAt = demoRows.findIndex(r => r[0] === 'Report Generated');
+      demoRows.splice(insertAt, 0, ...ventRows);
+    }
+  }
   for (const [k, v] of demoRows) {
     if (v) lines.push(`${k}: ${v}`);
   }
@@ -5816,9 +6026,13 @@ function buildEdecPlainText() {
 
 function doEdecExportPlainText() {
   const text = buildEdecPlainText();
+  const titleEl = document.getElementById('plainTextReportTitle');
+  const instructions = document.getElementById('quickDataInputInstructions');
   const pre = document.getElementById('plainTextReportBody');
   const overlay = document.getElementById('plainTextReportOverlay');
-  if (pre) pre.textContent = text;
+  if (titleEl) titleEl.textContent = 'BSE/EDEC Style Report';
+  if (instructions) instructions.hidden = true;
+  if (pre) { pre.textContent = text; pre.dataset.copyKind = 'report'; }
   overlay?.classList.add('open');
   if (overlay) overlay.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
@@ -5919,6 +6133,7 @@ const SESSION_DRAFT_TOGGLE_IDS = [
   'toggle-show-pasp-field',
   'toggle-show-rv-lv-basal-ratio',
   'toggle-show-tapse-pasp-ratio',
+  'toggle-show-rvot-vti',
   'toggle-show-ea-field',
   'toggle-lap-measures-all',
   'toggle-lv-measures-all',
@@ -5963,7 +6178,8 @@ const VALVE_MEASURES_CHILD_TOGGLE_IDS = [
 const RH_MEASURES_CHILD_TOGGLE_IDS = [
   'toggle-show-pasp-field',
   'toggle-show-rv-lv-basal-ratio',
-  'toggle-show-tapse-pasp-ratio'
+  'toggle-show-tapse-pasp-ratio',
+  'toggle-show-rvot-vti'
 ];
 const LAP_MEASURES_CHILD_TOGGLE_IDS = [
   'toggle-show-ea-field'
@@ -5998,6 +6214,7 @@ const NONFUSIC_MEASURE_CAP_REQS = {
   'toggle-show-ea-field':         ['pwd'],
   'toggle-show-pasp-field':       ['cwd'],
   'toggle-show-tapse-pasp-ratio': ['cwd'],
+  'toggle-show-rvot-vti':         ['pwd'],
   'toggle-show-ava-continuity':   ['cwd', 'pwd']
 };
 function isNonfusicToggleAvailable(id) {
@@ -6028,7 +6245,7 @@ let sessionDraftSaveTimer = null;
 /** Keys match f-sumCond-* ids; exportLabel used in Excel. */
 const SUMMARY_CONDITIONS = [
   { key: 'strokeVol', exportLabel: '1. Is the Stroke Volume Abnormal?' },
-  { key: 'strokeVolResponsive', exportLabel: '2. Is the stroke volume responsive to inotropes or preload (i.e. vasopressors and/or fluid)?' },
+  { key: 'strokeVolResponsive', exportLabel: '2. Is stroke volume responsive to fluid, vasopressors or inotropes?' },
   { key: 'aortaAbn', exportLabel: '3. Is the aorta abnormal?' },
   { key: 'valvesSevere', exportLabel: '4. Is the aortic valve, mitral valve or tricuspid valve severely abnormal?' },
   { key: 'sam', exportLabel: '5. Is there systolic anterior motion of the mitral valve?' },
@@ -6163,6 +6380,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('overlay').addEventListener('click', closeSettings);
   document.getElementById('clearBtn').addEventListener('click', () => document.getElementById('clearModal').classList.add('open'));
   document.getElementById('populateTestDataBtn')?.addEventListener('click', populateDebugTestData);
+  document.getElementById('populateTestDataBBtn')?.addEventListener('click', populateDebugTestDataB);
   initExportSplitControl();
   initExportImagesAttachments();
   document.getElementById('openAnonymiseModal')?.addEventListener('click', openPseudoAnonymiseDialog);
@@ -6170,6 +6388,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   checkSupervisionField();
   updateLAPRaisedPressureHint();
+  updateVentilationSubFields();
   updateVTIRespirationCaution();
   updateVTIInterventionUI();
   initTRVmaxMirror();
@@ -6200,6 +6419,7 @@ document.addEventListener('DOMContentLoaded', () => {
   bindAutoCalcInput('tapse-pasp-ratio-display-input', 'tapse-pasp-ratio-display-source', recalcRightHeartDerivedRatios);
   bindAutoCalcInput('ava-continuity-display-input', 'ava-continuity-display-source', recalcAVAContinuity);
   bindAutoCalcInput('rri-display-input', 'rri-display-source', recalcRRI);
+  bindAutoCalcInput('f-tv-mlkg-input', 'f-tv-mlkg-source', recalcTVmLkg);
   recalcMAP();
   recalcHaemodynamics();
   recalcEA();
@@ -6374,7 +6594,7 @@ function updateCVSDrugDetailsUI() {
     const lbl = document.createElement('label');
     lbl.className = 'field-label';
     lbl.setAttribute('for', id);
-    lbl.textContent = drug + ' — specifics';
+    lbl.textContent = drug;
     const ta = document.createElement('textarea');
     ta.id = id;
     ta.setAttribute('data-cvs-drug-detail', drug);
@@ -6862,9 +7082,6 @@ function applyGuidanceModeUI() {
   const off = !isGuidanceModeEnabled();
   document.body.classList.toggle('guidance-off', off);
   clearAbnormalFieldLabels();
-  if (off) {
-    hideAllUnusualPlausibilityWarnings();
-  }
   runMainContentSoftValidation();
 }
 
@@ -6933,6 +7150,7 @@ function restoreNativeDemographicInputsAfterClear() {
     ageEl.min = '0';
     ageEl.max = '130';
     ageEl.step = '1';
+    ageEl.removeAttribute('readonly');
   }
   const dateEl = document.getElementById('f-scanDate');
   if (dateEl) dateEl.type = 'date';
@@ -6958,11 +7176,14 @@ function applyPseudoAnonymisation() {
     ageEl.removeAttribute('min');
     ageEl.removeAttribute('max');
     ageEl.removeAttribute('step');
+    ageEl.removeAttribute('readonly');
     ageEl.type = 'text';
     ageEl.value = band;
     const ageLabel = document.getElementById('f-age-label');
     if (ageLabel) ageLabel.innerHTML = 'Age band <span class="unit">(decade)</span>';
   }
+  const dobEl = document.getElementById('f-dob');
+  if (dobEl) dobEl.value = '';
   const pseudo = generatePseudoPatientCode();
   if (nameEl) nameEl.value = pseudo;
   if (idEl) idEl.value = pseudo;
@@ -7150,7 +7371,12 @@ function populateDebugTestData() {
   setV('f-hr', '115');
   setV('f-sbp', '85');
   setV('f-dbp', '45');
-  setV('f-ventilation', 'IPPV');
+  setV('f-ventilation', 'Ventilated');
+  setV('f-fio2', '50');
+  setV('f-peep', '8');
+  setV('f-ventilatory-mode', 'Mandatory/IPPV');
+  setV('f-pplat', '22');
+  setV('f-tidal-volume', '490');
   setV('f-cvp', '4');
   setV('f-indication', '68M with community-acquired pneumonia and septic shock. Assessing fluid responsiveness and LV function on escalating noradrenaline requirements.');
 
@@ -7254,7 +7480,7 @@ function populateDebugTestData() {
   setV('f-sumCond-venousCong', 'No');
 
   setV('f-impression', 'Hyperdynamic left ventricle with normal systolic function. Stroke volume is borderline-low but demonstrates significant variation with positive pressure ventilation and a >20% increase following a passive leg raise, indicating clear fluid responsiveness. Right ventricle is normal in size and function. IVC is small and completely collapsing. Right basal lung consolidation with focal B-lines consistent with known pneumonia. No features of raised left atrial pressure or venous congestion.');
-  setV('f-significance', 'Abnormal — expected');
+    setV('f-significance', 'Abnormal (expected)');
   setV('f-actions', '1. Give 500ml Plasmalyte fluid bolus and reassess haemodynamics and noradrenaline requirement.\n2. Continue treatment for community-acquired pneumonia.');
 
   setV('edec-interp-lv', 'LV cavity size visually normal. Wall thickness appears normal. Systolic function is preserved (visual EF and Simpson\'s biplane in the normal range). MAPSE and LV S′ are satisfactory. LVOT VTI is modest with marked respiratory variation on IPPV and a clear step-up after passive leg raise, consistent with preload dependence and fluid responsiveness. No regional wall motion abnormality.');
@@ -7265,7 +7491,7 @@ function populateDebugTestData() {
   setV('edec-interp-aorta', 'Aortic root and ascending aorta diameters measured in parasternal long-axis are within non-urgent limits on this bedside study. No dissection flap or abnormal colour flow pattern at the segments assessed.');
   setV('edec-interp-veins', 'IVC is small with >50% respiratory collapse, in keeping with a low right atrial pressure estimate. Hepatic vein Doppler pattern S>D; portal vein pulsatility <0.3; renal intrarenal vein flow continuous — overall pattern not suggestive of venous congestion on VeXUS-style assessment.');
   setV('edec-interp-lungs', 'Right lung: focal B-lines and consolidation at the base in keeping with the clinical picture of pneumonia. Left lung field assessed appears broadly clear on the views obtained. No large pleural effusion identified on the thoracic windows examined.');
-  setV('edec-significance', 'Abnormal — expected');
+    setV('edec-significance', 'Abnormal (expected)');
   setV('edec-impression', document.getElementById('f-impression')?.value || '');
   setV('edec-actions', document.getElementById('f-actions')?.value || '');
 
@@ -7275,6 +7501,7 @@ function populateDebugTestData() {
   mirrorLVOTVTI('f-lvotVTI');
   mirrorTRVmax('f-trVmax');
   checkAortaCards();
+  updateVentilationSubFields();
   updateVTIInterventionUI();
   updateVTIRespirationCaution();
   recalcMAP();
@@ -7294,6 +7521,284 @@ function populateDebugTestData() {
   runMainContentSoftValidation();
   refreshFusicHdQuestionHighlights();
   showToast('Debug test data loaded (septic shock / fluid-responsive)', 'success');
+}
+
+function populateDebugTestDataB() {
+  const setV = (id, v) => {
+    const el = document.getElementById(id);
+    if (el) el.value = v;
+  };
+  const setChk = (id, on) => {
+    const el = document.getElementById(id);
+    if (el) el.checked = !!on;
+  };
+
+  // Enable all optional settings toggles so every field is visible
+  [
+    'toggle-show-lv-fractional-shortening', 'toggle-show-rwt', 'toggle-show-lv-mass',
+    'toggle-show-lvmi', 'toggle-show-lvidd-indexed', 'toggle-show-cardiac-index',
+    'toggle-show-bsa', 'toggle-show-svi', 'toggle-show-svr', 'toggle-show-svri',
+    'toggle-show-ea-field', 'toggle-show-pasp-field', 'toggle-show-rv-lv-basal-ratio',
+    'toggle-show-tapse-pasp-ratio', 'toggle-show-rvot-vti', 'toggle-show-ava-continuity',
+    'toggle-show-summary-section', 'toggle-machine-pwd', 'toggle-machine-cwd',
+    'toggle-machine-tdi', 'toggle-fusic-hd-questions'
+  ].forEach(id => setChk(id, true));
+
+  // Chip selections
+  selectedRhythms.clear();
+  selectedRhythms.add('Atrial Fibrillation (AF)');
+  selectedRhythms.add('RBBB');
+  buildRhythmChips();
+
+  selectedCVSDrugs.clear();
+  selectedCVSDrugs.add('Adrenaline');
+  selectedCVSDrugs.add('Milrinone');
+  selectedCVSDrugs.add('Vasopressin');
+  Object.keys(cvsDrugDetailValues).forEach(k => delete cvsDrugDetailValues[k]);
+  cvsDrugDetailValues.Adrenaline = '0.12 mcg/kg/min via right femoral CVC, titrating';
+  cvsDrugDetailValues.Milrinone = '0.375 mcg/kg/min, loaded 12h ago, stable';
+  cvsDrugDetailValues.Vasopressin = '2.4 units/hr, fixed dose';
+  buildCVSDrugChips();
+  updateCVSDrugDetailsUI();
+
+  selectedTamponade.clear();
+  selectedTamponade.add('RA collapse');
+  selectedTamponade.add('RV collapse');
+  buildTamponadeChips();
+
+  selectedLVOTO.clear();
+  buildLVOTOChips();
+
+  selectedPHTBasic.clear();
+  selectedPHTBasic.add('RV dilation');
+  selectedPHTBasic.add('D-Shaped Septum (Septal flattening)');
+  buildPHTBasicChips();
+
+  selectedPHTAdvanced.clear();
+  selectedPHTAdvanced.add('Systolic notching of RVOT Doppler');
+  buildPHTAdvancedChips();
+
+  selectedLeftLung.clear();
+  selectedLeftLung.add('B-Lines (Widespread)');
+  selectedLeftLung.add('Pleural Effusion');
+  selectedRightLung.clear();
+  selectedRightLung.add('B-Lines (Widespread)');
+  selectedRightLung.add('Consolidation');
+  selectedRightLung.add('Pleural Effusion');
+  selectedLeftLungPEQual.clear();
+  selectedLeftLungPEQual.add('Simple');
+  selectedRightLungPEQual.clear();
+  selectedRightLungPEQual.add('Loculated');
+  buildLungGrid();
+  buildLeftLungPEQualChips();
+  buildRightLungPEQualChips();
+  updateLeftLungPESubVisibility();
+  updateRightLungPESubVisibility();
+
+  // ── Scan info ──
+  setV('f-operatorName', 'Dr. Priya Mehta');
+  setV('f-supervision', 'direct');
+  setV('f-supervisorName', 'Prof. Andrew Clarke');
+  setV('f-imageQuality', 'Challenging');
+  setV('f-imagesStored', 'Uploaded to PACS');
+
+  // ── Demographics ──
+  setV('f-patientName', 'Jane Smith');
+  setV('f-patientId', 'MRN-123456789');
+  setV('f-sex', 'female');
+  setV('f-age', '54');
+  setV('f-weight', '72');
+  setV('f-height', '165');
+  setV('f-hr', '92');
+  setV('f-sbp', '98');
+  setV('f-dbp', '62');
+  setV('f-ventilation', 'Self-Vent: BiPAP');
+  setV('f-fio2', '60');
+  setV('f-peep', '10');
+  setV('f-ipap', '16');
+  setV('f-cvp', '18');
+  setV('f-indication', '54F with decompensated heart failure, worsening dyspnoea and peripheral oedema. BiPAP commenced for type 2 respiratory failure. Assessing biventricular function, valvular pathology, filling pressures and venous congestion to guide diuretic and inotrope therapy.');
+
+  // ── LV ──
+  setV('f-lvidd', '62');
+  setV('f-lvids', '52');
+  setV('f-visualLvSize', 'Dilated');
+  setV('f-ivsd', '9');
+  setV('f-lvpwd', '9');
+  setV('f-ef', 'Severely Impaired (< 30%)');
+  setV('f-efSimpsonBiplane', '22');
+  setV('f-mapse', '6');
+  setV('f-lvSPrime', '4');
+  setV('f-rwma', 'Present');
+  setV('f-rwmaDesc', 'Akinesia of the anterior wall and septum from base to apex. Hypokinesia of the anterolateral wall. Basal inferior and inferolateral walls appear to contract normally.');
+  setV('f-lvotDiam', '1.9');
+  setV('f-lvotVTI', '10');
+  setV('f-vtiDeltaResp', '6');
+  setV('f-vtiDeltaIntervention', '8');
+  setChk('vti-int-plr', true);
+  setChk('vti-int-fluids', true);
+  setChk('vti-int-pressor', false);
+  setChk('vti-int-inotropes', false);
+  setV('f-vtiInterventionDetails', 'PLR showed 8% increase. 250ml Hartmann\'s bolus given over 15 min — no further augmentation of VTI.');
+
+  // ── LA / Diastolic ──
+  setV('f-bLinesLung', 'Yes');
+  setV('f-atrialSeptalDev', 'None');
+  setV('f-laVisual', 'Dilated');
+  setV('f-laDiamSys', '48');
+  setV('f-laArea', '26');
+  setV('f-eWave', '95');
+  setV('f-aWave', '30');
+  setV('f-eSeptal', '5');
+  setV('f-eLateral', '7');
+  setV('f-trVmaxLAP', '3.2');
+
+  // ── RV ──
+  setV('f-rvVisualSize', 'Dilated');
+  setV('f-rvBasalDiam', '48');
+  setV('f-rvMidDiam', '38');
+  setV('f-rvLongDiam', '82');
+  setV('f-rvotProx', '34');
+  setV('f-rvWallThick', '6');
+  setV('f-raArea', '22');
+  setV('f-raVisualImpression', 'Dilated');
+  setV('f-rvVisLongitudinal', 'Impaired');
+  setV('f-rvVisRadial', 'Impaired');
+  setV('f-rvEDA', '36');
+  setV('f-rvESA', '26');
+  setV('f-tapse', '12');
+  setV('f-rvS', '7');
+  setV('f-rvotVTI-measure', '9');
+  setV('f-trVmaxPH', '3.6');
+  setV('f-phtRvotAccTime', '72');
+  setV('f-phtEarlyDiastolicPrVel', '2.5');
+  setV('f-phtPaDiameter', '30');
+
+  // ── Valves ──
+  setV('f-mvSten', 'Normal');
+  setV('f-mvApp', 'Thickened / Abnormal');
+  setV('f-mvReg', 'Moderate-Severe');
+  setV('f-avSten', 'Sclerotic (No stenosis)');
+  setV('f-avApp', 'Calcified');
+  setV('f-avReg', 'Mild');
+  setV('f-avVTI', '20');
+  setV('f-lvotVTI-valve', '10');
+  setV('f-tvSten', 'Normal');
+  setV('f-tvApp', 'Thin');
+  setV('f-tvReg', 'Moderate');
+  setV('f-trVmax', '3.6');
+  setV('f-pvSten', 'Normal');
+  setV('f-pvApp', 'Thin');
+  setV('f-pvReg', 'Mild');
+
+  // ── Pericardium ──
+  setV('f-periEffusion', 'Moderate');
+  setChk('f-periGlobal', true);
+  setChk('f-periAnterior', true);
+  setChk('f-periPosterior', true);
+  setChk('f-periLateral', true);
+  setV('f-periAppearance', 'Echogenic');
+
+  // ── Aorta (all sites populated) ──
+  setV('f-aortaRootDiam', '38');
+  setV('f-aortaRootFlap', 'Absent');
+  setV('f-aortaRootFlow', 'Normal');
+  setV('f-aortaAscDiam', '36');
+  setV('f-aortaAscFlap', 'Absent');
+  setV('f-aortaAscFlow', 'Normal');
+  setV('f-aortaArchDiam', '28');
+  setV('f-aortaArchFlap', 'Absent');
+  setV('f-aortaArchFlow', 'Abnormal');
+  setV('f-aortaDescDiam', '24');
+  setV('f-aortaDescFlap', 'Absent');
+  setV('f-aortaDescFlow', 'Normal');
+  setV('f-aortaAbdDiam', '20');
+  setV('f-aortaAbdFlap', 'Absent');
+  setV('f-aortaAbdFlow', 'Normal');
+
+  // ── Veins / IVC ──
+  setV('f-ivcDiam', '2.6');
+  setV('f-ivcCollapse', '<50% collapse');
+  setV('f-hepaticVein', 'S reversal');
+  setV('f-portalVein', '>50%');
+  setV('f-renalVein', 'Biphasic (S&D)');
+  setV('f-rriPSV', '55');
+  setV('f-rriEDV', '18');
+
+  // ── Lungs ──
+  setV('f-leftLungPeSize', 'Small');
+  setV('f-rightLungPeSize', 'Moderate');
+
+  // ── Summary / FUSIC HD Questions ──
+  setV('f-sumCond-strokeVol', 'Yes');
+  setV('f-sumCond-strokeVolResponsive', 'No');
+  setV('f-sumCond-aortaAbn', 'No');
+  setV('f-sumCond-valvesSevere', 'Yes');
+  setV('f-sumCond-sam', 'No');
+  setV('f-sumCond-rwma', 'Yes');
+  setV('f-sumCond-lapRaised', 'Yes');
+  setV('f-sumCond-rvImpair', 'Yes');
+  setV('f-sumCond-papRaised', 'Yes');
+  setV('f-sumCond-tamponadeFeat', 'Yes');
+  setV('f-sumCond-venousCong', 'Yes');
+
+  setV('f-impression', 'Severely dilated left ventricle with severely impaired systolic function (EF ~22%). Regional wall motion abnormality with anterior and septal akinesia suggestive of prior LAD territory infarction. Moderate-severe functional mitral regurgitation. Dilated LA with raised left atrial pressure pattern (E/A >2, raised E/e\', elevated TR Vmax). Dilated RV with impaired biventricular function. Significant tricuspid regurgitation with estimated PASP suggesting severe pulmonary hypertension. Moderate pericardial effusion with features suggesting early tamponade physiology (RA and RV diastolic collapse). Dilated IVC with minimal collapse and severe venous congestion pattern (hepatic vein S reversal, portal pulsatility >50%, biphasic renal vein flow). Bilateral pleural effusions, right larger than left, with widespread B-lines bilaterally. Right basal consolidation.');
+  setV('f-significance', 'Abnormal (unexpected)');
+  setV('f-actions', '1. Urgent cardiology review for severe biventricular failure with tamponade features — consider pericardiocentesis.\n2. Commence milrinone infusion as per cardiologist recommendation.\n3. IV furosemide 80mg bolus then infusion 10mg/hr for volume overload.\n4. Repeat echo in 4–6 hours post-intervention to reassess pericardial effusion and biventricular function.\n5. Restrict IV fluids to essential medications only.');
+
+  // ── EDEC interpretations ──
+  setV('edec-interp-lv', 'Severely dilated LV cavity (LVIDd 62mm). Wall thickness mildly reduced. Severely impaired systolic function with Simpson\'s biplane EF estimated at 22%. MAPSE markedly reduced at 6mm and LV S\' at 4cm/s, both consistent with severe systolic dysfunction. Fractional shortening severely reduced. Regional wall motion abnormality present: akinesia of the anterior wall and septum from base to apex with hypokinesia of the anterolateral segments. Basal inferior and inferolateral walls appear to contract. Pattern consistent with prior extensive LAD territory infarction. LVOT VTI is severely reduced at 10cm with minimal respiratory variation and only modest augmentation with PLR and fluid challenge, suggesting limited preload reserve.');
+  setV('edec-interp-la', 'LA visually dilated. Parasternal LA diameter 48mm and LA area 26cm² — both significantly above normal limits. Mitral inflow demonstrates an E/A ratio of ~3.2 consistent with restrictive filling. Average e\' is 6cm/s; E/e\' ratio is markedly elevated at ~16, indicating significantly raised left atrial pressure. TR Vmax 3.2 m/s adds further evidence of elevated filling pressures. Lung B-lines present. Overall pattern strongly suggests raised left atrial pressure.');
+  setV('edec-interp-rh', 'RV visually dilated with basal diameter 48mm (severely above normal female range). RV:LV basal ratio significantly >1. Both longitudinal and radial function visually impaired. TAPSE markedly reduced at 12mm and RV S\' reduced at 7cm/s. FAC approximately 28% — borderline impaired. D-shaped septum noted, consistent with RV pressure overload. RA visually dilated with area 22cm². TR jet velocity 3.6 m/s — with CVP estimated at 18mmHg, PASP approximately 70mmHg suggesting severe pulmonary hypertension. TAPSE/PASP ratio markedly reduced indicating poor RV–PA coupling. RVOT acceleration time 72ms, early diastolic PR velocity 2.5 m/s, PA diameter 30mm — all supporting severe pulmonary hypertension. Systolic notching of RVOT Doppler observed.');
+  setV('edec-interp-valves', 'Mitral valve: leaflets thickened and abnormal; no significant stenosis on this study; moderate-severe regurgitation with a posteriorly directed jet, likely functional secondary to annular dilatation and LV remodelling. Aortic valve: calcified, sclerotic without significant stenosis; mild aortic regurgitation. Dimensionless index 0.5 — consistent with no critical AS on this sweep. Tricuspid valve: thin leaflets; moderate tricuspid regurgitation. TR Vmax 3.6 m/s. Pulmonary valve: thin; mild pulmonary regurgitation.');
+  setV('edec-interp-pericardium', 'Moderate pericardial effusion, circumferential, echogenic fluid suggesting possible exudative or haemorrhagic component. RA diastolic collapse and RV diastolic collapse identified — features consistent with early tamponade physiology. Clinical correlation recommended urgently.');
+  setV('edec-interp-aorta', 'Aortic root 38mm, ascending aorta 36mm — at upper limit for female patient. No dissection flap at any level assessed. Arch flow noted as abnormal — potential holodiastolic flow reversal suggesting significant AR, though quantification limited on this bedside study. Descending and abdominal aorta diameters within normal limits with normal flow.');
+  setV('edec-interp-veins', 'IVC significantly dilated at 2.6cm with <50% collapse, indicating elevated right atrial pressure (estimated CVP ≥15mmHg). Hepatic vein Doppler shows systolic flow reversal — severe congestion. Portal vein pulsatility fraction >50% — severe congestion. Renal intrarenal venous Doppler biphasic (S and D pattern only) — moderate-severe congestion. Overall VeXUS pattern consistent with severe systemic venous congestion. Renal resistive index elevated at 0.67, suggesting renal hypoperfusion in the setting of cardiorenal compromise.');
+  setV('edec-interp-lungs', 'Left lung: widespread B-lines consistent with pulmonary oedema; small pleural effusion, simple. Right lung: widespread B-lines, consolidation at the base (possibly atelectatic vs infective), and moderate pleural effusion — loculated appearance raises concern for empyema or complex effusion; clinical and radiological correlation advised.');
+  setV('edec-significance', 'Abnormal (unexpected)');
+  setV('edec-impression', document.getElementById('f-impression')?.value || '');
+  setV('edec-actions', document.getElementById('f-actions')?.value || '');
+
+  // Trigger all recalcs and UI updates
+  refreshLVMeasuresOptionalVisibility();
+  refreshHaemodynamicsOptionalVisibility();
+  refreshEAFieldVisibility();
+  refreshRightHeartOptionalVisibility();
+  refreshValveOptionalVisibility();
+  toggleSummarySectionVisibility(true);
+  checkSupervisionField();
+  checkRWMA();
+  checkPericardialEffusion();
+  checkAortaCards();
+  mirrorLVOTVTI('f-lvotVTI');
+  mirrorTRVmax('f-trVmax');
+  updateVentilationSubFields();
+  updateVTIInterventionUI();
+  updateVTIRespirationCaution();
+  recalcMAP();
+  recalcHaemodynamics();
+  recalcCardiacIndex();
+  recalcBSAField();
+  recalcTVmLkg();
+  recalcDI();
+  recalcEA();
+  recalcEe();
+  recalcLVOptionalMeasures();
+  recalcDerivedHaemodynamics();
+  recalcAVAContinuity();
+  recalcRightHeartDerivedRatios();
+  recalcPASPCVP();
+  recalcRRI();
+  updateLAPRaisedPressureHint();
+  recalcLAPInterp();
+  updateVeinHint('f-hepaticVein', 'hint-hepatic');
+  updateVeinHint('f-portalVein', 'hint-portal');
+  updateVeinHint('f-renalVein', 'hint-renal');
+  recalcVeXUS();
+  syncPHTBasicAutoSelections();
+  runMainContentSoftValidation();
+  refreshFusicHdQuestionHighlights();
+  showToast('Debug test data B loaded (decompensated HF — all fields)', 'success');
 }
 
 // ─── SECTION VISIBILITY ────────────────────────────────
@@ -7540,6 +8045,7 @@ function refreshRightHeartOptionalVisibility() {
   }
   document.getElementById('rv-lv-basal-ratio-field-wrap')?.classList.toggle('section-hidden', !document.getElementById('toggle-show-rv-lv-basal-ratio')?.checked);
   document.getElementById('tapse-pasp-ratio-field-wrap')?.classList.toggle('section-hidden', !document.getElementById('toggle-show-tapse-pasp-ratio')?.checked);
+  document.getElementById('rvot-vti-field-wrap')?.classList.toggle('section-hidden', !(document.getElementById('toggle-show-rvot-vti')?.checked && isMachinePWDEnabled()));
   recalcPASPCVP();
   syncRHMasterToggle();
 }
@@ -7629,7 +8135,6 @@ function refreshLVMeasuresOptionalVisibility() {
   document.getElementById('lvidd-index-field-wrap')?.classList.toggle('section-hidden', !lvidIdxOn);
   const needAnthro = needsAnthropometricsForBSA();
   document.getElementById('ci-wt-ht-fields')?.classList.toggle('section-hidden', !needAnthro);
-  checkCIAnthropometrics();
   recalcLVOptionalMeasures();
   syncLVMasterToggle();
 }
@@ -7737,7 +8242,6 @@ function refreshHaemodynamicsOptionalVisibility() {
   const needAnthro = needsAnthropometricsForBSA();
   document.getElementById('ci-wt-ht-fields')?.classList.toggle('section-hidden', !needAnthro);
   if (!ciOn) clearCardiacIndexValidationUI();
-  checkCIAnthropometrics();
   recalcCardiacIndex();
   recalcBSAField();
   recalcDerivedHaemodynamics();
@@ -8091,155 +8595,6 @@ function updateLAPRaisedPressureHint() {
   el.classList.toggle('show', show);
 }
 
-// ─── PLAUSIBILITY (soft range checks) ─────────────────
-const UNUSUAL_VALUE_MSG = 'Unusual value.';
-
-const UNUSUAL_PLAUSIBILITY_RULES = {
-  'f-cvp': v => !isNaN(v) && v > 80,
-  'f-sbp': v => !isNaN(v) && (v < 50 || v > 250),
-  'f-dbp': v => !isNaN(v) && (v < 20 || v > 150),
-  'f-lvidd': v => !isNaN(v) && (v < 15 || v > 100),
-  'f-lvids': v => !isNaN(v) && (v < 15 || v > 100),
-  'f-ivsd': v => !isNaN(v) && (v < 4 || v > 35),
-  'f-lvpwd': v => !isNaN(v) && (v < 4 || v > 35),
-  'f-lvotDiam': v => !isNaN(v) && (v < 1.0 || v > 4.0),
-  'f-efSimpsonBiplane': v => !isNaN(v) && (v < 5 || v > 95),
-  'f-mapse': v => !isNaN(v) && (v < 2 || v > 40),
-  'f-lvSPrime': v => !isNaN(v) && (v < 2 || v > 35),
-  'f-eWave': v => !isNaN(v) && (v < 10 || v > 250),
-  'f-aWave': v => !isNaN(v) && (v < 10 || v > 250),
-  'f-eSeptal': v => !isNaN(v) && (v < 2 || v > 35),
-  'f-eLateral': v => !isNaN(v) && (v < 2 || v > 35),
-  'f-avVTI': v => !isNaN(v) && (v < 4 || v > 60),
-  'f-aortaRootDiam': v => !isNaN(v) && (v < 15 || v > 90),
-  'f-aortaAscDiam': v => !isNaN(v) && (v < 15 || v > 90),
-  'f-ivcDiam': v => !isNaN(v) && (v < 0.3 || v > 4.5),
-  'f-vtiDeltaResp': v => !isNaN(v) && v > 100,
-  'f-vtiDeltaIntervention': v => !isNaN(v) && v > 100,
-  'f-laArea': v => !isNaN(v) && (v < 5 || v > 60),
-  'f-raArea': v => !isNaN(v) && (v < 8 || v > 28),
-  'f-rvBasalDiam': v => !isNaN(v) && (v < 10 || v > 80),
-  'f-rvMidDiam': v => !isNaN(v) && (v < 10 || v > 80),
-  'f-rvLongDiam': v => !isNaN(v) && (v < 10 || v > 80),
-  'f-rvWallThick': v => !isNaN(v) && (v < 2 || v > 20),
-  'f-rvEDA': v => !isNaN(v) && (v < 4 || v > 70),
-  'f-rvESA': v => !isNaN(v) && (v < 3 || v > 65),
-  'fac-display-input': v => !isNaN(v) && (v < 5 || v > 80),
-  'f-tapse': v => !isNaN(v) && (v < 2 || v > 40),
-  'f-rvS': v => !isNaN(v) && (v < 2 || v > 35),
-  'fs-display-input': v => !isNaN(v) && (v < 8 || v > 60)
-};
-
-const UNUSUAL_MERGE_WITH_CLINICAL = new Set([
-  'f-laArea', 'f-raArea',
-  'f-rvBasalDiam', 'f-rvMidDiam', 'f-rvLongDiam', 'f-rvWallThick',
-  'f-rvEDA', 'f-rvESA', 'fac-display-input', 'f-tapse', 'f-rvS'
-]);
-
-const UNUSUAL_STANDALONE_SOFTRED = new Set(Object.keys(UNUSUAL_PLAUSIBILITY_RULES));
-
-function evalUnusualPlausibility(fieldId) {
-  if (!isGuidanceModeEnabled()) return false;
-  const fn = UNUSUAL_PLAUSIBILITY_RULES[fieldId];
-  if (!fn) return false;
-  const el = document.getElementById(fieldId);
-  if (!el || !String(el.value).trim()) return false;
-  const v = parseFloat(el.value);
-  return fn(v, el);
-}
-
-function getOrCreateUnusualWarnEl(fieldId) {
-  const wid = `unusual-warn-${fieldId}`;
-  let w = document.getElementById(wid);
-  if (w) return w;
-  const inp = document.getElementById(fieldId);
-  if (!inp) return null;
-  w = document.createElement('div');
-  w.id = wid;
-  w.className = 'inline-warn unusual-plausibility-warn';
-  w.textContent = UNUSUAL_VALUE_MSG;
-  inp.insertAdjacentElement('afterend', w);
-  return w;
-}
-
-function applyUnusualWarn(fieldId, bad) {
-  let w = null;
-  if (fieldId === 'f-age') w = document.getElementById('age-warn');
-  else if (fieldId === 'f-hr') w = document.getElementById('hr-warn');
-  else w = getOrCreateUnusualWarnEl(fieldId);
-  if (w) w.classList.toggle('show', bad);
-}
-
-function refreshTrVmaxUnusualPlausibility() {
-  if (!isGuidanceModeEnabled()) {
-    ['f-trVmax', 'f-trVmaxLAP', 'f-trVmaxPH'].forEach(id => {
-      applyUnusualWarn(id, false);
-      const inp = document.getElementById(id);
-      if (inp) inp.classList.remove('soft-red');
-    });
-    return;
-  }
-  const raw =
-    document.getElementById('f-trVmax')?.value?.trim() ||
-    document.getElementById('f-trVmaxLAP')?.value?.trim() ||
-    document.getElementById('f-trVmaxPH')?.value?.trim() ||
-    '';
-  const v = parseFloat(raw);
-  const bad = raw !== '' && !isNaN(v) && (v < 1.0 || v > 7.0);
-  ['f-trVmax', 'f-trVmaxLAP', 'f-trVmaxPH'].forEach(id => {
-    applyUnusualWarn(id, bad);
-    const inp = document.getElementById(id);
-    if (inp) inp.classList.toggle('soft-red', bad);
-  });
-}
-
-function refreshLvotVtiUnusualPlausibility() {
-  if (!isGuidanceModeEnabled()) {
-    ['f-lvotVTI', 'f-lvotVTI-valve'].forEach(id => {
-      applyUnusualWarn(id, false);
-      const inp = document.getElementById(id);
-      if (inp) inp.classList.remove('soft-red');
-    });
-    return;
-  }
-  const raw = document.getElementById('f-lvotVTI')?.value?.trim() || '';
-  const v = parseFloat(raw);
-  const bad = raw !== '' && !isNaN(v) && (v < 4 || v > 60);
-  ['f-lvotVTI', 'f-lvotVTI-valve'].forEach(id => {
-    applyUnusualWarn(id, bad);
-    const inp = document.getElementById(id);
-    if (inp) inp.classList.toggle('soft-red', bad);
-  });
-}
-
-function refreshAllUnusualPlausibilityChecks() {
-  if (!isGuidanceModeEnabled()) {
-    hideAllUnusualPlausibilityWarnings();
-    UNUSUAL_STANDALONE_SOFTRED.forEach(fieldId => {
-      applyUnusualWarn(fieldId, false);
-      const inp = document.getElementById(fieldId);
-      if (inp) inp.classList.remove('soft-red');
-    });
-    refreshTrVmaxUnusualPlausibility();
-    refreshLvotVtiUnusualPlausibility();
-    return;
-  }
-  UNUSUAL_STANDALONE_SOFTRED.forEach(fieldId => {
-    const bad = evalUnusualPlausibility(fieldId);
-    applyUnusualWarn(fieldId, bad);
-    const inp = document.getElementById(fieldId);
-    if (inp && !UNUSUAL_MERGE_WITH_CLINICAL.has(fieldId)) inp.classList.toggle('soft-red', bad);
-  });
-  refreshTrVmaxUnusualPlausibility();
-  refreshLvotVtiUnusualPlausibility();
-}
-
-function hideAllUnusualPlausibilityWarnings() {
-  document.querySelectorAll('[id^="unusual-warn-"]').forEach(el => el.classList.remove('show'));
-  document.getElementById('age-warn')?.classList.remove('show');
-  document.getElementById('hr-warn')?.classList.remove('show');
-}
-
 function getFieldLabelByInputId(inputId) {
   return document.querySelector(`label.field-label[for="${inputId}"]`);
 }
@@ -8303,9 +8658,7 @@ function checkLAArea() {
     if (!guidanceOn) toggleFieldAbnormalLabel('f-laArea', true);
     else if (refHint) refHint.classList.add('abnormal-ref');
   }
-  const unusual = evalUnusualPlausibility('f-laArea');
-  applyUnusualWarn('f-laArea', unusual);
-  inp.classList.toggle('soft-red', clinicalRed || unusual);
+  inp.classList.toggle('soft-red', clinicalRed);
 }
 
 function checkIVSd() {
@@ -8323,9 +8676,7 @@ function checkIVSd() {
     if (!guidanceOn) toggleFieldAbnormalLabel('f-ivsd', true);
     else if (refHint) refHint.classList.add('abnormal-ref');
   }
-  const unusual = evalUnusualPlausibility('f-ivsd');
-  applyUnusualWarn('f-ivsd', unusual);
-  inp.classList.toggle('soft-red', clinicalRed || unusual);
+  inp.classList.toggle('soft-red', clinicalRed);
 }
 
 function checkLVPWd() {
@@ -8343,9 +8694,7 @@ function checkLVPWd() {
     if (!guidanceOn) toggleFieldAbnormalLabel('f-lvpwd', true);
     else if (refHint) refHint.classList.add('abnormal-ref');
   }
-  const unusual = evalUnusualPlausibility('f-lvpwd');
-  applyUnusualWarn('f-lvpwd', unusual);
-  inp.classList.toggle('soft-red', clinicalRed || unusual);
+  inp.classList.toggle('soft-red', clinicalRed);
 }
 
 function checkRVBasalDiameter() {
@@ -8366,9 +8715,7 @@ function checkRVBasalDiameter() {
     if (!guidanceOn) toggleFieldAbnormalLabel('f-rvBasalDiam', true);
     else if (refHint) refHint.classList.add('abnormal-ref');
   }
-  const unusual = evalUnusualPlausibility('f-rvBasalDiam');
-  applyUnusualWarn('f-rvBasalDiam', unusual);
-  inp.classList.toggle('soft-red', clinicalRed || unusual);
+  inp.classList.toggle('soft-red', clinicalRed);
 }
 
 function checkRVMidDiameter() {
@@ -8389,9 +8736,7 @@ function checkRVMidDiameter() {
     if (!guidanceOn) toggleFieldAbnormalLabel('f-rvMidDiam', true);
     else if (refHint) refHint.classList.add('abnormal-ref');
   }
-  const unusual = evalUnusualPlausibility('f-rvMidDiam');
-  applyUnusualWarn('f-rvMidDiam', unusual);
-  inp.classList.toggle('soft-red', clinicalRed || unusual);
+  inp.classList.toggle('soft-red', clinicalRed);
 }
 
 function checkRVLongDiameter() {
@@ -8412,9 +8757,7 @@ function checkRVLongDiameter() {
     if (!guidanceOn) toggleFieldAbnormalLabel('f-rvLongDiam', true);
     else if (refHint) refHint.classList.add('abnormal-ref');
   }
-  const unusual = evalUnusualPlausibility('f-rvLongDiam');
-  applyUnusualWarn('f-rvLongDiam', unusual);
-  inp.classList.toggle('soft-red', clinicalRed || unusual);
+  inp.classList.toggle('soft-red', clinicalRed);
 }
 
 function checkRVOTProximal() {
@@ -8456,9 +8799,7 @@ function checkRVWallThickness() {
     if (!guidanceOn) toggleFieldAbnormalLabel('f-rvWallThick', true);
     else if (refHint) refHint.classList.add('abnormal-ref');
   }
-  const unusual = evalUnusualPlausibility('f-rvWallThick');
-  applyUnusualWarn('f-rvWallThick', unusual);
-  inp.classList.toggle('soft-red', clinicalRed || unusual);
+  inp.classList.toggle('soft-red', clinicalRed);
 }
 
 function checkRAArea() {
@@ -8472,17 +8813,10 @@ function checkRAArea() {
   if (refHint) refHint.classList.remove('abnormal-ref');
   inp.classList.remove('soft-red');
   if (inp.value.trim() === '' || isNaN(v)) return;
-  const unusual = evalUnusualPlausibility('f-raArea');
-  applyUnusualWarn('f-raArea', unusual);
-  if (unusual) {
-    hint.textContent = v < 8
-      ? 'Unusual value — below typical plausible range (&lt;8 cm²).'
-      : 'Unusual value — above typical plausible range (&gt;28 cm²).';
-    hint.classList.add('show', 'error');
-  } else if (v >= 18) {
+  if (v >= 18) {
     if (refHint) refHint.classList.add('abnormal-ref');
   }
-  inp.classList.toggle('soft-red', unusual || v >= 18);
+  inp.classList.toggle('soft-red', v >= 18);
 }
 
 function checkRVEDA() {
@@ -8499,9 +8833,7 @@ function checkRVEDA() {
     hint.textContent = 'Enlarged — at or above typical upper reference (≥40 cm²).';
     hint.classList.add('show', 'dilated');
   }
-  const unusual = evalUnusualPlausibility('f-rvEDA');
-  applyUnusualWarn('f-rvEDA', unusual);
-  inp.classList.toggle('soft-red', clinicalRed || unusual);
+  inp.classList.toggle('soft-red', clinicalRed);
 }
 
 function checkRVESA() {
@@ -8520,9 +8852,7 @@ function checkRVESA() {
     hint.textContent = 'RV ESA should be less than RV EDA for fractional area change.';
     hint.classList.add('show', 'neutral');
   }
-  const unusual = evalUnusualPlausibility('f-rvESA');
-  applyUnusualWarn('f-rvESA', unusual);
-  inp.classList.toggle('soft-red', clinicalOrder || unusual);
+  inp.classList.toggle('soft-red', clinicalOrder);
 }
 
 function checkMAPSE() {
@@ -8540,9 +8870,7 @@ function checkMAPSE() {
     if (!guidanceOn) toggleFieldAbnormalLabel('f-mapse', true);
     else if (refHint) refHint.classList.add('abnormal-ref');
   }
-  const unusual = evalUnusualPlausibility('f-mapse');
-  applyUnusualWarn('f-mapse', unusual);
-  inp.classList.toggle('soft-red', clinicalRed || unusual);
+  inp.classList.toggle('soft-red', clinicalRed);
 }
 
 function checkLVSPrime() {
@@ -8560,9 +8888,7 @@ function checkLVSPrime() {
     if (!guidanceOn) toggleFieldAbnormalLabel('f-lvSPrime', true);
     else if (refHint) refHint.classList.add('abnormal-ref');
   }
-  const unusual = evalUnusualPlausibility('f-lvSPrime');
-  applyUnusualWarn('f-lvSPrime', unusual);
-  inp.classList.toggle('soft-red', clinicalRed || unusual);
+  inp.classList.toggle('soft-red', clinicalRed);
 }
 
 function checkRVFAC() {
@@ -8587,9 +8913,7 @@ function checkRVFAC() {
       hint.classList.add('show', 'dilated');
     }
   }
-  const unusual = evalUnusualPlausibility('fac-display-input');
-  applyUnusualWarn('fac-display-input', unusual);
-  inp.classList.toggle('soft-red', clinicalRed || unusual);
+  inp.classList.toggle('soft-red', clinicalRed);
 }
 
 function checkRVTAPSE() {
@@ -8610,9 +8934,7 @@ function checkRVTAPSE() {
     if (!guidanceOn) toggleFieldAbnormalLabel('f-tapse', true);
     else if (refHint) refHint.classList.add('abnormal-ref');
   }
-  const unusual = evalUnusualPlausibility('f-tapse');
-  applyUnusualWarn('f-tapse', unusual);
-  inp.classList.toggle('soft-red', clinicalRed || unusual);
+  inp.classList.toggle('soft-red', clinicalRed);
 }
 
 function checkRVSPrime() {
@@ -8633,9 +8955,7 @@ function checkRVSPrime() {
     if (!guidanceOn) toggleFieldAbnormalLabel('f-rvS', true);
     else if (refHint) refHint.classList.add('abnormal-ref');
   }
-  const unusual = evalUnusualPlausibility('f-rvS');
-  applyUnusualWarn('f-rvS', unusual);
-  inp.classList.toggle('soft-red', clinicalRed || unusual);
+  inp.classList.toggle('soft-red', clinicalRed);
 }
 
 function runRvFieldClinicalChecksOnly() {
@@ -8654,7 +8974,6 @@ function runRvFieldClinicalChecksOnly() {
 }
 
 function refreshRVFieldValidations() {
-  refreshAllUnusualPlausibilityChecks();
   runRvFieldClinicalChecksOnly();
 }
 
@@ -8662,6 +8981,7 @@ let mainContentSoftValidationTimer = null;
 const MAIN_CONTENT_SOFT_VALIDATION_MS = 480;
 
 function runMainContentSoftValidation() {
+  recalcAgeFromDOB();
   recalcRVFAC();
   refreshRVFieldValidations();
   checkLVIDdHint();
@@ -8669,15 +8989,13 @@ function runMainContentSoftValidation() {
   checkLVPWd();
   recalcLVOptionalMeasures();
   checkScanDateNotFuture();
-  checkAge();
-  checkHR();
   checkMAPSE();
   checkLVSPrime();
   checkLADiameter();
   checkLAArea();
-  checkCIAnthropometrics();
   if (document.getElementById('toggle-show-cardiac-index')?.checked) recalcCardiacIndex();
   recalcBSAField();
+  recalcTVmLkg();
   recalcDerivedHaemodynamics();
   recalcAVAContinuity();
   recalcRightHeartDerivedRatios();
@@ -8695,6 +9013,24 @@ function flushMainContentSoftValidation() {
   clearTimeout(mainContentSoftValidationTimer);
   mainContentSoftValidationTimer = null;
   runMainContentSoftValidation();
+}
+
+/** Show/hide ventilation sub-fields based on the selected ventilation mode. */
+function updateVentilationSubFields() {
+  const v = (document.getElementById('f-ventilation')?.value || '');
+  const showFiO2 = ['Self-Vent: Oxygen', 'Self-Vent: CPAP', 'Self-Vent: BiPAP', 'Ventilated'].includes(v);
+  const showPEEP = ['Self-Vent: CPAP', 'Self-Vent: BiPAP', 'Ventilated'].includes(v);
+  const showIPAP = v === 'Self-Vent: BiPAP';
+  const showVentilated = v === 'Ventilated';
+
+  document.getElementById('f-ventilatory-mode-wrap')?.classList.toggle('visible', showVentilated);
+  document.getElementById('f-fio2-wrap')?.classList.toggle('visible', showFiO2);
+  document.getElementById('f-peep-wrap')?.classList.toggle('visible', showPEEP);
+  document.getElementById('f-ipap-wrap')?.classList.toggle('visible', showIPAP);
+  document.getElementById('ventilated-extra-wrap')?.classList.toggle('visible', showVentilated);
+
+  refreshHaemodynamicsOptionalVisibility();
+  if (showVentilated) recalcTVmLkg();
 }
 
 /** Spontaneous ventilation (all Self-Vent dropdown values): subtle mute on VTI % Δ respiration — input remains enabled. */
@@ -8763,13 +9099,13 @@ function checkLVIDdHint() {
   if (raw === '' || isNaN(mm)) return;
 
   if (mm > 65) {
-    hint.textContent = '>65 mm — severely dilated (independent of sex).';
+    hint.textContent = '>65 mm (severely dilated)';
     hint.classList.add('show', 'dilated');
     return;
   }
 
   if (!sex) {
-    hint.textContent = 'Select sex for sex-specific cut-offs (male <55 / 55–65 / >65 mm; female <50 / 50–60 / >60 mm).';
+    hint.textContent = 'Select sex for sex-specific cut-offs';
     hint.classList.add('show', 'neutral');
     return;
   }
@@ -8929,6 +9265,31 @@ function recalcBSAField() {
   if (src) setAutoCalcSourceVisible(src, manual, inp.value.trim() !== '');
 }
 
+function recalcTVmLkg() {
+  const inp = document.getElementById('f-tv-mlkg-input');
+  const src = document.getElementById('f-tv-mlkg-source');
+  if (!inp) return;
+  const manual = isAutoCalcManual(inp);
+  const tv = parseFloat(document.getElementById('f-tidal-volume')?.value);
+  const wt = parseFloat(document.getElementById('f-weight')?.value);
+  if (isFinite(tv) && tv > 0 && isFinite(wt) && wt > 0) {
+    if (!manual) inp.value = (tv / wt).toFixed(2);
+  } else if (!manual) {
+    inp.value = '';
+  }
+  inp.placeholder = (!manual && inp.value.trim() === '') ? 'Requires TV & weight' : '';
+  if (src) setAutoCalcSourceVisible(src, manual, inp.value.trim() !== '');
+}
+
+function getTVmLkgCalc() {
+  const inp = document.getElementById('f-tv-mlkg-input');
+  if (inp?.value.trim()) return inp.value.trim();
+  const tv = parseFloat(document.getElementById('f-tidal-volume')?.value);
+  const wt = parseFloat(document.getElementById('f-weight')?.value);
+  if (!isFinite(tv) || tv <= 0 || !isFinite(wt) || wt <= 0) return '';
+  return (tv / wt).toFixed(2);
+}
+
 function recalcDerivedHaemodynamics() {
   if (document.getElementById('toggle-show-svi')?.checked) {
     const inp = document.getElementById('svi-display-input');
@@ -8995,64 +9356,6 @@ function recalcDerivedHaemodynamics() {
   }
 }
 
-/** Height/weight plausibility when any BSA-based haemodynamic measure is on. */
-function checkCIAnthropometrics() {
-  const heightHint = document.getElementById('height-plaus-hint');
-  const weightHint = document.getElementById('weight-plaus-hint');
-  const hInp = document.getElementById('f-height');
-  const wInp = document.getElementById('f-weight');
-  if (!needsAnthropometricsForBSA()) {
-    hInp?.classList.remove('soft-red');
-    wInp?.classList.remove('soft-red');
-    heightHint?.classList.remove('show');
-    weightHint?.classList.remove('show');
-    if (heightHint) heightHint.textContent = '';
-    if (weightHint) weightHint.textContent = '';
-    return;
-  }
-
-  const HT_MIN = 120;
-  const HT_MAX = 220;
-  const WT_MIN = 35;
-  const WT_MAX = 200;
-
-  hInp?.classList.remove('soft-red');
-  wInp?.classList.remove('soft-red');
-  heightHint?.classList.remove('show');
-  weightHint?.classList.remove('show');
-  if (heightHint) heightHint.textContent = '';
-  if (weightHint) weightHint.textContent = '';
-
-  const hRaw = hInp?.value?.trim() || '';
-  const wRaw = wInp?.value?.trim() || '';
-  const h = parseFloat(hRaw);
-  const w = parseFloat(wRaw);
-
-  if (hRaw !== '' && !isNaN(h)) {
-    if (h < HT_MIN || h > HT_MAX) {
-      hInp.classList.add('soft-red');
-      if (heightHint) {
-        heightHint.textContent = h < HT_MIN
-          ? 'Unusually low for BSA (warn: minimum 120 cm / 47 in).'
-          : 'Unusually high for BSA (warn: maximum 220 cm / 86 in).';
-        heightHint.classList.add('show');
-      }
-    }
-  }
-
-  if (wRaw !== '' && !isNaN(w)) {
-    if (w < WT_MIN || w > WT_MAX) {
-      wInp.classList.add('soft-red');
-      if (weightHint) {
-        weightHint.textContent = w < WT_MIN
-          ? 'Unusually low for adult BSA (warn: soft minimum 35 kg / 77 lbs).'
-          : 'Unusually high for adult BSA (warn: soft maximum 200 kg / 440 lbs).';
-        weightHint.classList.add('show');
-      }
-    }
-  }
-}
-
 /** Mosteller BSA (m²) from weight (kg) and height (cm); NaN if invalid. */
 function getBSAMosteller() {
   const wt = parseFloat(document.getElementById('f-weight')?.value);
@@ -9068,7 +9371,8 @@ function needsAnthropometricsForBSA() {
     document.getElementById('toggle-show-svi')?.checked ||
     document.getElementById('toggle-show-svri')?.checked ||
     document.getElementById('toggle-show-lvmi')?.checked ||
-    document.getElementById('toggle-show-lvidd-indexed')?.checked
+    document.getElementById('toggle-show-lvidd-indexed')?.checked ||
+    document.getElementById('f-ventilation')?.value === 'Ventilated'
   );
 }
 
@@ -9752,24 +10056,23 @@ function checkScanDateNotFuture() {
   }
 }
 
-function checkAge() {
+function recalcAgeFromDOB() {
+  const dobEl = document.getElementById('f-dob');
   const ageEl = document.getElementById('f-age');
-  const el = document.getElementById('age-warn');
-  if (!el || !ageEl) return;
-  if (!isGuidanceModeEnabled()) {
-    el.classList.remove('show');
-    ageEl.classList.remove('soft-red');
+  if (!dobEl || !ageEl) return;
+  const dob = dobEl.value;
+  if (!dob) {
+    ageEl.removeAttribute('readonly');
     return;
   }
-  if (ageEl.type === 'text') {
-    el.classList.remove('show');
-    ageEl.classList.remove('soft-red');
-    return;
-  }
-  const age = parseFloat(ageEl.value);
-  const bad = !isNaN(age) && (age < 16 || age > 110);
-  el.classList.toggle('show', bad);
-  ageEl.classList.toggle('soft-red', bad);
+  const scanDateEl = document.getElementById('f-scanDate');
+  const ref = scanDateEl?.value ? new Date(scanDateEl.value + 'T00:00:00') : new Date();
+  const born = new Date(dob + 'T00:00:00');
+  let age = ref.getFullYear() - born.getFullYear();
+  const m = ref.getMonth() - born.getMonth();
+  if (m < 0 || (m === 0 && ref.getDate() < born.getDate())) age--;
+  ageEl.value = String(Math.max(0, age));
+  ageEl.setAttribute('readonly', '');
 }
 
 // ─── VEIN HINTS + VeXUS ────────────────────────────────
@@ -9905,21 +10208,6 @@ function checkAortaCards() {
   });
 }
 
-function checkHR() {
-  const hrEl = document.getElementById('f-hr');
-  const hr = parseFloat(hrEl?.value);
-  const el = document.getElementById('hr-warn');
-  if (!el || !hrEl) return;
-  if (!isGuidanceModeEnabled()) {
-    el.classList.remove('show');
-    hrEl.classList.remove('soft-red');
-    return;
-  }
-  const bad = !isNaN(hr) && (hr < 20 || hr > 250);
-  el.classList.toggle('show', bad);
-  hrEl.classList.toggle('soft-red', bad);
-}
-
 // ─── SESSION DRAFT (sessionStorage) & UNLOAD GUARD ─────
 function clearSessionDraftStorage() {
   try { sessionStorage.removeItem(SESSION_DRAFT_STORAGE_KEY); } catch (e) {}
@@ -9948,7 +10236,8 @@ function captureDemographicWidgetSnapshot() {
     scanTimeType: timeEl?.type || 'time',
     ageLabelHTML: document.getElementById('f-age-label')?.innerHTML || '',
     scanDateLabel: document.getElementById('f-scanDate-label')?.textContent || '',
-    scanTimeLabel: document.getElementById('f-scanTime-label')?.textContent || ''
+    scanTimeLabel: document.getElementById('f-scanTime-label')?.textContent || '',
+    dobValue: document.getElementById('f-dob')?.value || ''
   };
 }
 
@@ -9982,6 +10271,8 @@ function applyDemographicWidgetSnapshot(demo) {
   if (dl && demo.scanDateLabel != null) dl.textContent = demo.scanDateLabel;
   const tl = document.getElementById('f-scanTime-label');
   if (tl && demo.scanTimeLabel != null) tl.textContent = demo.scanTimeLabel;
+  const dobEl = document.getElementById('f-dob');
+  if (dobEl) dobEl.value = '';
   refreshAnonymiseEntrypointButtons();
 }
 
@@ -10274,6 +10565,8 @@ function confirmClear() {
     const pad2 = n => String(n).padStart(2,'0');
     document.getElementById('f-scanDate').value = now.toISOString().split('T')[0];
     document.getElementById('f-scanTime').value = `${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+    const dobEl = document.getElementById('f-dob');
+    if (dobEl) dobEl.value = '';
   }
   document.querySelectorAll('.conditional-field').forEach(e => e.classList.remove('visible'));
 
@@ -10316,7 +10609,6 @@ function confirmClear() {
   if (lapIntEl) { lapIntEl.className = 'lv-interp empty'; lapIntEl.innerHTML = '<span class="calc-empty">Enter relevant fields above when available</span>'; }
   const paspCvpEl = document.getElementById('pasp-cvp-display');
   if (paspCvpEl) paspCvpEl.innerHTML = '<span class="calc-empty">Enter TR Vmax, then CVP (Section 1) or IVC diameter (cm) + collapsibility (Veins)</span>';
-  const aw = document.getElementById('age-warn'); if (aw) aw.classList.remove('show');
   const ageEl = document.getElementById('f-age'); if (ageEl) ageEl.classList.remove('soft-red');
   const scanDateEl = document.getElementById('f-scanDate');
   if (scanDateEl) scanDateEl.classList.remove('soft-red');
@@ -10325,7 +10617,6 @@ function confirmClear() {
     scanFutureHint.textContent = '';
     scanFutureHint.classList.remove('show', 'error');
   }
-  const hw = document.getElementById('hr-warn'); if (hw) hw.classList.remove('show');
   const hrEl = document.getElementById('f-hr'); if (hrEl) hrEl.classList.remove('soft-red');
   ['aorta-card-root','aorta-card-asc','aorta-card-arch','aorta-card-desc','aorta-card-abd'].forEach(id => document.getElementById(id)?.classList.remove('aorta-alert'));
   ['hint-hepatic','hint-portal','hint-renal'].forEach(id => { const e = document.getElementById(id); if (e) { e.className = 'vein-hint'; e.textContent = ''; } });
@@ -10670,6 +10961,13 @@ function getNow() {
   return { date:`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`, time:`${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}` };
 }
 
+function formatStudyDateTime(dateStr, timeStr) {
+  if (!dateStr) return '';
+  const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr);
+  const formatted = isoMatch ? `${isoMatch[3]}-${isoMatch[2]}-${isoMatch[1]}` : dateStr;
+  return timeStr ? `${formatted} ${timeStr}` : formatted;
+}
+
 // ─── EXPORT MODAL & QUICK MENU ──────────────────────────
 function openExportModal() {
   closeExportDropdown();
@@ -10708,6 +11006,7 @@ function runQuickExportFormat(format) {
   if (format === 'xlsx') doExport();
   else if (format === 'clipboard-text') void doExportClipboardText();
   else if (format === 'plain-text-page') openPlainTextReportView();
+  else if (format === 'quick-data-page') openQuickDataInputTextView();
   else if (format === 'print-pdf') doExportPrintPdf();
   else if (format === 'edec') openEdecEditor();
 }
@@ -10718,6 +11017,7 @@ function triggerExportFromModal(format) {
   if (format === 'xlsx') doExport();
   else if (format === 'clipboard-text') void doExportClipboardText();
   else if (format === 'plain-text-page') openPlainTextReportView();
+  else if (format === 'quick-data-page') openQuickDataInputTextView();
   else if (format === 'print-pdf') doExportPrintPdf();
   else if (format === 'edec') openEdecEditor();
 }
@@ -10735,9 +11035,14 @@ function openPlainTextReportView() {
   closeExportDropdown();
   const valid = validateForm();
   const text = getPlainTextReportFullString();
+  const titleEl = document.getElementById('plainTextReportTitle');
+  const instructions = document.getElementById('quickDataInputInstructions');
   const pre = document.getElementById('plainTextReportBody');
   const overlay = document.getElementById('plainTextReportOverlay');
+  if (titleEl) titleEl.textContent = 'Plain text report';
+  if (instructions) instructions.hidden = true;
   if (pre) pre.textContent = text;
+  if (pre) pre.dataset.copyKind = 'report';
   overlay?.classList.add('open');
   if (overlay) overlay.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
@@ -10767,6 +11072,14 @@ async function plainTextReportCopyFromView() {
   const el = document.getElementById('plainTextReportBody');
   const text = el?.textContent ?? '';
   if (!text) return;
+  if (el?.dataset?.copyKind === 'quickData') {
+    const quickOk = await copyTextToClipboard(text);
+    showToast(
+      quickOk ? 'Quick data values copied to clipboard' : 'Could not copy to clipboard - use the full-page view',
+      quickOk ? 'success' : 'warn'
+    );
+    return;
+  }
   const valid = validateForm();
   const ok = await copyTextToClipboard(text);
   if (ok) {
@@ -10777,6 +11090,98 @@ async function plainTextReportCopyFromView() {
 }
 
 // ─── EXPORT: PDF HEADER LOGO (cached for offline) ─────
+// Values-only export for the external Excel "Quick Data Input" sheet.
+// Each array item maps to one row in column C; empty strings deliberately paste as blank cells.
+const QUICK_DATA_INPUT_FIELDS = [
+  { label: 'IVSd (PLAX)', id: 'f-ivsd' },
+  { label: 'LVIDd (PLAX)', id: 'f-lvidd' },
+  { label: 'LVPWd (PLAX)', id: 'f-lvpwd' },
+  { label: 'LVIDs (PLAX)', id: 'f-lvids' },
+  { label: 'LA Diam (PLAX)', id: 'f-laDiamSys' },
+  { label: 'LVOT Diam (PLAX)', id: 'f-lvotDiam' },
+  { label: 'Aortic Root diameter at STJ (PLAX)', id: 'f-aortaRootDiam' },
+  { label: 'Asc Ao Diam (PLAX)', id: 'f-aortaAscDiam' },
+  { label: 'RVOT Diam (PSAX RVOT 1 or PLAX)', id: 'f-rvotProx' },
+  { label: 'TR Vmax (RV inflow, PSAX or A4C)', id: 'f-trVmax' },
+  { label: 'Pulmonary Artery Diameter (PSAX)', id: 'f-phtPaDiameter' },
+  { label: 'RVOT VTI (PLAX RV outflow or PSAX)' },
+  { label: 'RVOT Accelaration Time (= PAT or PAAT)', id: 'f-phtRvotAccTime' },
+  { label: 'PR velocity early diastole (PLAX RV outflow or PSAX)', id: 'f-phtEarlyDiastolicPrVel' },
+  { label: 'LA Area (A4C)', id: 'f-laArea' },
+  { label: 'MAPSE lateral (A4C)', id: 'f-mapse' },
+  { label: 'MV Peak E Vel (A4C)', id: 'f-eWave' },
+  { label: 'MV Peak A Vel (A4C)', id: 'f-aWave' },
+  { label: "Lat E' (A4C)", id: 'f-eLateral' },
+  { label: "Lat S' (A4C)", id: 'f-lvSPrime' },
+  { label: "Sep E' (A4C)", id: 'f-eSeptal' },
+  { label: "Sep S' (A4C)" },
+  { label: 'TAPSE (A4C)', id: 'f-tapse' },
+  { label: "RV S' (A4C)", id: 'f-rvS' },
+  { label: 'EF% Simpsons Bi-plane (auto-calculated on echo machine)', id: 'f-efSimpsonBiplane' },
+  { label: 'LVEDV (A4C) - optional if EF not auto-calculated' },
+  { label: 'LVESV (A4C) optional if EF not auto-calculated' },
+  { label: 'LVEDV (A2C) - optional if EF not auto-calculated' },
+  { label: 'LVESV (A2C) - optional if EF not auto-calculated' },
+  { label: 'LVEDV BP' },
+  { label: 'LVESV BP' },
+  { label: 'EF% Simpsons Bi-plane (calculated from above volumes)' },
+  { label: 'RA Area (A4C or RV focussed view)', id: 'f-raArea' },
+  { label: 'RV Basal Diameter (RV focussed view)', id: 'f-rvBasalDiam' },
+  { label: 'RV Mid Diameter A4C (RV focussed view)', id: 'f-rvMidDiam' },
+  { label: 'RV Longitudinal A4C (RV focussed view)', id: 'f-rvLongDiam' },
+  { label: 'RV end diastolic area (RV focussed view)', id: 'f-rvEDA' },
+  { label: 'RV end systolic area (RV focussed view)', id: 'f-rvESA' },
+  { label: 'RV Fractional Area Change (FAC)', value: () => getFACCalc() },
+  { label: 'LVOT VTI (end expiration)', id: 'f-lvotVTI' },
+  { label: 'LVOT VTI (end inspiration - for fluid responsiveness)' },
+  { label: 'LVOT Vmax (end expiration)' },
+  { label: 'LVOT Vmax (end inspiration - for fluid responsiveness)' },
+  { label: 'LVOT Vmax % variability with respiration (autocalculated from above)' },
+  { label: 'AV Vmax (end expiration)' },
+  { label: 'RV Free Wall', id: 'f-rvWallThick' },
+  { label: 'Pericardial effusion diameter' },
+  { label: 'IVC diameter (expiration)', id: 'f-ivcDiam' },
+  { label: 'Renal Interlobular Artery diastolic peak velocity', id: 'f-rriEDV' },
+  { label: 'Renal Interlobular Artery systolic peak velocity', id: 'f-rriPSV' },
+  { label: 'Aortic Arch (Supra-sternal)', id: 'f-aortaArchDiam' },
+  { label: 'Descending Aorta (A2C)', id: 'f-aortaDescDiam' },
+  { label: 'Abdominal Aorta', id: 'f-aortaAbdDiam' }
+];
+
+function getQuickDataInputValues() {
+  return QUICK_DATA_INPUT_FIELDS.map(field => {
+    const raw = field.value ? field.value() : (field.id ? getVal(field.id) : '');
+    return raw == null ? '' : String(raw).trim();
+  });
+}
+
+function getQuickDataInputText() {
+  return getQuickDataInputValues().join('\n');
+}
+
+function getQuickDataInputBlankCount() {
+  return getQuickDataInputValues().filter(v => !v).length;
+}
+
+function openQuickDataInputTextView() {
+  closeExportDropdown();
+  const titleEl = document.getElementById('plainTextReportTitle');
+  const instructions = document.getElementById('quickDataInputInstructions');
+  const pre = document.getElementById('plainTextReportBody');
+  const overlay = document.getElementById('plainTextReportOverlay');
+  if (titleEl) titleEl.textContent = "Export for TOTEM FUSIC HD Reporting Tool";
+  if (instructions) instructions.hidden = false;
+  if (pre) {
+    pre.textContent = getQuickDataInputText();
+    pre.dataset.copyKind = 'quickData';
+  }
+  overlay?.classList.add('open');
+  if (overlay) overlay.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  const blanks = getQuickDataInputBlankCount();
+  showToast(`${QUICK_DATA_INPUT_FIELDS.length} rows ready; ${blanks} blank ${blanks === 1 ? 'cell' : 'cells'} preserved`, 'success');
+}
+
 let __fhdLogoDataUrl = '';
 async function preloadFhdLogo() {
   try {
@@ -11263,6 +11668,7 @@ const NONFUSIC_HD_EXPORT_MEASURE_OPTIONS = [
   { id: 'toggle-show-pasp-field', label: 'PASP (estimated)' },
   { id: 'toggle-show-rv-lv-basal-ratio', label: 'RV:LV basal diameter ratio' },
   { id: 'toggle-show-tapse-pasp-ratio', label: 'TAPSE / PASP ratio' },
+  { id: 'toggle-show-rvot-vti', label: 'RVOT VTI' },
   { id: 'toggle-show-ea-field', label: 'E/A ratio' },
   { id: 'toggle-show-lv-fractional-shortening', label: 'LV fractional shortening' },
   { id: 'toggle-show-rwt', label: 'Relative wall thickness' },
@@ -11372,9 +11778,13 @@ function buildExportRows() {
   blank();
   rows.push({ t:'meta', label:'Report Type',   value: 'FUSIC HD' });
   const anonHdr = isStudyPseudoAnonymised();
-  rows.push({ t:'meta', label: anonHdr ? 'Scan period (month & year)' : 'Date of Scan', value: scanDate });
-  if (scanTime) rows.push({ t:'meta', label: anonHdr ? 'Time of day (AM / PM)' : 'Time of Scan', value: scanTime });
-  rows.push({ t:'meta', label:'Report Generated', value:`${nd} ${nt.slice(0,2)}:${nt.slice(2,4)}:${nt.slice(4,6)}` });
+  if (anonHdr) {
+    rows.push({ t:'meta', label:'Scan period (month & year)', value: scanDate });
+    if (scanTime) rows.push({ t:'meta', label:'Time of day (AM / PM)', value: scanTime });
+  } else {
+    rows.push({ t:'meta', label:'Study Date', value: formatStudyDateTime(scanDate, scanTime) });
+  }
+  rows.push({ t:'meta', label:'Report Generated', value: formatStudyDateTime(nd, `${nt.slice(0,2)}:${nt.slice(2,4)}`) });
   rows.push({ t:'meta', label:'Operator',      value: getVal('f-operatorName') || 'Not specified' });
   rows.push({ t:'meta', label:'Supervision',   value: getSupervisionLabel() });
   if (getVal('f-imageQuality')) rows.push({ t:'meta', label:'Image Quality', value: getVal('f-imageQuality') });
@@ -11390,8 +11800,9 @@ function buildExportRows() {
   // 1. Demographics
   section('PATIENT DEMOGRAPHICS', () => {
     row('Patient Name', getVal('f-patientName'));
-    row('Patient ID / Reference', getVal('f-patientId'));
+    row('Patient ID', getVal('f-patientId'));
     const sex = getVal('f-sex'); row('Sex', sex === 'male' ? 'Male' : sex === 'female' ? 'Female' : '');
+    if (!isStudyPseudoAnonymised()) row('Date of Birth', formatStudyDateTime(getVal('f-dob'), ''));
     rowU(isStudyPseudoAnonymised() ? 'Age (band)' : 'Age', getVal('f-age'), isStudyPseudoAnonymised() ? '' : 'years');
     if (needsAnthropometricsForBSA()) {
       rowU('Weight', getVal('f-weight'), 'kg');
@@ -11414,14 +11825,33 @@ function buildExportRows() {
     const map = getMAPCalc();
     if (map) rowU(isAutoCalcManual(document.getElementById('map-display-input')) ? 'Mean Arterial Pressure — manually entered' : 'Mean Arterial Pressure', map, 'mmHg');
     row('Ventilation', getVal('f-ventilation'));
+    {
+      const ventMode = getVal('f-ventilation');
+      if (['Self-Vent: Oxygen', 'Self-Vent: CPAP', 'Self-Vent: BiPAP', 'Ventilated'].includes(ventMode))
+        rowU('FiO\u2082', getVal('f-fio2'), '%');
+      if (['Self-Vent: CPAP', 'Self-Vent: BiPAP', 'Ventilated'].includes(ventMode))
+        rowU('PEEP', getVal('f-peep'), 'cmH\u2082O');
+      if (ventMode === 'Self-Vent: BiPAP')
+        rowU('IPAP', getVal('f-ipap'), 'cmH\u2082O');
+      if (ventMode === 'Ventilated') {
+        row('Ventilatory Mode', getVal('f-ventilatory-mode'));
+        rowU('Pplat', getVal('f-pplat'), 'cmH\u2082O');
+        rowU('Tidal Volume', getVal('f-tidal-volume'), 'mL');
+        const tvmlkg = getTVmLkgCalc();
+        if (tvmlkg) rowU('Tidal Volume', tvmlkg, 'mL/kg');
+      }
+    }
     rowU('CVP', getVal('f-cvp'), 'mmHg');
     row('CVS Drugs', selectedCVSDrugs.size ? [...selectedCVSDrugs].join(', ') : '');
     syncCvsDrugDetailValuesFromDOM();
     [...selectedCVSDrugs].sort((a, b) => a.localeCompare(b)).forEach(drug => {
       const det = (cvsDrugDetailValues[drug] || '').trim();
-      if (det) row(`${drug} — specifics`, det);
+      if (det) row(drug, det);
     });
-    row('Clinical Indication', getVal('f-indication'));
+    {
+      const ind = getVal('f-indication');
+      if (ind) rows.push({ t: 'indicationRow', value: ind });
+    }
   });
 
   // 2. LV
@@ -11546,8 +11976,8 @@ function buildExportRows() {
     rowU('RV longitudinal diameter', getVal('f-rvLongDiam'), 'mm');
     rowU('RVOT proximal', getVal('f-rvotProx'), 'mm');
     rowU('RV wall thickness', getVal('f-rvWallThick'), 'mm');
-    row('Visual impression — longitudinal systolic function', getVal('f-rvVisLongitudinal'));
-    row('Visual impression — radial systolic function', getVal('f-rvVisRadial'));
+    row('Visual longitudinal systolic function', getVal('f-rvVisLongitudinal'));
+    row('Visual radial systolic function', getVal('f-rvVisRadial'));
     rowU('RV end-diastolic area', getVal('f-rvEDA'), 'cm²');
     rowU('RV end-systolic area', getVal('f-rvESA'), 'cm²');
     const fac = getFACCalc();
@@ -11560,6 +11990,7 @@ function buildExportRows() {
     }
     rowU('TAPSE', getVal('f-tapse'), 'mm');
     if (isMachineTDIEnabled()) rowU('RV S′', getVal('f-rvS'), 'cm/s');
+    if (document.getElementById('toggle-show-rvot-vti')?.checked) rowU('RVOT VTI', getVal('f-rvotVTI-measure'), 'cm');
     const phRisk = isMachineCWDEnabled() ? getTRVmaxPHRiskExportText() : '';
     if (phRisk) row('Estimated PH risk (TR Vmax, interpreted)', phRisk);
     if (document.getElementById('toggle-show-pasp-field')?.checked && isMachineCWDEnabled()) {
@@ -11875,6 +12306,8 @@ function formatExportRowsAsPlainText(rows) {
       for (let i = 1; i <= 17; i++) groups[st[i]||0].push(i);
       const mn = RWMA.MNAMES, nm = RWMA.NAMES;
       [1,2,3].forEach(s => { if (groups[s].length) lines.push(`  ${mn[s]}: ${groups[s].map(n => `${n} (${nm[n]})`).join(', ')}`); });
+    } else if (r.t === 'indicationRow') {
+      lines.push(`Indication: ${r.value}`);
     } else if (r.t === 'row') {
       const raw = r.label;
       const name = raw.trim();
@@ -11957,7 +12390,7 @@ function renderExportRowsToPrintHTML(rows) {
       metaGridOpen = false;
     }
   }
-  function flushFieldPairs(padOddWithEmpty) {
+  function flushFieldPairs(padOddWithEmpty, emptyClass = 'print-fld-empty') {
     while (fieldPairBuffer.length >= 2) {
       const a = fieldPairBuffer.shift();
       const b = fieldPairBuffer.shift();
@@ -11968,8 +12401,8 @@ function renderExportRowsToPrintHTML(rows) {
       parts.push(
         a.k,
         a.v,
-        '<div class="print-fld-k print-fld-empty" aria-hidden="true">&nbsp;</div>',
-        '<div class="print-fld-v print-fld-empty" aria-hidden="true">&nbsp;</div>'
+        `<div class="print-fld-k ${emptyClass}" aria-hidden="true">&nbsp;</div>`,
+        `<div class="print-fld-v ${emptyClass}" aria-hidden="true">&nbsp;</div>`
       );
     }
   }
@@ -12015,6 +12448,8 @@ function renderExportRowsToPrintHTML(rows) {
         parts.push(`<h1 class="print-doc-title">${esc(r.value)}</h1>`);
       }
     } else if (r.t === 'blank') {
+      closeMeta();
+      closeSection();
       parts.push('<div class="print-blank"></div>');
     } else if (r.t === 'meta') {
       closeSection();
@@ -12072,6 +12507,16 @@ function renderExportRowsToPrintHTML(rows) {
         });
         flushFieldPairs(false);
       }
+    } else if (r.t === 'indicationRow') {
+      closeMeta();
+      if (!inSection) {
+        parts.push('<section class="print-section">');
+        inSection = true;
+      }
+      ensureFieldGridOpen();
+      flushFieldPairs(true, 'print-fld-empty print-fld-empty--line-pad');
+      parts.push(`<div class="print-fld-k print-indication-k">Indication</div>`);
+      parts.push(`<div class="print-fld-v print-indication-v">${esc(r.value)}</div>`);
     } else if (r.t === 'rwmaDiagram') {
       closeFieldGrid();
       parts.push(buildRwmaPrintSVG(r.states));
@@ -12178,6 +12623,32 @@ function doExportPrintPdf() {
     window.addEventListener('focus', cleanup, { once: true });
   }
 
+  /* Print scheduling — DO NOT SIMPLIFY this nested chain.
+     Each layer addresses a distinct browser quirk; collapsing them re-introduces
+     blank-page or stale-content prints that we have already debugged out:
+
+     1) outer requestAnimationFrame  — defers until after the current layout/paint
+        cycle so the just-injected #printReportMount markup is committed to the DOM
+        tree the renderer is using. WebKit (Safari/iOS) and older Edge will print
+        a blank page if window.print() runs in the same tick as the DOM mutation.
+
+     2) inner requestAnimationFrame  — gives the browser one further frame to apply
+        @media print styles and resolve fonts/images. Chrome on desktop occasionally
+        prints partially-styled output without this second rAF; the second rAF is
+        cheap and reliably eliminates the issue.
+
+     3) setTimeout(delayMs)          — desktop: 80ms is the empirically-determined
+        minimum for Chrome/Edge font subsetting + SVG rasterisation to stabilise.
+        Android: 400ms is needed because Chrome-Android batches paint work more
+        aggressively and the print dialog otherwise captures a half-rendered frame.
+
+     4) window.print()               — synchronous on desktop, async on Android.
+
+     5) setTimeout(cleanup, fallbackMs) — fallback teardown if the user dismisses
+        the dialog without firing 'afterprint' (Android often does this; some
+        browsers also skip the event when "Save as PDF" is chosen). 6000ms desktop
+        is comfortably longer than typical print-preview interaction; 30000ms
+        Android matches the longer time users spend in the system print sheet. */
   const delayMs = isAndroid ? 400 : 80;
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
@@ -12263,6 +12734,10 @@ function doExport() {
       for (let i = 1; i <= 17; i++) groups[st[i]||0].push(i);
       const mn = RWMA.MNAMES, nm = RWMA.NAMES;
       [1,2,3].forEach(s => { if (groups[s].length) { wsData.push([`  RWMA ${mn[s]}`, groups[s].map(n => `${n} (${nm[n]})`).join(', ')]); rStyle[sheetRi] = 'row'; sheetRi++; } });
+    } else if (r.t === 'indicationRow') {
+      wsData.push(['Indication', r.value]);
+      rStyle[sheetRi] = 'row';
+      sheetRi++;
     } else if (r.t === 'row') {
       wsData.push([r.label, r.value]);
       rStyle[sheetRi] = 'row';
@@ -12288,6 +12763,14 @@ function doExport() {
       }
     }
   });
+
+  if (typeof XLSX === 'undefined' || !XLSX.utils) {
+    showToast(
+      'Excel export unavailable — the workbook library did not load (often because you\'re offline). Connect briefly once while online to cache it, or use Print/PDF.',
+      'warn'
+    );
+    return;
+  }
 
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(wsData);
